@@ -246,7 +246,7 @@ class JobManager:
                 # If the job is alive, do nothing
                 message = 'IGNORED: Job %s' % job.state
 
-            elif job.state in ["FAILED", "CANCELLED"]:
+            elif job.state in ["FAILED", "CANCELLED", "INTERRUPTED"]:
                 message = "SUBMITTED: Retrying %s Job" % job.state
                 job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=job)
                 job_id = job_dict['job_id']
