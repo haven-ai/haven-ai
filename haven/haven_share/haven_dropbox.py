@@ -1,8 +1,8 @@
 import os 
 import tqdm
 import shutil
-from . import haven_utils as hu 
-from . import haven_jupyter as hj
+from .. import haven_utils as hu 
+from .. import haven_jupyter as hj
 
 
 def to_dropbox(exp_list, savedir_base, dropbox_path, access_token, zipname):

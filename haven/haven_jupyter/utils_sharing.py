@@ -10,6 +10,7 @@ import copy
 import pprint
 import pandas as pd 
 
+
 try:
     import ast
     from ipywidgets import Button, HBox, VBox
@@ -60,7 +61,7 @@ def share_tab(self, output):
         def on_upload_clicked(b):
             fname = 'results.zip'
             bdownload_out_dropbox.clear_output()
-            self.vars['fname_list'] = get_list_from_str(l_fname_list.value)
+            self.vars['fname_list'] = hu.get_list_from_str(l_fname_list.value)
             self.vars['dropbox_path'] = l_dropbox_path.value
             self.vars['access_token'] = l_access_token_path.value
             with bdownload_out_dropbox:
@@ -76,7 +77,7 @@ def share_tab(self, output):
         def on_download_clicked(b):
             fname = 'results.zip'
             bdownload_out.clear_output()
-            self.vars['fname_list'] = get_list_from_str(l_fname_list.value)
+            self.vars['fname_list'] = hu.get_list_from_str(l_fname_list.value)
 
             with bdownload_out:
                 self.rm.to_zip(savedir_base='', fname=fname, 
