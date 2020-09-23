@@ -25,8 +25,8 @@ $ pip install --upgrade git+https://github.com/haven-ai/haven
 |Section| Description|
 |:-------------|:-------------|
 |1. [Features](#features)|See the features that Haven can offer.|
-|2. [Getting Started](https://github.com/IssamLaradji/haven/tree/master/getting_started.ipynb)|Start using Haven by following the [Jupyter notebook](https://github.com/IssamLaradji/haven/tree/master/getting_started.ipynb).|
-|3. [Minimal Example](https://github.com/IssamLaradji/haven/tree/master/examples/minimal)|Check out a minimal example project based on Haven's workflow.|
+|2. [Getting Started](https://github.com/haven-ai/haven/tree/master/getting_started.ipynb)|Start using Haven by following the [Jupyter notebook](https://github.com/haven-ai/haven/tree/master/getting_started.ipynb).|
+|3. [Minimal Example](https://github.com/haven-ai/haven/tree/master/examples/minimal)|Check out a minimal example project based on Haven's workflow.|
 |4. [Havenized Projects](#havenized-projects)|Check out some projects that are built on Haven.|
 
 
@@ -81,7 +81,7 @@ Haven's workflow provides the following features:
 
 The following are example projects built using this library.
 
-- [Minimal](https://github.com/IssamLaradji/haven/tree/master/examples/minimal) - we recommend this example as a starting point for using Haven.
+- [Minimal](https://github.com/haven-ai/haven/tree/master/examples/minimal) - we recommend this example as a starting point for using Haven.
 - [Embedding Propagation](https://github.com/ElementAI/embedding-propagation)
 - [Counting with LCFCN](https://github.com/ElementAI/LCFCN)
 - [Sps optimizer](https://github.com/IssamLaradji/sps)
@@ -92,17 +92,17 @@ The following are example projects built using this library.
 
 #### 1. Write the codebase
 
-A [minimal](https://github.com/IssamLaradji/haven/tree/master/examples/minimal) codebase can include the following 4 files. Each of these files is hyper-linked to a template source code.
+A [minimal](https://github.com/haven-ai/haven/tree/master/examples/minimal) codebase can include the following 4 files. Each of these files is hyper-linked to a template source code.
 
-- [`exp_configs.py`](https://github.com/IssamLaradji/haven/tree/master/examples/minimal/exp_configs.py) contains experiment groups for MNIST. Below we define two sets of hyper-parameters for experiment group `mnist`.
+- [`exp_configs.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/exp_configs.py) contains experiment groups for MNIST. Below we define two sets of hyper-parameters for experiment group `mnist`.
 ```python
 EXP_GROUPS = {'mnist':
                 [{'lr':1e-3, 'model':'mlp', 'dataset':'mnist'},
                  {'lr':1e-4, 'model':'mlp', 'dataset':'mnist'}]}
 ```
-- [`trainval.py`](https://github.com/IssamLaradji/haven/tree/master/examples/minimal/trainval.py) contains the main training and validation loop for an experiment.
-- [`datasets.py`](https://github.com/IssamLaradji/haven/tree/master/examples/minimal/datasets.py) contains the code for acquiring a Pytorch dataset.
-- [`models.py`](https://github.com/IssamLaradji/haven/tree/master/examples/minimal/models.py) contains the code for acquiring a Pytorch model.
+- [`trainval.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/trainval.py) contains the main training and validation loop for an experiment.
+- [`datasets.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/datasets.py) contains the code for acquiring a Pytorch dataset.
+- [`models.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/models.py) contains the code for acquiring a Pytorch model.
 
 #### 2. Run the Experiments
 
@@ -120,7 +120,7 @@ python trainval.py -e mnist -sb ../results -r 1
 
 The orkestrator allows us to run all the experiments in parallel. Note that we will be able to view their status and logs using the visualization script in Section 4. To request access to the orkestrator please visit the [orkestrator website](https://www.elementai.com/products/ork).
 
-Define a job configuration  and add it to [`trainval.py`](https://github.com/IssamLaradji/haven/tree/master/examples/minimal/trainval.py) (see example),
+Define a job configuration  and add it to [`trainval.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/trainval.py) (see example),
 
 ```
 job_config = {'data': <data>,
