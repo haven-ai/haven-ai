@@ -16,7 +16,7 @@ Haven is a library for managing and visualizing heavy-scale experiments. It is d
 
 ### Install
 ```
-$ pip install --upgrade git+https://github.com/haven-ai/haven
+$ pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ```
 
 
@@ -25,8 +25,8 @@ $ pip install --upgrade git+https://github.com/haven-ai/haven
 |Section| Description|
 |:-------------|:-------------|
 |1. [Features](#features)|See the features that Haven can offer.|
-|2. [Getting Started](https://github.com/haven-ai/haven/tree/master/getting_started.ipynb)|Start using Haven by following the [Jupyter notebook](https://github.com/haven-ai/haven/tree/master/getting_started.ipynb).|
-|3. [Minimal Example](https://github.com/haven-ai/haven/tree/master/examples/minimal)|Check out a minimal example project based on Haven's workflow.|
+|2. [Getting Started](https://github.com/haven-ai/haven-ai/tree/master/getting_started.ipynb)|Start using Haven by following the [Jupyter notebook](https://github.com/haven-ai/haven-ai/tree/master/getting_started.ipynb).|
+|3. [Minimal Example](https://github.com/haven-ai/haven-ai/tree/master/examples/minimal)|Check out a minimal example project based on Haven's workflow.|
 |4. [Havenized Projects](#havenized-projects)|Check out some projects that are built on Haven.|
 
 
