@@ -84,7 +84,7 @@ jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter notebook
 ```
 
-### 2.2 Run Jupyter script to visualize
+### 2.2 Run Jupyter script to visualize dashboard
 
 Run the following script from a Jupyter cell to launch a dashboard.
 
