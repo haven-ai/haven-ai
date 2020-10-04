@@ -16,6 +16,9 @@
 
 - This library could strongly boost productivity for building great products, winning machine learning competitions, and getting research papers published. 
 
+- The only structure required is that each has experiment has the following.
+    * `<savedir_base>/<exp_id>/exp_dict.json` that defines the hyperparamters.
+    * `<savedir_base>/<exp_id>/score_list.pkl` that has a list of dicts where each dict contains metrics as keys with scores as their values.
 
 
 ## Install
