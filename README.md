@@ -5,153 +5,80 @@
 
 
 
-Haven is a library for managing and visualizing heavy-scale reproducible experiments. It is designed to be simple while still being flexible enough for more complex experimentation workflow. In few steps, Haven helps researchers and developers find the best configuration for their model at large scale.
+- Haven is a library for building, managing and visualizing large-scale reproducible experiments. It helps developers establish a workflow that allows them to quickly prototype a reliable codebase. It also helps them easily  scale that codebase to one that can run, manage, and visualize thousands of experiments seamlessly. 
 
-### Install
+- The library provide a wide range of functionality including best practices for defining experiments, checkpointing, visualizing and debugging experiments, and ensuring reproducible benchmarks. 
+
+- This library could strongly boost productivity for building great products, winning machine learning competitions, and getting research papers published. 
+
+
+## Install
 ```
 $ pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ```
 
 
-## Table of Contents 
-
-|Section| Description|
-|:-------------|:-------------|
-|1. [Features](#features)|See the features that Haven can offer.|
-|2. [Getting Started](https://github.com/haven-ai/haven-ai/tree/master/getting_started.ipynb)|Start using Haven by following the [Jupyter notebook](https://github.com/haven-ai/haven-ai/tree/master/getting_started.ipynb).|
-|3. [Minimal Example](https://github.com/haven-ai/haven-ai/tree/master/examples/minimal)|Check out a minimal example project based on Haven's workflow.|
-|4. [Havenized Projects](#havenized-projects)|Check out some projects that are built on Haven.|
-
-
-
-
-<!-- /home/issam/Research_Ground/haven/ -->
-
-## Features
-
-
-Haven's workflow provides the following features:
-
-#### Easy to adopt:
-
-- Users can make it work in a few minutes
-
-#### Simple to use:
-
-- Users can find the best configuration of hyperparameters for their model using a few lines of code
-
-- Users can quickly debug their code for failed experiments
-
-#### Easy to visualize:
-
-- Users can use Jupyter or Terminal to dynamically interact with the pandas DataFrame and matplotlib plots to compare between results
-
-- Users can use our Jupyter dashboard to have a flexible view of their experiments
-
-- Users can view the status of their launched experiments and their logs.
-
-#### Easy to reproduce results:
-
-- Haven keeps a copy of the code for each running experiment
-
-- Haven keeps a copy of the logs and the control flow for each experiment
-
-#### Backend agnostic:
-
-- Haven can be used in conjunction with any job scheduler to launch experiments such as slurm and the orkestrator
-
-#### Shareable results:
-
-- The results can easily be shared between developers and researchers
-
-#### Production ready:
-
-- Users can integrate Haven in their production pipeline
-
-
-
 ## Havenized Projects
 
-The following are example projects built using this library.
+- LCFCN: https://github.com/ElementAI/LCFCN
+- Embedding Propagation: https://github.com/ElementAI/embedding-propagation
+- Bilevel Augmentation: https://github.com/ElementAI/bilevel_augment
+- SSN optimizer: https://github.com/IssamLaradji/ssn
+- SLS optimizer: https://github.com/IssamLaradji/sls
+- Ada SLS optimizer: https://github.com/IssamLaradji/ada_sls
+- SPS optimizer: https://github.com/IssamLaradji/sps
+- Fish Dataset: https://github.com/alzayats/DeepFish
+- Covid Weak Supervision: https://github.com/IssamLaradji/covid19_weak_supervision
 
-- [Minimal](https://github.com/haven-ai/haven/tree/master/examples/minimal) - we recommend this example as a starting point for using Haven.
-- [Embedding Propagation](https://github.com/ElementAI/embedding-propagation)
-- [Counting with LCFCN](https://github.com/ElementAI/LCFCN)
-- [Sps optimizer](https://github.com/IssamLaradji/sps)
-- [Sls optimizer](https://github.com/IssamLaradji/sls)
-
-
-## Getting Started
-
-#### 1. Write the codebase
-
-A [minimal](https://github.com/haven-ai/haven/tree/master/examples/minimal) codebase can include the following 4 files. Each of these files is hyper-linked to a template source code.
-
-- [`exp_configs.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/exp_configs.py) contains experiment groups for MNIST. Below we define two sets of hyper-parameters for experiment group `mnist`.
-```python
-EXP_GROUPS = {'mnist':
-                [{'lr':1e-3, 'model':'mlp', 'dataset':'mnist'},
-                 {'lr':1e-4, 'model':'mlp', 'dataset':'mnist'}]}
+## Expected structure of a Havenized project
 ```
-- [`trainval.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/trainval.py) contains the main training and validation loop for an experiment.
-- [`datasets.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/datasets.py) contains the code for acquiring a Pytorch dataset.
-- [`models.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/models.py) contains the code for acquiring a Pytorch model.
-
-#### 2. Run the Experiments
-
-After writing the codebase, we can run the `mnist` experiment group by following one of the two steps below.
-
-##### 2.1 Run trainval.py in Command Line
-
-The following command launches the mnist experiments and saves their results under `../results/`.
-
-```
-python trainval.py -e mnist -sb ../results -r 1
+project/
+├── src/
+│   ├── __init__.py
+│   ├── datasets.py
+│   └── models.py
+├── scripts/
+│   ├── visualize_mnist.py
+│   └── train_on_single_image.py
+├── exp_configs.py
+├── README.md
+└── trainval.py
 ```
 
-##### 2.2 Using the orkestrator
+# Getting Started
 
-The orkestrator allows us to run all the experiments in parallel. Note that we will be able to view their status and logs using the visualization script in Section 4. To request access to the orkestrator please visit the [orkestrator website](https://www.elementai.com/products/ork).
+## 1. Run Experiments
 
-Define a job configuration  and add it to [`trainval.py`](https://github.com/haven-ai/haven/tree/master/examples/minimal/trainval.py) (see example),
 
-```
-job_config = {'data': <data>,
-            'image': <docker image>,
-            'bid': '1',
-            'restartable': '1',
-            'gpu': '4',
-            'mem': '30',
-            'cpu': '2'}
-```
 
-Then run the following command,
+### 1.1 Run experiments sequentially for MNIST across batch size
+
 
 ```
-python trainval.py -e mnist -sb ../results -r 1 -j 1
+python example.py -e mnist_batchsize -sb ../results -r 1
 ```
-The `-j 1` argument launches each experiment in `exp_list` concurrently and a job id is assigned to each experiment. 
 
-#### 3. Visualize the Results
+results are saved in `../results/`
 
-The following two steps will setup the visualization environment.
+### 1.2 Run experiments in a cluster using [Orkestrator](https://www.elementai.com/products/ork)
 
-##### 3.1 Launch Jupyter
+```
+python example.py -e mnist_batchsize -sb ../results -r 1 -j 1
+```
 
-Run the following in command line to install a Jupyter server
+
+## 2. Visualize Results
+
+![](docs/4_results.png)
+
+### 2.1 Launch a Jupyter server
+
 ```bash
 jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter notebook
 ```
 
-or if you are working using an open-ssh server, run the following instead,
-
-```
-jupyter notebook --ip 0.0.0.0 --port 9123 \
-      --notebook-dir="/home/$USER" --NotebookApp.token="password"
-```
-
-##### 3.2 Run Jupyter script
+### 2.2 Run Jupyter script to visualize
 
 Run the following script from a Jupyter cell to launch a dashboard.
 
@@ -175,11 +102,9 @@ rm = hr.ResultManager(exp_list=exp_list,
 hj.get_dashboard(rm, vars(), wide_display=True)
 ```
 
-This script outputs the following dashboard.
-
-![](examples/4_results.png)
 
 
-### Contributing
+
+## Contributing
 
 We love contributions!
