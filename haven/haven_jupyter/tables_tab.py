@@ -61,16 +61,16 @@ def tables_tab(db, output):
                 layout=db.layout_dropdown,
                 disabled=False,
             )
+    hparam_txt = widgets.Label(value="Select hyperparamters:", 
+                                    layout=widgets.Layout(width='300px'),)
+    metrics_txt = widgets.Label(value="Select metrics:", 
+                                    layout=db.layout_label,)
+    db.hparam_widget = widgets.SelectMultiple(options=db.rm.exp_params)
+    db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
 
-    hparam_widget, db.hparam_dict = columns_widget(widgets.Label(value="Hyperparameters:",
-                                        layout=db.layout_label,), db.rm.exp_params)
-    metrics_widget, db.metrics_dict = columns_widget(widgets.Label(value='Metrics:',
-                                        layout=db.layout_label,), [k for k in db.rm_original.score_keys if k is not 'None'])
-    
-    button = widgets.VBox([widgets.HBox([b_table, b_diff, b_meta, d_avg_across_txt, d_avg_across_columns]),
-                            widgets.HBox([bstatus, blogs, bfailed]),
-                            hparam_widget,
-                            metrics_widget
+    button = widgets.VBox([widgets.HBox([hparam_txt, metrics_txt]),
+                            widgets.HBox([db.hparam_widget, db.metrics_widget]),
+                            widgets.HBox([b_table, bstatus, blogs, bfailed, d_avg_across_txt, d_avg_across_columns]),
                             # widgets.HBox([d_columns_txt, d_score_columns_txt]),
                             # widgets.HBox([d_columns, d_score_columns ]),
     ])
@@ -90,8 +90,8 @@ def tables_tab(db, output):
             if avg_across_value == "None":
                 avg_across_value = None
 
-            db.vars['columns'] = [k for k in db.hparam_dict if db.hparam_dict[k].value is True]
-            db.vars['score_columns'] = [k for k in db.metrics_dict if db.metrics_dict[k].value is True]
+            db.vars['columns'] = list(db.hparam_widget.value)
+            db.vars['score_columns'] = list(db.metrics_widget.value)
             # print('cols', db.hparam_dict)
             # stop
             score_table = db.rm.get_score_table(columns=db.vars.get('columns'), 
