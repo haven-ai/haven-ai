@@ -1,8 +1,10 @@
 
 
-# Haven AI
+![](docs/images/haven_logo.png)
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+## Havenized Results
 ![](docs/images/table2.png)
 
 - Haven is a library for building, managing and visualizing large-scale reproducible experiments. It helps developers establish a workflow that allows them to quickly prototype a reliable codebase. It also helps them easily  scale that codebase to one that can run, manage, and visualize thousands of experiments seamlessly. 
@@ -70,7 +72,7 @@ python example.py -e mnist_learning_rates -sb ../results -r 1 -j 1
 
 ## 2. Visualize Results
 
-![](docs/images/table1.png)
+![](docs/images/table3.png)
 
 ### 2.1 Launch a Jupyter server
 
