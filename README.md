@@ -1,6 +1,9 @@
 
 
-![](docs/images/haven_logo.png)
+
+<p align="center" width="100%">
+    <img width="80%" src="docs/images/haven_logo.png"> 
+</p>
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
