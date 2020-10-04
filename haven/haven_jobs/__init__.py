@@ -92,7 +92,7 @@ class JobManager:
                     in_parallel=True):
         exp_list = exp_list or self.exp_list
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
-        summary_dict = hr.group_list(summary_list, key='job_state', return_count=True)
+        summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
 
         print("\nTotal Experiments:", len(exp_list))
         print("Experiment Status:", summary_dict)
@@ -153,7 +153,7 @@ class JobManager:
 
     def print_job_status(self, exp_list):
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
-        summary_dict = hr.group_list(summary_list, key='job_state', return_count=False)
+        summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
         
         for k in summary_dict.keys():
             n_jobs = len(summary_dict[k])
@@ -161,7 +161,7 @@ class JobManager:
                 print('\nExperiments %s: %d' % (k, n_jobs))
                 print(pd.DataFrame(summary_dict[k]).head())
 
-        summary_dict = hr.group_list(summary_list, key='job_state', return_count=True)
+        summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
         print(summary_dict)
 
     def launch_exp_list(self, command,  exp_list=None, savedir_base=None, reset=0, in_parallel=True):

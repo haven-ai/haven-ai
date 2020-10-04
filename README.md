@@ -3,13 +3,14 @@
 # Haven AI
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-
+![](docs/images/table2.png)
 
 - Haven is a library for building, managing and visualizing large-scale reproducible experiments. It helps developers establish a workflow that allows them to quickly prototype a reliable codebase. It also helps them easily  scale that codebase to one that can run, manage, and visualize thousands of experiments seamlessly. 
 
 - The library provide a wide range of functionality including best practices for defining experiments, checkpointing, visualizing and debugging experiments, and ensuring reproducible benchmarks. 
 
 - This library could strongly boost productivity for building great products, winning machine learning competitions, and getting research papers published. 
+
 
 
 ## Install
@@ -49,13 +50,13 @@ project/
 
 ## 1. Run Experiments
 
+![](docs/images/terminal.png)
 
-
-### 1.1 Run experiments sequentially for MNIST across batch size
+### 1.1 Run experiments sequentially for MNIST across learning rates
 
 
 ```
-python example.py -e mnist_batchsize -sb ../results -r 1
+python example.py -e mnist_learning_rates -sb ../results -r 1
 ```
 
 results are saved in `../results/`
@@ -63,13 +64,13 @@ results are saved in `../results/`
 ### 1.2 Run experiments in a cluster using [Orkestrator](https://www.elementai.com/products/ork)
 
 ```
-python example.py -e mnist_batchsize -sb ../results -r 1 -j 1
+python example.py -e mnist_learning_rates -sb ../results -r 1 -j 1
 ```
 
 
 ## 2. Visualize Results
 
-![](docs/4_results.png)
+![](docs/images/table1.png)
 
 ### 2.1 Launch a Jupyter server
 
