@@ -97,8 +97,6 @@ def plots_tab(self, output):
         layout=self.layout_dropdown,
         disabled=False,
     )
-    d_avg_across_txt = widgets.Label(value="avg_across:",
-                                     layout=widgets.Layout(width='75px'),)
 
     d_avg_across_columns = widgets.Text(
         value=str(self.vars.get('avg_across', 'None')),

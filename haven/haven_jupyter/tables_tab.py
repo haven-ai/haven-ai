@@ -49,7 +49,13 @@ def tables_tab(db, output):
     b_meta = widgets.Button(description="Display Meta Table")
     b_diff = widgets.Button(description="Display Filtered Table")
 
-    button = widgets.VBox([widgets.HBox([b_table, b_diff, b_meta]),
+    d_avg_across_columns = widgets.Text(
+        value=str(db.vars.get('avg_across', 'None')),
+        description='avg_across:',
+        disabled=False
+    )
+
+    button = widgets.VBox([widgets.HBox([b_table, b_diff, b_meta, d_avg_across_columns]),
                             widgets.HBox([bstatus, blogs, bfailed]),
                             widgets.HBox([d_columns_txt, d_score_columns_txt]),
                             widgets.HBox([d_columns, d_score_columns ]),
@@ -65,13 +71,19 @@ def tables_tab(db, output):
         with output_plot:
             db.update_rm()
 
+            db.vars['avg_across'] = d_avg_across_columns.value
+            avg_across_value = db.vars.get('avg_across', 'None')
+            if avg_across_value == "None":
+                avg_across_value = None
+
             db.vars['columns'] = hu.get_list_from_str(d_columns.value)
             db.vars['score_columns'] = hu.get_list_from_str(d_score_columns.value)
             score_table = db.rm.get_score_table(columns=db.vars.get('columns'), 
                                             score_columns=db.vars.get('score_columns'),
                                             hparam_diff=db.vars.get('hparam_diff', 0),
                                             show_meta=db.vars.get('show_meta', 1),
-                                            add_prefix=True)
+                                            add_prefix=True,
+                                            avg_across=avg_across_value)
             display(score_table) 
 
     def on_job_status_clicked(b):
@@ -80,10 +92,10 @@ def tables_tab(db, output):
             db.update_rm()
             summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
                                                add_prefix=True)
-            summary_dict = hr.group_list(summary_list, key='job_state', return_count=True)
+            summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
             display(summary_dict)
 
-            summary_dict = hr.group_list(summary_list, key='job_state', return_count=False)
+            summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
 
             for state in summary_dict:
                 n_jobs = len(summary_dict[state])
@@ -121,7 +133,7 @@ def tables_tab(db, output):
             db.update_rm()
             summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
                                                add_prefix=True)
-            summary_dict = hr.group_list(summary_list, key='job_state', return_count=False)
+            summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
             if 'FAILED' not in summary_dict:
                 display('NO FAILED JOBS')
                 return

@@ -1,2 +1,0 @@
-havenai>=0.0
-baal>=0.0

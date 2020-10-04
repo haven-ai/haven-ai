@@ -1,18 +1,11 @@
-<!-- <table>
-    <thead>
-        <tr>
-            <th style="text-align:center;"><img src="docs/images/haven_logo.png" width="40%" alt="Image"></th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table> -->
+
+
+# Haven AI
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-<h1 align="center">Haven</h1>
-<h5 align="center">A workflow for organizing large-scale python experiments. If you have access to the [orkestrator](https://www.elementai.com/products/ork) or slurm, you can run and manage thousands of experiments in parallel.</h5>
 
-Haven is a library for managing and visualizing heavy-scale experiments. It is designed to be simple while still being flexible enough for more complex experimentation workflow. In few steps, Haven helps researchers and developers find the best configuration for their model at large scale.
+
+Haven is a library for managing and visualizing heavy-scale reproducible experiments. It is designed to be simple while still being flexible enough for more complex experimentation workflow. In few steps, Haven helps researchers and developers find the best configuration for their model at large scale.
 
 ### Install
 ```

@@ -14,7 +14,7 @@ import numpy as np
 import getpass
 import pprint
 from .. import haven_jupyter as hj
-from . import utils_toolkit as ho
+from . import toolkit_manager as ho
 
 
 
@@ -123,11 +123,24 @@ class JobManager:
 
         elif option == 'reset':
             self.verbose = False
-            self.launch_exp_list(command=command, exp_list=exp_list, reset=1, in_parallel=in_parallel)
+            for e_list in chunk_list(exp_list, n=100):
+                self.launch_exp_list(command=command, exp_list=e_list, reset=1, in_parallel=in_parallel)
 
         elif option == 'run':
             self.verbose = False
-            self.launch_exp_list(command=command, exp_list=exp_list, reset=0, in_parallel=in_parallel)
+            tmp_list = [s_dict['exp_dict'] for s_dict in summary_list if s_dict['job_state'] not in ['RUNNING', 
+                                                                                      'QUEUED', 
+                                                                                      'SUCCEEDED', 
+                                                                                      'QUEUING']]
+
+            print('Selected %d/%d exps' % (len(tmp_list), len(exp_list)))
+            exp_list = tmp_list
+            if len(exp_list) == 0:
+                print('All experiments have ran.')
+                return
+
+            for e_list in chunk_list(exp_list, n=100):
+                self.launch_exp_list(command=command, exp_list=e_list, reset=0, in_parallel=in_parallel)
 
         elif option == 'kill':
             self.verbose = False
@@ -494,3 +507,6 @@ def run_exp_list_jobs(exp_list,
                     token=token)
 
     jm.run()
+
+def chunk_list(my_list, n=100):
+    return [my_list[x:x+n] for x in range(0, len(my_list), n)]

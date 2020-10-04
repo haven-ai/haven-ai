@@ -22,8 +22,46 @@ try:
 except:
     print('widgets not available...')
 
-def latex_tab():
-    pass
+def latex_tab(self, output):
+    kwargs = {}
+
+    filter_dict = self.vars.get('filter_dict', {})
+    map_row_dict_dict = self.vars.get('map_row_dict_dict', {})
+    map_col_dict = self.vars.get('map_col_dict', {})
+    table = (self.rm.get_score_table())
+    # map columns
+    table2 = pd.DataFrame()
+    for col_old, col_new in map_col_dict.items():
+        # map column
+        table2[col_new] = table[col_old]
+        
+        # map rows
+        if col_old in map_row_dict_dict:
+            map_row_dict = map_row_dict_dict[col_old]
+            table2[col_new] = table2[col_new].apply( lambda x: map_row_dict[x.replace("'","")] if x.replace("'","") in map_row_dict else x )
+        
+    # filter dict
+    conds = None
+    for k, v in filter_dict.items():
+        if not isinstance(v, list):
+            v = [v]
+#         print(k, v)
+        for vi in v:
+            cond = table2[k] == vi
+            if conds is None:
+                conds = cond
+            else:
+                conds = conds | cond
+        
+        table2 = table2[conds]
+        table2 = table2.set_index(k)
+        print(v)
+        table2 = table2.reindex(v)
+        table2.insert(0, k, table2.index)
+        table2 = table2.reset_index(drop=True)
+        
+    with output:
+        display(table2.to_latex(**kwargs))
 
 def create_latex_table(table, filter_dict, map_row_dict_dict, map_col_dict, **kwargs):
     '''
@@ -68,36 +106,4 @@ def create_latex_table(table, filter_dict, map_row_dict_dict, map_col_dict, **kw
                                     index=False))
                                     
     '''
-    # map columns
-    table2 = pd.DataFrame()
-    for col_old, col_new in map_col_dict.items():
-        # map column
-        table2[col_new] = table[col_old]
-        
-        # map rows
-        if col_old in map_row_dict_dict:
-            map_row_dict = map_row_dict_dict[col_old]
-            table2[col_new] = table2[col_new].apply( lambda x: map_row_dict[x.replace("'","")] if x.replace("'","") in map_row_dict else x )
-        
-    # filter dict
-    conds = None
-    for k, v in filter_dict.items():
-        if not isinstance(v, list):
-            v = [v]
-#         print(k, v)
-        for vi in v:
-            cond = table2[k] == vi
-            if conds is None:
-                conds = cond
-            else:
-                conds = conds | cond
-        
-        table2 = table2[conds]
-        table2 = table2.set_index(k)
-        print(v)
-        table2 = table2.reindex(v)
-        table2.insert(0, k, table2.index)
-        table2 = table2.reset_index(drop=True)
-        
-
-    return table2.to_latex(**kwargs)
+    pass

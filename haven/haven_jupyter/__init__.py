@@ -4,11 +4,11 @@ from .. import haven_results as hr
 from .. import haven_utils as hu
 from .. import haven_share as hd
 
-from .utils_sharing import share_tab
-from .utils_plots import plots_tab
-from .utils_tables import tables_tab
-from .utils_latex import latex_tab
-from .utils_images import images_tab
+from .share_tab import share_tab
+from .plots_tab import plots_tab
+from .tables_tab import tables_tab
+from .latex_tab import latex_tab
+from .images_tab import images_tab
 from . import utils_widgets as uw
 
 import os
@@ -105,14 +105,16 @@ class DashboardManager:
         plots = widgets.Output()
         images = widgets.Output()
         share = widgets.Output()
+        latex = widgets.Output()
 
         main_out = widgets.Output()
         # Display tabs
-        tab = widgets.Tab(children=[tables, plots, images, share])
+        tab = widgets.Tab(children=[tables, plots, images, share, latex])
         tab.set_title(0, 'Tables')
         tab.set_title(1, 'Plots')
         tab.set_title(2, 'Images')
         tab.set_title(3, 'Share Results')
+        tab.set_title(4, 'Latex')
 
         with main_out:
             display(tab)
@@ -120,12 +122,14 @@ class DashboardManager:
             plots.clear_output()
             images.clear_output()
             share.clear_output()
+            latex.clear_output()
 
             # show tabs
             tables_tab(self, tables)
             plots_tab(self, plots)
             images_tab(self, images)
             share_tab(self, share)
+            latex_tab(self, latex)
 
         display(main_out)
 

@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     exp_list = [{'model':{'name':'mlp', 'n_layers':20}, 
                 'dataset':'mnist', 'batch_size':1}]
-    savedir_base = '/mnt/results/test'
+    savedir_base = '.tmp'
 
     
     jm = hjb.JobManager(exp_list=exp_list, 

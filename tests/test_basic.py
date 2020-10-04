@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
         hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict),
                      'exp_dict.json'), exp_dict)
         # check if score_list can be loaded and viewed in pandas
-        exp_list = hr.get_exp_list(savedir_base=savedir_base)
+        exp_list = hu.get_exp_list(savedir_base=savedir_base)
         
         score_lists = hr.get_score_lists(exp_list, savedir_base=savedir_base)
         assert(score_lists[0][0]['acc'] == 0.5)
@@ -108,7 +108,7 @@ class Test(unittest.TestCase):
         hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict2),
                      'exp_dict.json'), exp_dict)
         # check if score_list can be loaded and viewed in pandas
-        exp_list = hr.get_exp_list(savedir_base=savedir_base)
+        exp_list = hu.get_exp_list(savedir_base=savedir_base)
         
         score_df = hr.get_score_df(exp_list, savedir_base=savedir_base)
         
@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
         hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict),
                      'exp_dict.json'), exp_dict)
         # check if score_list can be loaded and viewed in pandas
-        exp_list = hr.get_exp_list(savedir_base=savedir_base)
+        exp_list = hu.get_exp_list(savedir_base=savedir_base)
         
         fig, axis = hr.get_plot(exp_list,
              savedir_base=savedir_base,
@@ -204,6 +204,8 @@ class Test(unittest.TestCase):
         # for exp_list in rm.exp_groups:
         #     assert(exp_list[0]['dataset'] in ['mnist', 'cifar10'])
         rm.get_exp_list_df()
+        rm.get_score_df(avg_across='dataset')
+        rm.get_score_df(avg_across='dataset', add_prefix=True)
         rm.get_score_df()
         rm.get_score_lists()
         rm.get_images()
@@ -242,15 +244,15 @@ class Test(unittest.TestCase):
             'mnist','cifar10'], 
                         'model':'mlp', 'batch_size':[1, 5]})
         
-        exp_list1 = hr.filter_exp_list(exp_list, 
+        exp_list1 = hu.filter_exp_list(exp_list, 
                             filterby_list=[{'dataset': 'mnist'}])
 
-        exp_list2 = hr.filter_exp_list(exp_list, 
+        exp_list2 = hu.filter_exp_list(exp_list, 
                             filterby_list=[
                                             [{'dataset':'mnist'}]
                                            ])
 
-        exp_list = hr.filter_exp_list(exp_list, 
+        exp_list = hu.filter_exp_list(exp_list, 
                             filterby_list=[{'dataset':'mnist'},
                                             {'dataset':'cifar10'}])
         visited = []
@@ -267,10 +269,10 @@ class Test(unittest.TestCase):
             'mnist','cifar10'], 
                         'model':'mlp', 'batch_size':[1, 5], 'mode':{'fset':1}})
 
-        list_of_exp_list = hr.group_exp_list(exp_list,
+        list_of_exp_list = hu.group_exp_list(exp_list,
                              groupby_list=['dataset', ['mode','fset']])
 
-        list_of_exp_list = hr.group_exp_list(exp_list,
+        list_of_exp_list = hu.group_exp_list(exp_list,
                              groupby_list='dataset')
         for exp_list in list_of_exp_list:
             assert(len(set([exp_dict['dataset'] for exp_dict in exp_list])) 
@@ -295,7 +297,7 @@ class Test(unittest.TestCase):
         hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict_2),
                      'score_list.pkl'), score_list)
 
-        best_exp_list = hr.filter_exp_list([exp_dict_1, exp_dict_2], savedir_base=savedir_base,
+        best_exp_list = hu.filter_exp_list([exp_dict_1, exp_dict_2], savedir_base=savedir_base,
                             filterby_list=[({'model.name':'mlp'}, 
                                     {'best':{'avg_across':'run',
                                               'metric':'acc', 
@@ -304,7 +306,7 @@ class Test(unittest.TestCase):
         assert len(best_exp_list) == 1
         assert best_exp_list[0]['model']['n_layers'] == 35
 
-        best_exp_list = hr.filter_exp_list([exp_dict_1, exp_dict_2], savedir_base=savedir_base,
+        best_exp_list = hu.filter_exp_list([exp_dict_1, exp_dict_2], savedir_base=savedir_base,
                             filterby_list=[({'model.name':'mlp'}, 
                                     {'best':{'avg_across':'run',
                                               'metric':'acc', 
@@ -328,7 +330,7 @@ class Test(unittest.TestCase):
 
 
         exp_list = [exp_dict_1, exp_dict_2, exp_dict_3]
-        best_exp_dict = hr.get_best_exp_dict(exp_list, 
+        best_exp_dict = hu.get_best_exp_dict(exp_list, 
                             savedir_base=savedir_base, metric='acc', 
                             avg_across='run',
                             metric_agg='max',

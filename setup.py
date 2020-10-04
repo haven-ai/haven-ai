@@ -1,12 +1,12 @@
 from setuptools import setup
 import setuptools
 
-setup(name='havenai-dev',
-      version='0.6.0',
+setup(name='haven-ai',
+      version='0.1.0',
       description='Manage large-scale experiments',
-      url='https://github.com/ElementAI/haven',
+      url='https://github.com/haven-ai/haven-ai',
       maintainer='Issam Laradji',
-      maintainer_email='issam.laradji@elementai.com',
+      maintainer_email='issam.laradji@gmail.com',
       license='MIT',
       packages=setuptools.find_packages(),
       zip_safe=False,
