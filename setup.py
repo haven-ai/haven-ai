@@ -25,5 +25,6 @@ setup(name='haven-ai',
         'sklearn>=0.0',
         'torch>=0.0',
         'torchvision>=0.0',
-        'notebook >= 4.0'
+        'notebook >= 4.0',
+        'jupyter>=0.0',
       ]),
