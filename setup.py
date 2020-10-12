@@ -11,6 +11,7 @@ setup(name='haven-ai',
       packages=setuptools.find_packages(),
       zip_safe=False,
       install_requires=[
+        'requests>=0.0',
         'ipywidgets>=0.0',
         'tqdm>=0.0',
         'matplotlib>=0.0',
