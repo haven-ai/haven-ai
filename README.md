@@ -30,6 +30,7 @@ $ pip install --upgrade git+https://github.com/haven-ai/haven-ai
 
 ## Havenized Projects
 
+- COVID19: https://www.elementai.com/news/2020/accelerating-the-creation-of-ai-models-to-combat-covid-19-with-element-ai-orkestrator?fbclid=IwAR33nO8gqq7Bf8F4NyG3WYlH3c7t7QkgPAZEru4UpP2FGzSYfHZ5nnPLKZI
 - LCFCN: https://github.com/ElementAI/LCFCN
 - Embedding Propagation: https://github.com/ElementAI/embedding-propagation
 - Bilevel Augmentation: https://github.com/ElementAI/bilevel_augment
