@@ -230,12 +230,26 @@ class MLP(nn.Module):
         return probs.argmax(dim=1)
 
 
+JOB_CONFIG = {'image': 'registry.console.elementai.com/%s/ssh' % 
+                      os.environ['EAI_ACCOUNT_ID'] ,
+      'data': ['eai.colab.public:/mnt/public'],
+      'restartable':True,
+      'resources': {
+          'cpu': 4,
+          'mem': 8,
+          'gpu': 1
+      },
+      'interactive': False,
+      'bid':9999,
+      }
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-e', '--exp_group_list', nargs='+')
     parser.add_argument('-sb', '--savedir_base', required=True)
     parser.add_argument('-r', '--reset',  default=0, type=int)
+    parser.add_argument('-j', '--run_jobs',  default=0, type=int)
     parser.add_argument('-ei', '--exp_id', default=None)
 
     args = parser.parse_args()
@@ -244,10 +258,28 @@ if __name__ == '__main__':
     exp_list = []
     for exp_group_name in args.exp_group_list:
         exp_list += EXP_GROUPS[exp_group_name]
+    
+    if not args.run_jobs:
+      # run experiments
+      for exp_dict in exp_list:
+          # do trainval
+          trainval(exp_dict=exp_dict,
+                   savedir_base=args.savedir_base,
+                   reset=args.reset)
+        
+    else:
+        # launch jobs
+        from haven import haven_jobs as hjb
+        import job_configs as jc
+        
+        jm = hjb.JobManager(exp_list=exp_list, 
+                    savedir_base=args.savedir_base, 
+                    account_id=os.environ['EAI_ACCOUNT_ID'],
+                    workdir=os.path.dirname(os.path.realpath(__file__)),
+                    job_config=JOB_CONFIG,
+                    )
 
-    # run experiments
-    for exp_dict in exp_list:
-        # do trainval
-        trainval(exp_dict=exp_dict,
-                 savedir_base=args.savedir_base,
-                 reset=args.reset)
+        command = ('python trainval.py -ei <exp_id> -sb %s -d %s -nw 2' %  
+                  (args.savedir_base, args.datadir))
+        print(command)
+        jm.launch_menu(command=command)
