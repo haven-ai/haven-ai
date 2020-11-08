@@ -3,7 +3,7 @@ import copy
 import hashlib
 import itertools
 from itertools import groupby
-import tqdm 
+import tqdm, pprint
 import numpy as np
 from .. import haven_utils as hu
 
@@ -38,6 +38,14 @@ def cartesian_exp_group(exp_config):
     # Convert into a list
     exp_list = []
     for exp_dict in exp_list_raw:
+        # remove hparams with None
+        if remove_none:
+            to_remove = []
+            for k, v in exp_dict.items():
+                if v is None:
+                    to_remove += [k]
+            for k in to_remove:
+                del exp_dict[k]
         exp_list += [exp_dict]
 
     return exp_list

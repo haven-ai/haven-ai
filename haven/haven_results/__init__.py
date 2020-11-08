@@ -15,6 +15,7 @@ from .. import haven_utils as hu
 from .. import haven_share as hd
 from .tables_scores import *
 from .plots_line import *
+from . import images_fig
 # from . import tools
 
 
@@ -373,7 +374,7 @@ class ResultManager:
         [type]
             [description]
         """
-        return get_images(exp_list=self.exp_list, savedir_base=self.savedir_base, verbose=self.verbose, **kwargs)
+        return images_fig.get_images(exp_list=self.exp_list, savedir_base=self.savedir_base, verbose=self.verbose, **kwargs)
 
     def get_job_summary(self, columns=None, add_prefix=False, **kwargs):
         """[summary]
@@ -420,102 +421,6 @@ class ResultManager:
 
 
 
-def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
-                   figsize=(12,12), legend_list=None,
-                   dirname='images', verbose=True):
-    """[summary]
-    
-    Parameters
-    ----------
-    exp_list : list
-        A list of experiments, each defines a single set of hyper-parameters
-    savedir_base : str
-        A directory where experiments are saved
-    n_exps : int, optional
-        [description], by default 3
-    n_images : int, optional
-        [description], by default 1
-    height : int, optional
-        [description], by default 12
-    width : int, optional
-        [description], by default 12
-    legend_list : [type], optional
-        [description], by default None
-    dirname : str, optional
-        [description], by default 'images'
 
-    Returns
-    -------
-    fig_list : list
-        a list of pylab figures
-
-    Example
-    -------
-    >>> from haven import haven_results as hr
-    >>> savedir_base='../results/isps/'
-    >>> exp_list = hr.get_exp_list(savedir_base=savedir_base, 
-    >>>                            filterby_list=[{'sampler':{'train':'basic'}}])
-    >>> hr.get_images(exp_list, savedir_base=savedir_base)
-    """
-    fig_list = []
-    exp_count = 0
-    for k, exp_dict in enumerate(exp_list):
-        
-        if exp_count >= n_exps:
-            if verbose:
-                print('displayed %d/%d experiment images' % (k, n_exps))
-            break
-
-        result_dict = {}
-        if legend_list is None:
-            label = hu.hash_dict(exp_dict)
-        else:
-            label = '_'.join([str(exp_dict.get(k)) for
-                                k in legend_list])
-
-        exp_id = hu.hash_dict(exp_dict)
-        result_dict['exp_id'] = exp_id
-        if verbose:
-            print('Displaying Images for Exp:', exp_id)
-        savedir = os.path.join(savedir_base, exp_id)
-
-        base_dir = os.path.join(savedir, dirname)
-        img_list = glob.glob(os.path.join(base_dir, '*.jpg'))
-        img_list += glob.glob(os.path.join(base_dir, '*.png'))
-
-        img_list.sort(key=os.path.getmtime)
-        img_list = img_list[::-1]
-        img_list = img_list[:n_images]
-
-        if len(img_list) == 0:
-            if verbose:
-                print('no images in %s' % base_dir)
-            continue
-
-        ncols = len(img_list)
-        # ncols = len(exp_configs)
-        nrows = 1
-
-        print('%s\nExperiment id: %s' % ("="*100, exp_id,))
-        for i in range(ncols):
-            img_fname = os.path.split(img_list[i])[-1]
-            fig = plt.figure(figsize=figsize)
-            try:
-                img = plt.imread(img_list[i])
-                plt.imshow(img)
-                plt.title('%s\n%s:%s' %
-                                (exp_id, label, img_fname))
-
-                plt.axis('off')
-                plt.tight_layout()
-                fig_list += [fig]
-
-            except:
-                print('skipping - %s, image corrupted' % img_fname)
-            
-            
-        exp_count += 1
-    
-    return fig_list
 
 

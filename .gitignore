@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 .idea
 .tmp
+results/
 eai-toolkit-python-client/
 eai_toolkit_client/
 tests/test_jobs_borgy.py

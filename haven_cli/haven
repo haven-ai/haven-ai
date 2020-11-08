@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+
+import haven_cli, sys, argparse, os
+from haven import haven_utils as hu
+from haven_jobs import toolkit_manager as ho
+
+
+def form(string):
+  try:
+    if '.' in string:
+        return float(string)
+    else:
+        return int(string)
+  except ValueError: 
+    return string
+
+# print(sys.argv)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-f', '--fname')
+    parser.add_argument('-m', '--method', required=True)
+    parser.add_argument('-ei', '--exp_id', required=True)
+    parser.add_argument('-sb', '--savedir_base', required=True)
+
+    parser.add_argument('-j', '--run_jobs', default=0, type=int)
+    parser.add_argument('-v', '--visualize', default=0, type=int)
+
+    args, rest = parser.parse_known_args()
+    print(args)
+    print(rest)
+
+    # assert()
+    assert os.path.dirname(args.fname) == ''
+    from importlib import import_module
+    fname = args.fname
+    if not os.path.exists(fname):
+        raise ValueError('%s not found...' % fname)
+
+    sys.path.append(os.path.dirname(fname))
+
+    name = os.path.split(fname)[-1].replace('.py','')
+    module = import_module(name) 
+
+    exp_group = {}
+    for i in range(0, len(rest), 2):
+        h_key, h_val = rest[i], rest[i+1]
+        exp_group[h_key.replace('--','')] = [form(v) for v in h_val.split(',')]
+
+    exp_list = hu.cartesian_exp_group(exp_group)
+
+    print(exp_group)
+
+    if args.exp_id is not None:
+        # select one experiment
+        savedir = os.path.join(args.savedir_base, args.exp_id)
+        exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
+
+        exp_list = [exp_dict]
+
+    if args.visualize:
+        pass
+
+    else:
+        if args.run_jobs:
+            api = ho.get_api(token=None)
+            command_list = []
+            for exp_dict in exp_list:
+                exp_id, savedir = hu.create_experiment(exp_dict, 
+                                     args.savedir_base, 
+                                     reset=0, verbose=True, copy_code=1)
+
+                if hj.skip_job(reset=True):
+                    continue
+
+                command_list += ['python %s']
+                ho.submit_job_v2(api=api, 
+                                 account_id='', 
+                                 command=command, 
+                                 job_config={}, 
+                                 savedir=savedir)
+        else:
+            for exp_dict in exp_list:
+                hu.create_experiment(exp_dict, args.savedir_base, reset=True, 
+                                    verbose=True, copy_code=1)
+                getattr(module, args.method)(exp_dict, args.savedir_base)

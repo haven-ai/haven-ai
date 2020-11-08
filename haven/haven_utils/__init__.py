@@ -25,6 +25,8 @@ from datetime import datetime
 from PIL import Image
 
 
+def get_function_from_file():
+    pass
 
 def create_command(base_command, args):
     """

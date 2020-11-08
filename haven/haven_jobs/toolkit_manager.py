@@ -52,6 +52,10 @@ def get_api(**kwargs):
 
 # Job submission
 # ==============
+def submit_job_v2(api, account_id, command, job_config, savedir):
+    workdir = os.path.join(savedir, 'code')
+    return submit_job(api, account_id, command, job_config, workdir, savedir_logs=savedir)
+
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
     job_spec = get_job_spec(job_config, command, savedir_logs, workdir=workdir)
     job = api.v1_account_job_post(account_id=account_id, human=1, job_spec=job_spec)
