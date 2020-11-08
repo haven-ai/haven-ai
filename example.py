@@ -51,6 +51,19 @@ def trainval(exp_dict, savedir):
 
     print('Experiment done')
 
+JOB_CONFIG = {'image': 'registry.console.elementai.com/%s/ssh' % 
+                      os.environ['EAI_ACCOUNT_ID'] ,
+      'data': ['eai.colab.public:/mnt/public'],
+      'restartable':True,
+      'resources': {
+          'cpu': 4,
+          'mem': 8,
+          'gpu': 1
+      },
+      'interactive': False,
+      'bid':9999,
+      }
+
 if __name__ == '__main__':
     # define a list of experiments
     exp_list = []
