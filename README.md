@@ -7,7 +7,7 @@
 
 
 
-### **Create end-to-end ML projects with the following 4 steps**
+### **Create end-to-end ML projects with the following 6 steps**
 
 ### 0. Install
 ```
@@ -81,7 +81,7 @@ jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter notebook
 ```
 
-## Run the experiments in cluster
+### 6. Run the experiments in cluster
 
 Using the `api`,
 
