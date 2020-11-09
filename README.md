@@ -70,7 +70,7 @@ python trainval.py --reset 1
 
 ### 5. Visualize 
 
-Open `trainval_results.ipynb` in Jupyter to get tables and plots
+Step 4 creates `trainval_results.ipynb`, open the file on Jupyter to get tables and plots
 
 ![](docs/images/table1.png)
 
