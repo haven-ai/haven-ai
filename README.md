@@ -7,7 +7,7 @@
 
 
 
-## Create end-to-end ML projects with the following 4 steps
+### **Create end-to-end ML projects with the following 4 steps**
 
 ### 0. Install
 ```
@@ -70,7 +70,7 @@ python trainval.py --reset 1
 
 ### 5. Visualize 
 
-Open `results.ipynb` in Jupyter to get tables and plots
+Open `trainval_results.ipynb` in Jupyter to get tables and plots
 
 ![](docs/images/table1.png)
 
