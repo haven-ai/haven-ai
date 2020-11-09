@@ -109,7 +109,7 @@ def plots_tab(self, output):
     bdownload_out = widgets.Output(layout=self.layout_button)
 
     def on_download_clicked(b):
-        fname = 'plots'
+        fname = 'plots.pdf'
         from matplotlib.backends.backend_pdf import PdfPages
         import matplotlib.pyplot as plt
 
@@ -127,8 +127,9 @@ def plots_tab(self, output):
 
     brefresh = widgets.Button(description="Display Plot")
     button = widgets.VBox([widgets.HBox([brefresh, bdownload, bdownload_out]),
-                           widgets.HBox([t_title_list, d_style]),
                            widgets.HBox([t_y_metric,  d_x_metric_columns]),
+                           widgets.HBox([t_title_list, d_style]),
+                          
                            widgets.HBox([t_groupby_list, llegend_list, ]),
                            widgets.HBox([t_mode, t_bar_agg]),
                            widgets.HBox([ltitle_format, llegend_format]),

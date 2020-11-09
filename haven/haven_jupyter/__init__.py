@@ -31,14 +31,14 @@ except:
     print('widgets not available...')
 
 
-def get_dashboard(rm, vars=None, show_jobs=True, wide_display=False):
+def get_dashboard(rm, vars=None, show_jobs=True, wide_display=False, enable_datatables=True):
     dm = DashboardManager(
-        rm, vars=vars, show_jobs=show_jobs, wide_display=wide_display)
+        rm, vars=vars, show_jobs=show_jobs, wide_display=wide_display, enable_datatables=enable_datatables)
     dm.display()
     return dm
     
 class DashboardManager:
-    def __init__(self, rm, vars=None, show_jobs=True, wide_display=True):
+    def __init__(self, rm, vars=None, show_jobs=True, wide_display=True, enable_datatables=True):
         self.rm_original = rm
         if vars is None:
             self.vars = {}
@@ -47,6 +47,7 @@ class DashboardManager:
 
         self.show_jobs = show_jobs
         self.wide_display = wide_display
+        self.enable_datatables = enable_datatables
 
         self.layout = widgets.Layout(width='100px')
         self.layout_label = widgets.Layout(width='200px')
@@ -99,8 +100,9 @@ class DashboardManager:
                               widgets.HBox(
                                   [d_exp_group, l_n_exps, self.t_filterby_list])
                               ]))
-
-        init_datatable_mode()
+        
+        if self.enable_datatables:
+            init_datatable_mode()
         tables = widgets.Output()
         plots = widgets.Output()
         images = widgets.Output()

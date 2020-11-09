@@ -61,11 +61,12 @@ def tables_tab(db, output):
                 layout=db.layout_dropdown,
                 disabled=False,
             )
-    hparam_txt = widgets.Label(value="Select hyperparamters:", 
+    hparam_txt = widgets.Label(value="Hyperparamters:", 
                                     layout=widgets.Layout(width='300px'),)
-    metrics_txt = widgets.Label(value="Select metrics:", 
-                                    layout=db.layout_label,)
     db.hparam_widget = widgets.SelectMultiple(options=db.rm.exp_params)
+
+    metrics_txt = widgets.Label(value="Metrics:", 
+                                    layout=db.layout_label,)
     db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
 
     button = widgets.VBox([widgets.HBox([hparam_txt, metrics_txt]),

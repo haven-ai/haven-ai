@@ -18,7 +18,7 @@ def get_args():
 
     return args
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id=None):
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id=None, results_fname=None):
     args = get_args()
 
     # Collect experiments
@@ -31,10 +31,16 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id
         exp_list = [exp_dict]
 
     elif exp_list is None:
+        if results_fname:
+            create_jupyter_file(fname=results_fname, savedir_base=args.savedir_base)
+
         # select exp group
         exp_list = []
         for exp_group_name in args.exp_group_list:
             exp_list += exp_groups[exp_group_name]
+    else:
+        if results_fname:
+            create_jupyter_file(fname=results_fname, savedir_base=args.savedir_base)
 
     # Run experiments
     # ===============
@@ -44,7 +50,8 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id
                                         verbose=True)
             # do trainval
             func(exp_dict=exp_dict,
-                 savedir=savedir)
+                 savedir=savedir,
+                 args=args)
     else:
         # launch jobs
         from haven import haven_jobs as hjb
@@ -61,6 +68,52 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id
 
         print(command)
         jm.launch_menu(command=command)
+
+
+def create_jupyter_file(fname, savedir_base):
+    if not os.path.exists(fname):
+        cells = [main_cell(savedir_base)]
+        save_ipynb(fname, cells)
+        print('> Open %s to visualize results' % fname)
+
+def save_ipynb(fname, script_list):
+    import nbformat as nbf
+
+    nb = nbf.v4.new_notebook()
+    nb['cells'] = [nbf.v4.new_code_cell(code) for code in
+                   script_list]
+    with open(fname, 'w') as f:
+        nbf.write(nb, f)
+
+def main_cell(savedir_base):
+    script = ("""
+from haven import haven_jupyter as hj
+from haven import haven_results as hr
+from haven import haven_utils as hu
+
+# path to where the experiments got saved
+savedir_base = '%s'
+exp_list = None
+
+# filter exps
+# e.g. filterby_list =[{'dataset':'mnist'}] gets exps with mnist
+filterby_list = None
+
+# get experiments
+rm = hr.ResultManager(exp_list=exp_list, 
+                      savedir_base=savedir_base, 
+                      filterby_list=filterby_list,
+                      verbose=0,
+                      exp_groups=None
+                     )
+
+# launch dashboard
+# make sure you have 'widgetsnbextension' enabled; 
+# otherwise see README.md in https://github.com/haven-ai/haven-ai
+
+hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
+          """ % savedir_base)
+    return script
 
 
 def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp_id=False, verbose=True):
@@ -81,16 +134,6 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
     if not os.path.exists(exp_dict_json_fname):
         hu.save_json(exp_dict_json_fname, exp_dict)
     
-    #-- score_list
-    score_list_fname = os.path.join(savedir, "score_list.pkl")
-    if not os.path.exists(score_list_fname):
-        hu.save_pkl(score_list_fname, [])
-        
-    #-- model
-    model_fname = os.path.join(savedir, "model.pth")
-    if not os.path.exists(model_fname):
-        hu.torch_save(model_fname, {})
-
     #-- images
     os.makedirs(os.path.join(savedir, 'images'), exist_ok=True)
 
@@ -133,12 +176,44 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
     images_dir = os.path.join(savedir, 'images%s'% fname_suffix)
     if images is not None:
         for i, img in enumerate(images):
-            hu.save_image(os.path.join(images_dir, '%d.png' % i), img)
+      
+            if images_fname is not None:
+                fname = '%s' % images_fname[i]
+            else:
+                fname = '%d.png' % i
+            hu.save_image(os.path.join(images_dir, fname), img)
         if verbose:
             print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
 
 
 def get_checkpoint(savedir, return_model_state_dict=False):
+    chk_dict = {} 
+
+    # score list
+    score_list_fname = os.path.join(savedir, 'score_list.pkl')
+    if os.path.exists(score_list_fname):
+        score_list = hu.load_pkl(score_list_fname)
+    else:
+        score_list = []
+
+    chk_dict['score_list'] = score_list
+    if len(score_list) == 0:
+        chk_dict['epoch'] = 0
+    else:
+        chk_dict['epoch'] = score_list[-1]['epoch'] + 1
+
+    model_state_dict_fname = os.path.join(savedir, 'model.pth')
+    if return_model_state_dict:
+        if os.path.exists(model_state_dict_fname):  
+            chk_dict['model_state_dict'] = hu.torch_load(model_state_dict_fname)
+        else:
+            chk_dict['model_state_dict'] = {}
+        
+
+    return chk_dict
+
+
+def create_jupyter(savedir, return_model_state_dict=False):
     chk_dict = {} 
 
     # score list
@@ -156,4 +231,3 @@ def get_checkpoint(savedir, return_model_state_dict=False):
         chk_dict['model_state_dict'] = hu.torch_load(model_state_dict_fname)
 
     return chk_dict
-
