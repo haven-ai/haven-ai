@@ -141,9 +141,17 @@ def plots_tab(self, output):
 
     bdownload.on_click(on_download_clicked)
 
+    h1 = widgets.Label(value="Hyperparamters:", 
+                                    layout=widgets.Layout(width='300px'),)
+    h2 = widgets.Label(value="Hyperparamters:", 
+                                    layout=widgets.Layout(width='300px'),)
+    h3 = widgets.Label(value="Hyperparamters:", 
+                                    layout=widgets.Layout(width='300px'),)
     brefresh = widgets.Button(description="Display Plot")
     button = widgets.VBox([widgets.HBox([brefresh, bdownload, bdownload_out, d_style, d_avg_across_columns]),
-                           widgets.HBox([t_y_metric,  llegend_list, ltitle_format, t_mode, t_groupby_list]),
+
+    
+                           widgets.HBox([t_y_metric,  llegend_list, t_title_list, t_groupby_list, t_mode, ]),
                            widgets.HBox([d_x_metric_columns, llegend_format, ltitle_format, t_bar_agg, ]),
                            ])
 
