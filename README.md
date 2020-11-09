@@ -74,6 +74,13 @@ Step 4 creates `trainval_results.ipynb`, open the file on Jupyter to get tables 
 
 ![](docs/images/table1.png)
 
+You can launch Jupyter with,
+
+```bash
+jupyter nbextension enable --py widgetsnbextension --sys-prefix
+jupyter notebook
+```
+
 ## Run the experiments in cluster
 
 Using the `api`,
@@ -130,66 +137,6 @@ project/
 ├── README.md
 └── trainval.py
 ```
-
-# Getting Started
-
-## 1. Run Experiments
-
-![](docs/images/terminal.png)
-
-### 1.1 Run experiments sequentially for MNIST across learning rates
-
-
-```
-python example.py -e mnist_learning_rates -sb ../results -r 1
-```
-
-results are saved in `../results/`
-
-### 1.2 Run experiments in a cluster using [Orkestrator](https://www.elementai.com/products/ork)
-
-```
-python example.py -e mnist_learning_rates -sb ../results -r 1 -j 1
-```
-
-
-## 2. Visualize Results
-
-![](docs/images/table3.png)
-
-### 2.1 Launch a Jupyter server
-
-```bash
-jupyter nbextension enable --py widgetsnbextension --sys-prefix
-jupyter notebook
-```
-
-### 2.2 Run Jupyter script to visualize dashboard
-
-Run the following script from a Jupyter cell to launch a dashboard.
-
-
-```python
-from haven import haven_jupyter as hj
-from haven import haven_results as hr
-from haven import haven_utils as hu
-
-# path to where the experiments got saved
-savedir_base = <insert_savedir_base>
-exp_list = None
-
-# exp_list = hu.load_py(<exp_config_name>).EXP_GROUPS[<exp_group>]
-# get experiments
-rm = hr.ResultManager(exp_list=exp_list, 
-                      savedir_base=savedir_base, 
-                      verbose=0
-                     )
-# launch dashboard
-hj.get_dashboard(rm, vars(), wide_display=True)
-```
-
-
-
 
 ## Contributing
 
