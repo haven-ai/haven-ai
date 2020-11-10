@@ -11,7 +11,7 @@
 
 ### 0. Install
 ```
-pip install -r requirements.txt
+pip install haven-ai
 ```
 
 ### 1. Create trainval.py with the following code
