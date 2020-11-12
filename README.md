@@ -65,7 +65,7 @@ if __name__ == '__main__':
 ### 2. Run the experiments
 
 ```
-python trainval.py --reset 1 -v trainval_results.ipynb
+python trainval.py --reset 1 -v trainval_results.ipynb --savedir_base ../results
 ```
 
 Optional arguments,
