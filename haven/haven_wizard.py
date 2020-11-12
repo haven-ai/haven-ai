@@ -6,7 +6,7 @@ from . import haven_utils as hu
 
 
 def get_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=make_wide(argparse.ArgumentDefaultsHelpFormatter))
 
     parser.add_argument('-e', '--exp_group_list', nargs="+",
                         help='Define which exp groups to run.')
@@ -29,6 +29,17 @@ def get_args():
 
     return args
 
+def make_wide(formatter, w=120, h=36):
+    """Return a wider HelpFormatter, if possible."""
+    try:
+        # https://stackoverflow.com/a/5464440
+        # beware: "Only the name of this class is considered a public API."
+        kwargs = {'width': w, 'max_help_position': h}
+        formatter(None, **kwargs)
+        return lambda prog: formatter(prog, **kwargs)
+    except TypeError:
+        warnings.warn("argparse help formatter failed, falling back.")
+        return formatter
 
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None):
     args = get_args()
