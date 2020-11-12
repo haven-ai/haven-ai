@@ -7,7 +7,7 @@ import tqdm, pprint
 import numpy as np
 from .. import haven_utils as hu
 
-def cartesian_exp_group(exp_config, remove_none):
+def cartesian_exp_group(exp_config, remove_none=False):
     """Cartesian experiment config.
 
     It converts the exp_config into a list of experiment configuration by doing
