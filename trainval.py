@@ -39,4 +39,18 @@ if __name__ == '__main__':
                 for lr in [1e-3, 1e-4]]
 
     # 8. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=exp_list)
+    hw.run_wizard(func=trainval, 
+                  exp_list=exp_list, 
+                  job_config={
+                            'account_id': os.environ['EAI_ACCOUNT_ID'],
+                            'image': 'registry.console.elementai.com/eai.colab/ssh',
+                            'data': ['eai.colab.public:/mnt/public' ],
+                            'restartable':True,
+                            'resources': {
+                                'cpu': 4,
+                                'mem': 8,
+                                'gpu': 1
+                            },
+                            'interactive': False,
+                            'bid':9999,
+                            })

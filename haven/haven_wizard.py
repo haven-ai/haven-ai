@@ -1,24 +1,36 @@
-import os, argparse
+import os
+import argparse
 import pandas as pd
 
-from . import haven_utils as hu 
+from . import haven_utils as hu
+
 
 def get_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-e', '--exp_group_list', nargs="+")
-    parser.add_argument('-sb', '--savedir_base', required=True)
-    parser.add_argument('-d', '--datadir', default=None)
-    parser.add_argument("-r", "--reset",  default=0, type=int)
-    parser.add_argument("-ei", "--exp_id", default=None)
-    parser.add_argument("-j", "--run_jobs", default=0, type=int)
-    parser.add_argument("-nw", "--num_workers", type=int, default=0)
+    parser.add_argument('-e', '--exp_group_list', nargs="+",
+                        help='Define which exp groups to run.')
+    parser.add_argument('-sb', '--savedir_base', required=True,
+                        help='Define the base directory where the experiments will be saved.')
+    parser.add_argument('-d', '--datadir', default=None,
+                        help='Define the dataset directory.')
+    parser.add_argument("-r", "--reset",  default=0, type=int,
+                        help='Reset or resume the experiment.')
+    parser.add_argument("-ei", "--exp_id", default=None,
+                        help='Run a specific experiment based on its id.')
+    parser.add_argument("-j", "--run_jobs", default=0, type=int,
+                        help='Run the experiments as jobs in the cluster.')
+    parser.add_argument("-nw", "--num_workers", type=int, default=0,
+                        help='Specify the number of workers in the dataloader.')
+    parser.add_argument("-v", "--visualize_notebook", type=str, default='',
+                        help='Create a jupyter file to visualize the results.')
 
     args = parser.parse_args()
 
     return args
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id=None, results_fname=None):
+
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None):
     args = get_args()
 
     # Collect experiments
@@ -31,22 +43,25 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id
         exp_list = [exp_dict]
 
     elif exp_list is None:
-        if results_fname:
-            create_jupyter_file(fname=results_fname, savedir_base=args.savedir_base)
-
         # select exp group
         exp_list = []
         for exp_group_name in args.exp_group_list:
             exp_list += exp_groups[exp_group_name]
-    else:
-        if results_fname:
-            create_jupyter_file(fname=results_fname, savedir_base=args.savedir_base)
+
+    # save results folder
+    if args.exp_id is None:
+        results_fname = args.visualize_notebook
+        if len(results_fname):
+            if '.ipynb' not in results_fname:
+                results_fname += '.ipynb'
+            create_jupyter_file(fname=results_fname,
+                                savedir_base=args.savedir_base)
 
     # Run experiments
     # ===============
     if not args.run_jobs:
         for exp_dict in exp_list:
-            savedir = create_experiment(exp_dict, args.savedir_base, reset=args.reset, 
+            savedir = create_experiment(exp_dict, args.savedir_base, reset=args.reset,
                                         verbose=True)
             # do trainval
             func(exp_dict=exp_dict,
@@ -55,16 +70,15 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, account_id
     else:
         # launch jobs
         from haven import haven_jobs as hjb
-        
-        jm = hjb.JobManager(exp_list=exp_list, 
-                    savedir_base=args.savedir_base, 
-                    account_id=account_id,
-                    workdir=os.getcwd(),
-                    job_config=job_config,
-                    )
+        assert job_config is not None
+        jm = hjb.JobManager(exp_list=exp_list,
+                            savedir_base=args.savedir_base,
+                            workdir=os.getcwd(),
+                            job_config=job_config,
+                            )
 
-        command = ('python trainval.py -ei <exp_id> -sb %s' %  
-                  (args.savedir_base))
+        command = ('python trainval.py -ei <exp_id> -sb %s -d %s' %
+                   (args.savedir_base, args.datadir))
 
         print(command)
         jm.launch_menu(command=command)
@@ -76,6 +90,7 @@ def create_jupyter_file(fname, savedir_base):
         save_ipynb(fname, cells)
         print('> Open %s to visualize results' % fname)
 
+
 def save_ipynb(fname, script_list):
     import nbformat as nbf
 
@@ -84,6 +99,7 @@ def save_ipynb(fname, script_list):
                    script_list]
     with open(fname, 'w') as f:
         nbf.write(nb, f)
+
 
 def main_cell(savedir_base):
     script = ("""
@@ -118,7 +134,7 @@ hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
 
 def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp_id=False, verbose=True):
     import pprint
-    from . import haven_chk as hc 
+    from . import haven_chk as hc
 
     exp_id = hu.hash_dict(exp_dict)
     savedir = os.path.join(savedir_base, exp_id)
@@ -133,7 +149,7 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
     exp_dict_json_fname = os.path.join(savedir, "exp_dict.json")
     if not os.path.exists(exp_dict_json_fname):
         hu.save_json(exp_dict_json_fname, exp_dict)
-    
+
     #-- images
     os.makedirs(os.path.join(savedir, 'images'), exist_ok=True)
 
@@ -151,7 +167,8 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
     return savedir
 
-def save_checkpoint(savedir, score_list, model_state_dict=None, 
+
+def save_checkpoint(savedir, score_list, model_state_dict=None,
                     images=None, images_fname=None, fname_suffix='', verbose=True):
     # Report
     if verbose:
@@ -163,20 +180,23 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
     score_list_fname = os.path.join(savedir, 'score_list%s.pkl' % fname_suffix)
     hu.save_pkl(score_list_fname, score_list)
     if verbose:
-        print('> Saved "score_list" as %s' % os.path.split(score_list_fname)[-1])
+        print('> Saved "score_list" as %s' %
+              os.path.split(score_list_fname)[-1])
 
     # save model
     if model_state_dict is not None:
-        model_state_dict_fname = os.path.join(savedir, 'model%s.pth'% fname_suffix)
+        model_state_dict_fname = os.path.join(
+            savedir, 'model%s.pth' % fname_suffix)
         hu.torch_save(model_state_dict_fname, model_state_dict)
         if verbose:
-            print('> Saved "model_state_dict" as %s' % os.path.split(model_state_dict_fname)[-1])
+            print('> Saved "model_state_dict" as %s' %
+                  os.path.split(model_state_dict_fname)[-1])
 
     # save images
-    images_dir = os.path.join(savedir, 'images%s'% fname_suffix)
+    images_dir = os.path.join(savedir, 'images%s' % fname_suffix)
     if images is not None:
         for i, img in enumerate(images):
-      
+
             if images_fname is not None:
                 fname = '%s' % images_fname[i]
             else:
@@ -187,7 +207,7 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
 
 
 def get_checkpoint(savedir, return_model_state_dict=False):
-    chk_dict = {} 
+    chk_dict = {}
 
     # score list
     score_list_fname = os.path.join(savedir, 'score_list.pkl')
@@ -204,17 +224,17 @@ def get_checkpoint(savedir, return_model_state_dict=False):
 
     model_state_dict_fname = os.path.join(savedir, 'model.pth')
     if return_model_state_dict:
-        if os.path.exists(model_state_dict_fname):  
-            chk_dict['model_state_dict'] = hu.torch_load(model_state_dict_fname)
+        if os.path.exists(model_state_dict_fname):
+            chk_dict['model_state_dict'] = hu.torch_load(
+                model_state_dict_fname)
         else:
             chk_dict['model_state_dict'] = {}
-        
 
     return chk_dict
 
 
 def create_jupyter(savedir, return_model_state_dict=False):
-    chk_dict = {} 
+    chk_dict = {}
 
     # score list
     score_list_fname = os.path.join(savedir, 'score_list.pkl')

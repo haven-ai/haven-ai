@@ -55,10 +55,11 @@ def images_tab(self, output):
                                 layout=self.layout_button)
     bdownload_out = widgets.Output(layout=self.layout_button)
     brefresh = widgets.Button(description="Display Images")
-    button = widgets.VBox([widgets.HBox([brefresh, bdownload, bdownload_out]),
+    button = widgets.VBox([
             widgets.HBox([t_n_exps, t_n_images]),
             widgets.HBox([tfigsize, llegend_list, ]),
             widgets.HBox([t_dirname, ]),
+            widgets.HBox([brefresh, bdownload, bdownload_out]),
                         ])
 
     output_plot = widgets.Output()

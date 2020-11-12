@@ -69,9 +69,10 @@ def tables_tab(db, output):
                                     layout=db.layout_label,)
     db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
 
-    button = widgets.VBox([ widgets.HBox([b_table, bstatus, blogs, bfailed, d_avg_across_txt, d_avg_across_columns]),
+    button = widgets.VBox([ 
                             widgets.HBox([hparam_txt, metrics_txt]),
                             widgets.HBox([db.hparam_widget, db.metrics_widget]),
+                            widgets.HBox([b_table, bstatus, blogs, bfailed, d_avg_across_txt, d_avg_across_columns]),
                            
                             # widgets.HBox([d_columns_txt, d_score_columns_txt]),
                             # widgets.HBox([d_columns, d_score_columns ]),

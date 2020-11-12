@@ -43,6 +43,10 @@ class JobManager:
         verbose : int, optional
             [description], by default 1
         """
+        if account_id is None and job_config is not None and 'account_id' in job_config:
+            account_id = job_config['account_id']
+            del job_config['account_id']
+
         self.exp_list = exp_list
         self.job_config = job_config
         self.workdir = workdir

@@ -5,6 +5,8 @@ __pycache__/
 *$py.class
 .idea
 .tmp
+job_configs.py
+trainval.py
 trainval_results.ipynb
 results/
 eai-toolkit-python-client/

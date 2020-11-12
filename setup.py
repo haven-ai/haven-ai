@@ -2,13 +2,13 @@ from setuptools import setup
 import setuptools
 
 setup(name='haven-ai',
-      version='0.2.0',
+      version='0.3.3',
       description='Manage large-scale experiments',
       url='https://github.com/haven-ai/haven-ai',
       maintainer='Issam Laradji',
       maintainer_email='issam.laradji@gmail.com',
       license='MIT',
-      scripts=['./haven_cli/haven'],
+      scripts=['./haven_scripts/haven'],
       packages=setuptools.find_packages(),
       zip_safe=False,
       python_requires='>=3.5',

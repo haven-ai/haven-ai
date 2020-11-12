@@ -176,8 +176,8 @@ class DashboardManager:
                 display('No experiments exist...')
             return
         else:
-            display('Selected %d/%d experiments using "filterby_list"' %
-                    (len(self.rm.exp_list), len(self.rm.exp_list_all)))
+            display('Selected %d/%d experiments using "filterby_list" from savedir_base "%s"' %
+                    (len(self.rm.exp_list), len(self.rm.exp_list_all), self.vars.get('savedir_base')))
 
 
 
