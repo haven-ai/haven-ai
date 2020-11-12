@@ -68,6 +68,24 @@ if __name__ == '__main__':
 python trainval.py --reset 1 -v trainval_results.ipynb
 ```
 
+Optional arguments,
+
+```python
+  -h, --help                        show this help message and exit
+  -e EXP_GROUP_LIST [EXP_GROUP_LIST ...], --exp_group_list EXP_GROUP_LIST [EXP_GROUP_LIST ...]
+                                    Define which exp groups to run. (default: None)
+  -sb SAVEDIR_BASE, --savedir_base SAVEDIR_BASE
+                                    Define the base directory where the experiments will be saved. (default: None)
+  -d DATADIR, --datadir DATADIR     Define the dataset directory. (default: None)
+  -r RESET, --reset RESET           Reset or resume the experiment. (default: 0)
+  -ei EXP_ID, --exp_id EXP_ID       Run a specific experiment based on its id. (default: None)
+  -j RUN_JOBS, --run_jobs RUN_JOBS  Run the experiments as jobs in the cluster. (default: 0)
+  -nw NUM_WORKERS, --num_workers NUM_WORKERS
+                                    Specify the number of workers in the dataloader. (default: 0)
+  -v VISUALIZE_NOTEBOOK, --visualize_notebook VISUALIZE_NOTEBOOK
+                                    Create a jupyter file to visualize the results. (default: )
+```
+
 ### 3. Visualize 
 
 Step 2 creates `trainval_results.ipynb`, open the file on Jupyter to get tables and plots
