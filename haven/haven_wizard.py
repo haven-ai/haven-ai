@@ -38,6 +38,7 @@ def make_wide(formatter, w=120, h=36):
         formatter(None, **kwargs)
         return lambda prog: formatter(prog, **kwargs)
     except TypeError:
+        import warnings
         warnings.warn("argparse help formatter failed, falling back.")
         return formatter
 
