@@ -24,25 +24,6 @@ from haven import haven_jupyter as hj
 
 if __name__ == '__main__':
     # return
-   
-    job_config = {
-        'image': 'registry.console.elementai.com/eai.issam/ssh',
-        
-        'data': ['eai.issam.home:/mnt/home',
-                 'eai.issam.results:/mnt/results',
-                 'eai.issam.datasets:/mnt/datasets',
-                 'eai.colab.slices:/mnt/slices',
-                 'eai.colab.public:/mnt/public'],
-
-        'preemptable':True,
-        'resources': {
-            'cpu': 4,
-            'mem': 8,
-            'gpu': 1
-        },
-        'interactive': False,
-    }
-
     exp_list = [{'model':{'name':'mlp', 'n_layers':20}, 
                 'dataset':'mnist', 'batch_size':1}]
     savedir_base = '.tmp'
@@ -52,7 +33,6 @@ if __name__ == '__main__':
                     savedir_base=savedir_base, 
                     workdir=os.path.dirname(os.path.realpath(__file__)),
                     job_config=job_config,
-                    account_id='75ce4cee-6829-4274-80e1-77e89559ddfb',
                     )
     # get jobs              
     job_list_old = jm.get_jobs()
@@ -86,8 +66,7 @@ if __name__ == '__main__':
     print(hr.filter_list(summary_list, {'job_state':'SUCCEEDED'}))
     print(hr.group_list(summary_list, key='job_state', return_count=True))
     
-    rm = hr.ResultManager(exp_list=exp_list, savedir_base=savedir_base,
-                          account_id='75ce4cee-6829-4274-80e1-77e89559ddfb')
+    rm = hr.ResultManager(exp_list=exp_list, savedir_base=savedir_base)
     rm_summary_list = rm.get_job_summary()
 
     db = hj.get_dashboard(rm,  wide_display=True)
