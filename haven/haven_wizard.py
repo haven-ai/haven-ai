@@ -223,6 +223,7 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
         if verbose:
             print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
 
+    print("=" * 100 + "\n")
 
 def get_checkpoint(savedir, return_model_state_dict=False):
     chk_dict = {}
