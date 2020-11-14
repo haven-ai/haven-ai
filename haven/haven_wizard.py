@@ -42,12 +42,13 @@ def make_wide(formatter, w=120, h=36):
         warnings.warn("argparse help formatter failed, falling back.")
         return formatter
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None):
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None, reset=None):
     args = get_args()
 
     # Asserts
     # =======
     savedir_base = savedir_base or args.savedir_base
+    reset = reset or args.reset
     assert savedir_base is not None
 
     # Collect experiments
@@ -78,7 +79,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
     # ===============
     if not args.run_jobs:
         for exp_dict in exp_list:
-            savedir = create_experiment(exp_dict, savedir_base, reset=args.reset,
+            savedir = create_experiment(exp_dict, savedir_base, reset=reset,
                                         verbose=True)
             # do trainval
             func(exp_dict=exp_dict,
