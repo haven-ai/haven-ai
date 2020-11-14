@@ -177,8 +177,12 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
         hu.copy_code(src, dst)
 
     if verbose:
-        pprint.pprint(exp_dict)
-        print("> Experiment saved in %s\n" % savedir)
+        print('\nExp id: %s' % exp_id)
+        print("Save directory: %s\n" % savedir)
+        print('\nHyperparameters:\n' + "-"*16)
+        print(pd.DataFrame([exp_dict]).to_string(index=False))
+        print("=" * 100)
+        
 
     if return_exp_id:
         return savedir, exp_id
@@ -190,25 +194,33 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
                     images=None, images_fname=None, fname_suffix='', verbose=True):
     # Report
     if verbose:
-        score_df = pd.DataFrame(score_list)
-        print("\n", score_df.tail(), "\n")
+        exp_dict = hu.load_json(os.path.join(savedir, 'exp_dict.json'))
+        
 
-    print('Saving in %s' % savedir)
+        print('\nHyperparameters:\n' + "-"*16)
+        print(pd.DataFrame([exp_dict]).to_string(index=False))
+        print('\nMetrics:\n' + "-"*8)
+        score_df = pd.DataFrame(score_list)
+        print(score_df.tail().to_string(index=False), "\n")
+
+        print('Exp id: %s' % hu.hash_dict(exp_dict))
+        print("Save directory: %s" % savedir)
+
     # save score_list
     score_list_fname = os.path.join(savedir, 'score_list%s.pkl' % fname_suffix)
     hu.save_pkl(score_list_fname, score_list)
-    if verbose:
-        print('> Saved "score_list" as %s' %
-              os.path.split(score_list_fname)[-1])
+    # if verbose:
+        # print('> Saved "score_list" as %s' %
+        #       os.path.split(score_list_fname)[-1])
 
     # save model
     if model_state_dict is not None:
         model_state_dict_fname = os.path.join(
             savedir, 'model%s.pth' % fname_suffix)
         hu.torch_save(model_state_dict_fname, model_state_dict)
-        if verbose:
-            print('> Saved "model_state_dict" as %s' %
-                  os.path.split(model_state_dict_fname)[-1])
+        # if verbose:
+            # print('> Saved "model_state_dict" as %s' %
+            #       os.path.split(model_state_dict_fname)[-1])
 
     # save images
     images_dir = os.path.join(savedir, 'images%s' % fname_suffix)
@@ -220,10 +232,10 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
             else:
                 fname = '%d.png' % i
             hu.save_image(os.path.join(images_dir, fname), img)
-        if verbose:
-            print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
+        # if verbose:
+        #     print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
 
-    print("=" * 100 + "\n")
+    print("=" * 100)
 
 def get_checkpoint(savedir, return_model_state_dict=False):
     chk_dict = {}
