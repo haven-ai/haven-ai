@@ -100,7 +100,7 @@ def plots_tab(self, output):
             )
 
     t_title_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                    value=self.vars.get('title_list', ['dataset']),)
+                    value=self.vars.get('title_list', [self.rm.exp_params[0]]),)
     # widgets.Text(
     #     value=str(self.vars.get('title_list', 'dataset')),
     #     description='title_list:',

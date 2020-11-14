@@ -10,7 +10,7 @@ def get_args():
 
     parser.add_argument('-e', '--exp_group_list', nargs="+",
                         help='Define which exp groups to run.')
-    parser.add_argument('-sb', '--savedir_base', required=True,
+    parser.add_argument('-sb', '--savedir_base', default=None,
                         help='Define the base directory where the experiments will be saved.')
     parser.add_argument('-d', '--datadir', default=None,
                         help='Define the dataset directory.')
@@ -42,14 +42,19 @@ def make_wide(formatter, w=120, h=36):
         warnings.warn("argparse help formatter failed, falling back.")
         return formatter
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None):
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None):
     args = get_args()
+
+    # Asserts
+    # =======
+    savedir_base = savedir_base or args.savedir_base
+    assert savedir_base is not None
 
     # Collect experiments
     # ===================
     if args.exp_id is not None:
         # select one experiment
-        savedir = os.path.join(args.savedir_base, args.exp_id)
+        savedir = os.path.join(savedir_base, args.exp_id)
         exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
 
         exp_list = [exp_dict]
@@ -67,13 +72,13 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None):
             if '.ipynb' not in results_fname:
                 results_fname += '.ipynb'
             create_jupyter_file(fname=results_fname,
-                                savedir_base=args.savedir_base)
+                                savedir_base=savedir_base)
 
     # Run experiments
     # ===============
     if not args.run_jobs:
         for exp_dict in exp_list:
-            savedir = create_experiment(exp_dict, args.savedir_base, reset=args.reset,
+            savedir = create_experiment(exp_dict, savedir_base, reset=args.reset,
                                         verbose=True)
             # do trainval
             func(exp_dict=exp_dict,
@@ -84,13 +89,13 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None):
         from haven import haven_jobs as hjb
         assert job_config is not None
         jm = hjb.JobManager(exp_list=exp_list,
-                            savedir_base=args.savedir_base,
+                            savedir_base=savedir_base,
                             workdir=os.getcwd(),
                             job_config=job_config,
                             )
 
         command = ('python trainval.py -ei <exp_id> -sb %s -d %s' %
-                   (args.savedir_base, args.datadir))
+                   (savedir_base, args.datadir))
 
         print(command)
         jm.launch_menu(command=command)
