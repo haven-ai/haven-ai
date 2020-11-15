@@ -314,7 +314,7 @@ def get_plot(exp_list, savedir_base,
 
     return fig, axis
 
-def get_label(original_list, exp_dict, format_str=None):
+def get_label(original_list, exp_dict, format_str=None, show_key=False):
     label_list = []
     for k in original_list:
         depth_list = k.split('.')
@@ -324,8 +324,10 @@ def get_label(original_list, exp_dict, format_str=None):
                 sub_dict = None
                 break
             sub_dict = sub_dict[d]
-            
-        label_list += [str(sub_dict)]
+        if show_key:
+            label_list += ['%s:%s' % (k, str(sub_dict))]
+        else:
+            label_list += [str(sub_dict)]
         
     if format_str:
         label = format_str.format(*label_list)

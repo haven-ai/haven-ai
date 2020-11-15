@@ -29,11 +29,8 @@ def images_tab(self, output):
         description='figsize:',
         disabled=False
             )
-    llegend_list = widgets.Text(
-        value=str(self.vars.get('legend_list', '[model]')),
-        description='legend_list:',
-        disabled=False
-            )
+    llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                        value=self.vars.get('legend_list', [self.rm.exp_params[0]]))
     
     t_n_images = widgets.Text(
         value=str(self.vars.get('n_images', '5')),
@@ -56,9 +53,9 @@ def images_tab(self, output):
     bdownload_out = widgets.Output(layout=self.layout_button)
     brefresh = widgets.Button(description="Display Images")
     button = widgets.VBox([
-            widgets.HBox([t_n_exps, t_n_images]),
-            widgets.HBox([tfigsize, llegend_list, ]),
-            widgets.HBox([t_dirname, ]),
+            widgets.HBox([ widgets.Label(value="Legend:", 
+                                    layout=widgets.Layout(width='300px'),) ,t_n_exps, t_n_images, ]),
+            widgets.HBox([llegend_list, tfigsize,t_dirname ]),
             widgets.HBox([brefresh, bdownload, bdownload_out]),
                         ])
 
@@ -76,7 +73,7 @@ def images_tab(self, output):
         
             w, h = tfigsize.value.strip('(').strip(')').split(',')
             self.vars['figsize'] = (int(w), int(h))
-            self.vars['legend_list'] = hu.get_list_from_str(llegend_list.value)
+            self.vars['legend_list'] = llegend_list.value
             self.vars['n_images'] = int(t_n_images.value)
             self.vars['n_exps'] = int(t_n_exps.value)
             self.vars['dirname'] = t_dirname.value

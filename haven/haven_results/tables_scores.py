@@ -125,7 +125,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
 
     # create table
     df = pd.DataFrame(result_list)
-    metric_columns = [c for c in result_dict if c not in hparam_columns + ['creation_time']]
+    metric_columns = [c for c in df.columns if c not in hparam_columns + ['creation_time']]
     # print(avg_across)
     if avg_across is not None:
         df_avg = df.groupby('_' + avg_across)

@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import pylab as plt
 import tqdm
+from . import plots_line
 from .. import haven_utils as hu
 
 
@@ -92,12 +93,15 @@ def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
             score_list = hu.load_pkl(score_list_path)
             result_dict.update(score_list[-1])
         # display(pd.Series(result_dict))
-
-        if legend_list is None:
-            label = hu.hash_dict(exp_dict)
+        if legend_list is not None:
+            label = plots_line.get_label(legend_list, exp_dict, show_key=True)
         else:
-            label = '-'.join(['%s:%s' % (k, str(result_dict.get(k))) for
-                                k in legend_list])
+            label = exp_id
+        # if legend_list is None:
+        #     label = hu.hash_dict(exp_dict)
+        # else:
+        #     label = '-'.join(['%s:%s' % (k, str(result_dict.get(k))) for
+        #                         k in legend_list])
 
         for i in range(ncols):
             img_fname = os.path.split(img_list[i])[-1]

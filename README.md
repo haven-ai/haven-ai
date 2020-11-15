@@ -11,7 +11,7 @@
 
 ### 0. Install
 ```
-pip install haven-ai
+pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
 ```
 
 ### 1. Create trainval.py with the following code
@@ -55,7 +55,7 @@ def trainval(exp_dict, savedir, args):
 # 6. create main
 if __name__ == '__main__':
     # 7. define a list of experiments
-    exp_list = [{'dataset':'mnist', 'model':'linear', 'lr':lr} 
+    exp_list = [{'dataset':'syn', 'model':'linear', 'lr':lr} 
                 for lr in [1e-3, 1e-4]]
 
     # 8. Launch experiments using magic command
