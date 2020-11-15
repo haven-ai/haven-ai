@@ -178,7 +178,8 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
         hu.copy_code(src, dst)
 
     if verbose:
-        print('\nExp id: %s' % exp_id)
+        print('\n******')
+        print('Exp id: %s' % exp_id)
         print('\nHyperparameters:\n' + "-"*16)
         # print(pd.DataFrame([exp_dict]).to_string(index=False))
         pprint.pprint(exp_dict)
@@ -199,7 +200,7 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
     if verbose:
         exp_dict = hu.load_json(os.path.join(savedir, 'exp_dict.json'))
         
-        print('Exp id: %s' % hu.hash_dict(exp_dict))
+        print('\nExp id: %s' % hu.hash_dict(exp_dict))
 
         print('\nHyperparameters:\n' + "-"*16)
         # print(pd.DataFrame([exp_dict]).to_string(index=False))

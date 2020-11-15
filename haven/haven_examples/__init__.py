@@ -55,7 +55,13 @@ class Linear(torch.nn.Module):
         self.opt.step()
 
         return {"train_loss": loss.item(), 'train_acc':(logits.argmax(dim=1) == labels).float().mean().item()}
+    
+    def train_on_loader(self, loader, **extras):
+        for batch in tqdm.tqdm(loader, desc="Epoch %d" % extras.get('epoch'), 
+                               leave=False):
+            train_dict = self.train_on_batch(batch)
 
+        return train_dict
 
 # MLP
 class Mlp(torch.nn.Module):
@@ -82,6 +88,13 @@ class Mlp(torch.nn.Module):
         self.opt.step()
 
         return {"train_loss": loss.item(), 'train_acc':(logits.argmax(dim=1) == labels).float().mean().item()}
+
+    def train_on_loader(self, loader, **extras):
+        for batch in tqdm.tqdm(loader, desc="Epoch %d" % extras.get('epoch'), 
+                               leave=False):
+            train_dict = self.train_on_batch(batch)
+
+        return train_dict
 
     def forward(self, x):
         x = x.view(-1, self.input_size)

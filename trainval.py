@@ -20,10 +20,9 @@ def trainval(exp_dict, savedir, args):
     chk_dict = hw.get_checkpoint(savedir)
 
     # 3. Add main loop
-    for epoch in range(chk_dict['epoch'], 3):
+    for epoch in tqdm.tqdm(range(chk_dict['epoch'], 3), desc="Running experiment"):
         # 4. train for one epoch
-        for batch in tqdm.tqdm(train_loader, desc="Training Epoch %d" % epoch):
-            train_dict = model.train_on_batch(batch)
+        train_dict = model.train_on_loader(train_loader, epoch=epoch)
 
         # 5. get and save metrics
         score_dict = {'epoch':epoch, 'acc': train_dict['train_acc'], 
