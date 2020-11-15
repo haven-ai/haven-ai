@@ -2,10 +2,18 @@ import torch, torchvision, os, pprint
 import tqdm
 import argparse, pandas as pd
 
+from torch.utils.data import TensorDataset
 from haven import haven_utils as hu
 from haven import haven_wizard as hw
 
 def get_loader(name, split, datadir, exp_dict):
+    if name == 'syn':
+        # get dataset and loader
+        X = torch.randn(5000, 1, 28, 28)
+        y = torch.randint(0, 2, (5000,1))
+        dataset = TensorDataset(X, y)
+        loader = torch.utils.data.DataLoader(dataset, batch_size=256)
+
     if name == 'mnist':
         # get dataset and loader
         train = True if split == 'train' else False

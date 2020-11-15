@@ -1,6 +1,7 @@
 import os
 import argparse
 import pandas as pd
+import pprint
 
 from . import haven_utils as hu
 
@@ -178,9 +179,11 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
     if verbose:
         print('\nExp id: %s' % exp_id)
-        print("Save directory: %s\n" % savedir)
         print('\nHyperparameters:\n' + "-"*16)
-        print(pd.DataFrame([exp_dict]).to_string(index=False))
+        # print(pd.DataFrame([exp_dict]).to_string(index=False))
+        pprint.pprint(exp_dict)
+
+        print("\nSave directory: %s" % savedir)
         print("=" * 100)
         
 
@@ -196,14 +199,16 @@ def save_checkpoint(savedir, score_list, model_state_dict=None,
     if verbose:
         exp_dict = hu.load_json(os.path.join(savedir, 'exp_dict.json'))
         
+        print('Exp id: %s' % hu.hash_dict(exp_dict))
 
         print('\nHyperparameters:\n' + "-"*16)
-        print(pd.DataFrame([exp_dict]).to_string(index=False))
+        # print(pd.DataFrame([exp_dict]).to_string(index=False))
+        pprint.pprint(exp_dict)
         print('\nMetrics:\n' + "-"*8)
         score_df = pd.DataFrame(score_list)
         print(score_df.tail().to_string(index=False), "\n")
 
-        print('Exp id: %s' % hu.hash_dict(exp_dict))
+        
         print("Save directory: %s" % savedir)
 
     # save score_list

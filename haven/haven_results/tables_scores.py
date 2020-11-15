@@ -18,7 +18,8 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
                  score_columns=None,
                  verbose=True, wrap_size=8, hparam_diff=0, flatten_columns=True,
                  show_meta=True, show_max_min=True, add_prefix=False,
-                 score_list_name='score_list.pkl', in_latex_format=False, avg_across=None):
+                 score_list_name='score_list.pkl', in_latex_format=False, avg_across=None,
+                 return_columns=False):
     """Get a table showing the scores for the given list of experiments 
 
     Parameters
@@ -64,13 +65,20 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         score_list_fname = os.path.join(savedir, score_list_name)
         exp_dict_fname = os.path.join(savedir, "exp_dict.json")
 
-        hparam_columns = columns or list(exp_dict.keys())
+        
+        if flatten_columns:
+            exp_dict_flat = hu.flatten_column(exp_dict)
+        else:
+            exp_dict_flat = exp_dict
+        hparam_columns = columns or list(exp_dict_flat.keys())
         for k in hparam_columns:
             if add_prefix:
                 k_new = "(hparam) " + k
             else:
                 k_new = k
-            result_dict[k_new] = exp_dict[k]
+            if k not in exp_dict_flat:
+                continue
+            result_dict[k_new] = exp_dict_flat[k]
 
         if os.path.exists(score_list_fname) and show_meta:
             result_dict['started_at'] = hu.time_to_montreal(exp_dict_fname)
@@ -81,10 +89,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         if show_meta:
             result_dict["exp_id"] = exp_id
 
-        if flatten_columns:
-            result_dict = hu.flatten_column(result_dict)
-
-        hparam_columns = list(result_dict.keys())
+        # hparam_columns = [k for k in result_dict.keys() if k not in ['creation_time']]
 
         if not os.path.exists(score_list_fname):
             if verbose:
@@ -120,7 +125,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
 
     # create table
     df = pd.DataFrame(result_list)
-    metric_columns = [c for c in result_dict if c not in hparam_columns]
+    metric_columns = [c for c in result_dict if c not in hparam_columns + ['creation_time']]
     # print(avg_across)
     if avg_across is not None:
         df_avg = df.groupby('_' + avg_across)
@@ -141,9 +146,12 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         cols = hu.get_diff_columns(df, min_threshold=hparam_diff, max_threshold='auto')
         df = df[cols]
 
-    df =  hu.sort_df_columns(df)
+    df =  hu.sort_df_columns(df, also_first=hparam_columns)
     if in_latex_format:
         return df.to_latex(index=False)
+
+    if return_columns:
+        return df, hparam_columns, metric_columns
     return df
 
 def get_score_lists(exp_list, savedir_base, filterby_list=None, verbose=True,

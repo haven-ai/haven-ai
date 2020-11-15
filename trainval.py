@@ -31,12 +31,19 @@ def trainval(exp_dict, savedir, args):
         chk_dict['score_list'] += [score_dict]
         hw.save_checkpoint(savedir, score_list=chk_dict['score_list'])
 
+    from haven import haven_results as hr
+    rm = hr.ResultManager(exp_list=None, 
+                      savedir_base=os.path.split(savedir)[0], 
+                      filterby_list=None,
+                      verbose=0,
+                      exp_groups=None
+                     )
     print('Experiment done')
 
 # 6. create main
 if __name__ == '__main__':
     # 7. define a list of experiments
-    exp_list = [{'dataset':'mnist', 'model':'linear', 'lr':lr} 
+    exp_list = [{'dataset':'syn', 'model':'linear', 'lr':lr, 'yours':{'name':'hello', 'lb':3}} 
                 for lr in [1e-3, 1e-4]]
 
     # 8. Launch experiments using magic command

@@ -105,17 +105,9 @@ class ResultManager:
                                                                 score_list_name))]
         if has_score_list:
             exp_list = exp_list_with_scores
-
         self.exp_list_all = copy.deepcopy(exp_list)
 
-        
         self.score_keys  = ['None']
-
-        if len(exp_list_with_scores):
-            score_fname = os.path.join(savedir_base, hu.hash_dict(exp_list_with_scores[0]), score_list_name)
-            self.score_keys = ['None'] + list(hu.load_pkl(score_fname)[0].keys())
-                    
-                                                        
         self.savedir_base = savedir_base
         
         self.filterby_list = filterby_list
@@ -126,20 +118,15 @@ class ResultManager:
         self.exp_list = hu.filter_exp_list(exp_list, 
                                         filterby_list=filterby_list, 
                                         savedir_base=savedir_base,
-                                        verbose=verbose)
-
-        if len(self.exp_list) != 0:
-            self.exp_params = list(self.exp_list[0].keys())
-        else:
-            self.exp_params = []
-
-        
-        
+                                        verbose=verbose)        
         if mode_key:
             for exp_dict in exp_list:
                 exp_dict[mode_key] = 1
             for exp_dict in self.exp_list_all:
                 exp_dict[mode_key] = 1
+
+        _, self.exp_params, self.score_keys = self.get_score_df(flatten_columns=True, show_meta=False, return_columns=True, show_max_min=False)
+        self.score_keys += ['None']
 
         self.exp_groups['all'] = copy.deepcopy(self.exp_list_all)
     
