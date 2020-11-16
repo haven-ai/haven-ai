@@ -6,7 +6,10 @@
 </p>
 
 <p align="center">
-  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>|
+  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>
+
+</p>
+<p align="center">
   <a href="#1.-setup-experiments">Setup Experiments</a>|
   <a href="#3.-visualize-experiments">Visualize Experiments</a>|
   <a href="#4.-run-experiments">Run Experiments in Cluster</a>
