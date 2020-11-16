@@ -194,6 +194,15 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
     return savedir
 
 
+
+class Checkpointer:
+    def __init__(self, savedir):
+        self.savedir = savedir
+
+
+    def save_checkpoint(self, score_dict):
+        pass
+    
 def save_checkpoint(savedir, score_list, model_state_dict=None,
                     images=None, images_fname=None, fname_suffix='', verbose=True):
     # Report
