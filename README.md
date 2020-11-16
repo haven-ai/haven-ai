@@ -2,21 +2,30 @@
 
 
 <p align="center" width="100%">
-    <img width="80%" src="docs/images/logo.png"> 
+    <img width="100%" src="docs/images/logo.png"> 
 </p>
 
+<p align="center">
+  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>
 
-Go to [Google Colab](https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing) for a quick demo.
-
+</p>
+<p align="center">
+  <a href="#1-setup-experiments">Setup Experiments</a>|
+    <a href="#2-run-experiments">Run Experiments</a>|
+  <a href="#3-visualize-experiments">Visualize Experiments</a>|
+  <a href="#4-run-experiments-in-cluster">Run Experiments in Cluster</a>
+</p>
 
 ## **Create end-to-end ML projects with the following 4 steps**
 
-### 0. Install
+### 0 Install
 ```
 pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
 ```
 
-### 1. Create trainval.py with the following code
+### 1. Setup Experiments
+
+Create trainval.py with the following code
 
 ```python
 import tqdm
@@ -24,10 +33,6 @@ import os
 
 from haven import haven_examples as he
 from haven import haven_wizard as hw
-
-# 0. define a list of experiments
-EXP_LIST = [{'dataset':'syn', 'model':'linear', 'lr':lr} 
-             for lr in [1e-3, 1e-4]]
 
 # 1. define the training and validation function
 def trainval(exp_dict, savedir, args):
@@ -61,12 +66,16 @@ def trainval(exp_dict, savedir, args):
 
 # 7. create main
 if __name__ == '__main__':
-    # 8. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=EXP_LIST)
+    # 8. define a list of experiments
+    exp_list = [{'dataset':'syn', 'model':'linear', 'lr':lr} 
+                 for lr in [1e-3, 1e-4]]
+             
+    # 9. Launch experiments using magic command
+    hw.run_wizard(func=trainval, exp_list=exp_list)
 ```
 
 
-### 2. Run the experiments
+### 2. Run Experiments
 
 ```
 python trainval.py --reset 1 -v trainval_results.ipynb --savedir_base ../results
@@ -90,7 +99,7 @@ Optional arguments,
                                     Create a jupyter file to visualize the results. (default: )
 ```
 
-### 3. Visualize 
+### 3. Visualize Experiments
 
 Step 2 creates `trainval_results.ipynb`, open the file on Jupyter to get tables and plots
 
@@ -103,7 +112,7 @@ jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter notebook
 ```
 
-### 4. Run the experiments in cluster
+### 4. Run Experiments in Cluster
 
 Using the `api`,
 
