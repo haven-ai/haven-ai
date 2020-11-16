@@ -10,19 +10,19 @@
 
 </p>
 <p align="center">
-  <a href="#1.-setup-experiments">Setup Experiments</a>|
+  <a href="#1-setup-experiments">Setup Experiments</a>|
   <a href="#3.-visualize-experiments">Visualize Experiments</a>|
   <a href="#4.-run-experiments">Run Experiments in Cluster</a>
 </p>
 
 ## **Create end-to-end ML projects with the following 4 steps**
 
-### 0. Install
+### 0 Install
 ```
 pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
 ```
 
-### 1. Setup Experiments
+### 1 Setup Experiments
 
 Create trainval.py with the following code
 
