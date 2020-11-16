@@ -13,4 +13,4 @@ if __name__ == "__main__":
     
   # second way
   chk = load_checkpoint(savedir)
-  hw.save_checkpoint(savedir, wandb_config={})
+  hw.save_checkpoint(savedir, score_dict=score_dict, wandb_config={})
