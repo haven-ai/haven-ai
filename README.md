@@ -22,7 +22,7 @@
 pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
 ```
 
-### 1 Setup Experiments
+### 1. Setup Experiments
 
 Create trainval.py with the following code
 
