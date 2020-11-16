@@ -3,7 +3,7 @@ import copy
 import hashlib
 import itertools
 import json
-
+import tqdm
 
 import pprint
 import os
@@ -199,6 +199,7 @@ class Parallel:
         """Constructor"""
         self.threadList = []
         self.count = 0
+        self.thread_logs = []
 
     def add(self, func,  *args):
         """Add a function to run as a process.
@@ -217,15 +218,13 @@ class Parallel:
 
     def run(self):
         """Run the added functions in parallel"""
-        for thread in self.threadList:
+        for thread in tqdm.tqdm(self.threadList, desc='Starting threads', leave=False):
             thread.daemon = True
-            print("  > Starting thread %s" % thread.name)
             thread.start()
 
     def close(self):
         """Finish: wait for all the functions to finish"""
-        for thread in self.threadList:
-            print("  > Joining thread %s" % thread.name)
+        for thread in tqdm.tqdm(self.threadList, desc='Joining threads', leave=False):
             thread.join()
 
 

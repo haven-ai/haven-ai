@@ -198,10 +198,14 @@ class JobManager:
                 com = command.replace('<exp_id>', exp_id)
                 self.launch_or_ignore_exp_dict(exp_dict, com, reset, savedir, submit_dict)
 
+        if len(submit_dict) == 0:
+            raise ValueError('The threads have an error, most likely a permission error (see above)')
+        
         pprint.pprint(submit_dict)
         print("%d/%d experiments submitted." % (len([s for s in submit_dict.values() if 'SUBMITTED' in s]),
-                                                len(submit_dict)))
-        assert len(submit_dict) == len(exp_list), 'considered exps does not match expected exps'
+                                                len(exp_list)))                                         
+        if len(submit_dict) > 0:
+            assert len(submit_dict) == len(exp_list), 'considered exps does not match expected exps'
         return submit_dict
 
     def kill_jobs(self, exp_list=None):

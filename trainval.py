@@ -41,17 +41,12 @@ def trainval(exp_dict, savedir, args):
 # 7. create main
 if __name__ == '__main__':
     # 8. Launch experiments using magic command
+    if os.path.exists('job_config.py'):
+        import job_config
+        jc = job_config.JOB_CONFIG
+
+    else:
+        jc = None 
+
     hw.run_wizard(func=trainval, exp_list=EXP_LIST, 
-                  job_config={
-                            'account_id': os.environ['EAI_ACCOUNT_ID'],
-                            'image': 'registry.console.elementai.com/eai.colab/ssh',
-                            'data': ['eai.colab.public:/mnt/public' ],
-                            'restartable':True,
-                            'resources': {
-                                'cpu': 4,
-                                'mem': 8,
-                                'gpu': 1
-                            },
-                            'interactive': False,
-                            'bid':9999,
-                            })
+                  job_config=jc)

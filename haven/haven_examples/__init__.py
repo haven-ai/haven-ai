@@ -23,6 +23,16 @@ def get_loader(name, split, datadir, exp_dict):
                                              transform=transform)
         loader = torch.utils.data.DataLoader(dataset, batch_size=256)
 
+    if name == 'pascal_small':
+        # get dataset and loader
+        train = True if split == 'train' else False
+        transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
+        dataset = torchvision.datasets.MNIST(root=datadir, 
+                                             train=train, download=True,
+                                             transform=transform)
+        loader = torch.utils.data.DataLoader(dataset, batch_size=256)
+
+
     return loader
 
 def get_model(name, exp_dict):
@@ -33,6 +43,11 @@ def get_model(name, exp_dict):
     if name == 'mlp':
         model = Mlp()
         model.opt = torch.optim.Adam(model.parameters(), lr=exp_dict['lr'])
+
+    if name == 'seg_model':
+        model = Mlp()
+        model.opt = torch.optim.Adam(model.parameters(), lr=exp_dict['lr'])
+
 
     return model
 

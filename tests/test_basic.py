@@ -109,7 +109,6 @@ class Test(unittest.TestCase):
                      'exp_dict.json'), exp_dict)
         # check if score_list can be loaded and viewed in pandas
         exp_list = hu.get_exp_list(savedir_base=savedir_base)
-        
         score_df = hr.get_score_df(exp_list, savedir_base=savedir_base)
         
         assert(np.array(score_df['dataset'])[0].strip("'") == 'mnist')

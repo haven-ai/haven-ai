@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 .idea
 .tmp
+job_config.py
 job_configs.py
 trainval.py
 trainval_results.ipynb
