@@ -196,12 +196,17 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
 
 class Checkpointer:
-    def __init__(self, savedir):
+    def __init__(self, savedir, return_model_state_dict=False, verbose=True):
         self.savedir = savedir
+        self.verbose = verbose
+        self.chk_dict = get_checkpoint(savedir, return_model_state_dict=return_model_state_dict)
 
-
-    def save_checkpoint(self, score_dict):
-        pass
+    def save_checkpoint(self, score_dict, score_list=None, model_state_dict=None, images=None, 
+                        images_fname=None, fname_suffix=''):
+        
+        save_checkpoint(savedir, score_list, model_state_dict=model_state_dict,
+                    images=images, images_fname=images_fname, 
+                    fname_suffix=fname_suffix, verbose=self.verbose)
     
 def save_checkpoint(savedir, score_list, model_state_dict=None,
                     images=None, images_fname=None, fname_suffix='', verbose=True):
