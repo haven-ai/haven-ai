@@ -1,7 +1,7 @@
 import torch, torchvision, os, pprint
 import tqdm
 import argparse, pandas as pd
-
+import numpy as np
 from torch.utils.data import TensorDataset
 from haven import haven_utils as hu
 from haven import haven_wizard as hw
@@ -70,6 +70,23 @@ class Linear(torch.nn.Module):
         self.opt.step()
 
         return {"train_loss": loss.item(), 'train_acc':(logits.argmax(dim=1) == labels).float().mean().item()}
+
+    @torch.no_grad()
+    def vis_on_loader(self, loader, **extras):
+        self.eval()
+
+        for batch in loader:
+            images, labels = batch
+            probs = torch.softmax(self.model.forward(images.view(images.shape[0], -1)), dim=1)
+            score, label = probs.max(dim=1)
+            i_list = []
+            for i in range(probs.shape[0]):
+                pil_img = hu.save_image('tmp', images[i], return_image=True)
+                img = get_image(pil_img, 'Predicted %d (Prob: %.2f)' % (label[i], score[i]))
+                i_list += [img]
+                if i > 5: 
+                    break
+            return np.hstack(i_list)[:, :, None].repeat(3, axis=2)
     
     def train_on_loader(self, loader, **extras):
         for batch in tqdm.tqdm(loader, desc="Epoch %d" % extras.get('epoch'), 
@@ -133,6 +150,15 @@ class Mlp(torch.nn.Module):
         self.opt.load_state_dict(state_dict["opt"])
 
 
-
-
-    
+def get_image(pil_img, title):
+    import pylab as plt
+    from PIL import Image
+    # plt.figure(figsize=(16,10))
+    plt.imshow(pil_img)
+    ax = plt.gca()
+    plt.title(title, fontsize=20)
+    plt.axis('off')
+    plt.tight_layout()
+    plt.savefig('.tmp/tmp.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
+    return np.array(Image.open('.tmp/tmp.png').convert('L'))

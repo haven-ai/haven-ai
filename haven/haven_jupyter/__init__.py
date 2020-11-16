@@ -111,27 +111,29 @@ class DashboardManager:
 
         main_out = widgets.Output()
         # Display tabs
-        tab = widgets.Tab(children=[tables, plots, images, share, latex])
+        tab = widgets.Tab(children=[tables, plots, images, latex, share])
         tab.set_title(0, 'Tables')
         tab.set_title(1, 'Plots')
         tab.set_title(2, 'Images')
-        tab.set_title(3, 'Share Results')
-        tab.set_title(4, 'Latex')
+        tab.set_title(3, 'Latex')
+        tab.set_title(4, 'Share')
+        
 
         with main_out:
             display(tab)
             tables.clear_output()
             plots.clear_output()
             images.clear_output()
-            share.clear_output()
             latex.clear_output()
+            share.clear_output()
+            
 
             # show tabs
             tables_tab(self, tables)
             plots_tab(self, plots)
             images_tab(self, images)
-            share_tab(self, share)
             latex_tab(self, latex)
+            share_tab(self, share)
 
         display(main_out)
 

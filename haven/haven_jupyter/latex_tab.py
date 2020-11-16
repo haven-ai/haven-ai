@@ -22,88 +22,52 @@ try:
 except:
     print('widgets not available...')
 
-def latex_tab(self, output):
-    kwargs = {}
 
-    filter_dict = self.vars.get('filter_dict', {})
-    map_row_dict_dict = self.vars.get('map_row_dict_dict', {})
-    map_col_dict = self.vars.get('map_col_dict', {})
-    table = (self.rm.get_score_table())
-    # map columns
-    table2 = pd.DataFrame()
-    for col_old, col_new in map_col_dict.items():
-        # map column
-        table2[col_new] = table[col_old]
-        
-        # map rows
-        if col_old in map_row_dict_dict:
-            map_row_dict = map_row_dict_dict[col_old]
-            table2[col_new] = table2[col_new].apply( lambda x: map_row_dict[x.replace("'","")] if x.replace("'","") in map_row_dict else x )
-        
-    # filter dict
-    conds = None
-    for k, v in filter_dict.items():
-        if not isinstance(v, list):
-            v = [v]
-#         print(k, v)
-        for vi in v:
-            cond = table2[k] == vi
-            if conds is None:
-                conds = cond
-            else:
-                conds = conds | cond
-        
-        table2 = table2[conds]
-        table2 = table2.set_index(k)
-        print(v)
-        table2 = table2.reindex(v)
-        table2.insert(0, k, table2.index)
-        table2 = table2.reset_index(drop=True)
-        
+def latex_tab(db, output):
+
+    b_table = widgets.Button(description="Display Latex Table")
+
+    # d_avg_across_columns = widgets.Text(
+    #     value=str(db.vars.get('avg_across', 'None')),
+    #     description='avg_across:',
+    #     disabled=False
+    # )
+
+    hparam_txt = widgets.Label(value="Select Rows:", 
+                                    layout=widgets.Layout(width='300px'),)
+    db.hparam_widget = widgets.SelectMultiple(options=db.rm.exp_params)
+
+    metrics_txt = widgets.Label(value="Select Columns:", 
+                                    layout=db.layout_label,)
+    db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
+
+    button = widgets.VBox([ 
+                            widgets.HBox([hparam_txt, metrics_txt]),
+                            widgets.HBox([db.hparam_widget, db.metrics_widget]),
+                            widgets.HBox([b_table]),
+    ])
+    output_plot = widgets.Output()
+
     with output:
-        display(table2.to_latex(**kwargs))
+        display(button)
+        display(output_plot)
 
-def create_latex_table(table, filter_dict, map_row_dict_dict, map_col_dict, **kwargs):
-    '''
-    Usage
-    -----
-        map_row_dict_dict = {'model.loss': {"point_loss":'Point Loss', 
-                                        "cons_point_loss":'CB Point Loss', 
-                                        'joint_cross_entropy':'W-CE (Full Sup.)'}}
+    def on_clicked(b):
+        output_plot.clear_output()
+        with output_plot:
+            db.update_rm()
 
-        map_col_dict = {'model.loss': 'Loss Function', 
-                        'test_dice':'Dice', 
-                        'test_iou':'IoU', 
-                        'test_prec':'PPV', 
-                        'test_recall':'Sens.', 
-                        'test_spec':'Spec.'}
+            db.vars['columns'] = list(db.hparam_widget.value)
+            db.vars['score_columns'] = list(db.metrics_widget.value)
+            # print('cols', db.hparam_dict)
+            # stop
+            score_table = db.rm.get_latex_table(columns=db.vars.get('score_columns'), 
+                                            rows=db.vars.get('columns'),
+                                            caption='Results')
+            print(score_table) 
 
-        filter_dict = {'Loss Function':['Point Loss', 'CB Point Loss','W-CE (Full Sup.)']}
 
-        caption_dict = {'weakly_covid19_v1_c2':'COVID-19-A',
-                        'weakly_covid19_v2_mixed_c2':'COVID-19-B-Mixed',
-                        'weakly_covid19_v3_mixed_c2':'COVID-19-C-Mixed',
-                        
-                        'weakly_covid19_v2_sep_c2':'COVID-19-B-Sep',
-                        'weakly_covid19_v3_sep_c2':'COVID-19-C-Sep'}
+    b_table.on_click(on_clicked)
 
-        for exp_name in ['weakly_covid19_v1_c2', 
-                        
-                        'weakly_covid19_v2_mixed_c2', 
-                        'weakly_covid19_v3_mixed_c2',
-                        
-                        'weakly_covid19_v2_sep_c2', 
-                        'weakly_covid19_v3_sep_c2']:
-            rm.exp_list = hr.get_exp_list_from_config([exp_name], exp_config_name)
-            table = (rm.get_score_table())
-            print(create_latex_table(table=table, 
-                                    filter_dict=filter_dict, 
-                                    map_row_dict_dict=map_row_dict_dict, 
-                                    map_col_dict=map_col_dict,
-                                    float_format='%.2f', 
-                                    caption=caption_dict[exp_name], 
-        #                              label=caption_dict, 
-                                    index=False))
-                                    
-    '''
-    pass
+    
+    

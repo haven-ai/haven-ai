@@ -76,7 +76,7 @@ def plots_tab(self, output):
 
     d_x_metric_columns = widgets.Dropdown(
                 options=metrics_list,
-                value=self.vars.get('x_metric', 'None') if self.vars.get('x_metric', 'None') in metrics_list else 'None' ,
+                   value=self.vars.get('x_metric', metric_example[0]),
                 layout=widgets.Layout(width='300px'),
                 disabled=False,
             )

@@ -15,6 +15,7 @@ from .. import haven_utils as hu
 from .. import haven_share as hd
 from .tables_scores import *
 from .plots_line import *
+from .latex_tables import get_latex_table
 from . import images_fig
 # from . import tools
 
@@ -277,6 +278,18 @@ class ResultManager:
                 
         return fig_list
     
+    def get_latex_table(self, **kwargs):
+        """[summary]
+        
+        Returns
+        -------
+        [type]
+            [description]
+        """
+        score_df = self.get_score_df()
+        df_list = get_latex_table(score_df=score_df, **kwargs)
+        return df_list 
+
     def get_score_df(self, **kwargs):
         """[summary]
         

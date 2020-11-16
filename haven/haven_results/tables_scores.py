@@ -52,6 +52,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     exp_list = hu.filter_exp_list(exp_list, filterby_list, savedir_base=savedir_base, verbose=verbose)
 
     # aggregate results
+    hparam_list = set()
     result_list = []
     for exp_dict in exp_list:
         result_dict = {}
@@ -70,7 +71,10 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
             exp_dict_flat = hu.flatten_column(exp_dict)
         else:
             exp_dict_flat = exp_dict
+        
         hparam_columns = columns or list(exp_dict_flat.keys())
+        for hc in hparam_columns:
+            hparam_list.add(hc)
         for k in hparam_columns:
             if add_prefix:
                 k_new = "(hparam) " + k
@@ -125,6 +129,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
 
     # create table
     df = pd.DataFrame(result_list)
+    hparam_columns = list(hparam_list)
     metric_columns = [c for c in df.columns if c not in hparam_columns + ['creation_time']]
     # print(avg_across)
     if avg_across is not None:

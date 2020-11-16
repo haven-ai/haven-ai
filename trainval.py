@@ -3,10 +3,8 @@ import os
 
 from haven import haven_examples as he
 from haven import haven_wizard as hw
+from haven import haven_results as hr
 
-# 0. define a list of experiments
-EXP_LIST = [{'dataset':'syn', 'model':'linear', 'lr':lr} 
-             for lr in [1e-3, 1e-4]]
 
 # 1. define the training and validation function
 def trainval(exp_dict, savedir, args):
@@ -35,12 +33,25 @@ def trainval(exp_dict, savedir, args):
                       'loss':train_dict['train_loss']}
         chk_dict['score_list'] += [score_dict]
 
-    hw.save_checkpoint(savedir, score_list=chk_dict['score_list'])
+        images = model.vis_on_loader(train_loader)
+
+    # rm = hr.ResultManager(exp_list=None, 
+    #                   savedir_base=os.path.split(savedir)[0], 
+    #                   filterby_list=None,
+    #                   verbose=0,
+    #                   exp_groups=None
+    #                  )
+    hw.save_checkpoint(savedir, score_list=chk_dict['score_list'], images=[images])
     print('Experiment done\n')
 
 # 7. create main
 if __name__ == '__main__':
-    # 8. Launch experiments using magic command
+    # 8. define a list of experiments
+    exp_list = []
+    for lr in [1e-3, 1e-4]:
+        exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
+
+    # 9. Launch experiments using magic command
     if os.path.exists('job_config.py'):
         import job_config
         jc = job_config.JOB_CONFIG
@@ -48,5 +59,5 @@ if __name__ == '__main__':
     else:
         jc = None 
 
-    hw.run_wizard(func=trainval, exp_list=EXP_LIST, 
+    hw.run_wizard(func=trainval, exp_list=exp_list, 
                   job_config=jc)
