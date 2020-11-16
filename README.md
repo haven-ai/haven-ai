@@ -11,8 +11,9 @@
 </p>
 <p align="center">
   <a href="#1-setup-experiments">Setup Experiments</a>|
-  <a href="#3.-visualize-experiments">Visualize Experiments</a>|
-  <a href="#4.-run-experiments">Run Experiments in Cluster</a>
+    <a href="#2-run-experiments">Run Experiments</a>|
+  <a href="#3-visualize-experiments">Visualize Experiments</a>|
+  <a href="#4-run-in-experiments">Run Experiments in Cluster</a>
 </p>
 
 ## **Create end-to-end ML projects with the following 4 steps**
@@ -111,7 +112,7 @@ jupyter nbextension enable --py widgetsnbextension --sys-prefix
 jupyter notebook
 ```
 
-### 4. Run the experiments in cluster
+### 4. Run Experiments in Cluster
 
 Using the `api`,
 
