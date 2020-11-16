@@ -10,39 +10,6 @@ import getpass
 import pprint
 import requests
 
-# Api
-# ==============
-def get_api(**kwargs):
-    # Get Borgy API
-    jobs_url = 'https://console.elementai.com'
-    config = eai_toolkit_client.Configuration()
-    config.host = jobs_url
-
-    api_client = eai_toolkit_client.ApiClient(config)
-
-    if kwargs.get('token') is None:
-        try:
-            token_url = 'https://internal.console.elementai.com/v1/token'
-            r = requests.get(token_url)
-            r.raise_for_status()
-            token = r.text
-        except requests.exceptions.HTTPError as errh:
-            # Perhaps do something for each error
-            token = hu.subprocess_call('eai login token -H').split(' ')[-1].replace('\n', '')
-            
-        except requests.exceptions.ConnectionError as errc:
-            raise SystemExit(errc)
-        except requests.exceptions.Timeout as errt:
-            raise SystemExit(errt)
-        except requests.exceptions.RequestException as err:
-            raise SystemExit(err)
-
-    api_client.set_default_header('Authorization', 'Bearer {}'.format(token))
-
-    # create an instance of the API class
-    api = eai_toolkit_client.JobApi(api_client)
-
-    return api 
 
 # Job submission
 # ==============
@@ -73,22 +40,6 @@ def get_job_spec(job_config, command, savedir_logs, workdir):
 
 # Job status
 # ===========
-def get_jobs_dict(api, job_id_list, query_size=20):
-    # get jobs
-    "id__in=64c29dc7-b030-4cb0-8c51-031db029b276,52329dc7-b030-4cb0-8c51-031db029b276"
-
-    jobs = []
-    for i in range(0, len(job_id_list), query_size):
-        job_id_string = "id__in="
-        for job_id in  job_id_list[i:i + query_size]:
-            job_id_string += "%s," % job_id
-        job_id_string = job_id_string[:-1]
-        jobs += api.v1_cluster_job_get(q=job_id_string).items
-
-    jobs_dict = {job.id: job for job in jobs}
-
-    return jobs_dict
-
 def get_job(api, job_id):
     """Get job information."""
     try:
