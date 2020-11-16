@@ -6,10 +6,10 @@
 </p>
 
 <p align="center">
-  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>
-  <a href="#2.-run-experiments">Setup Experiments</a>
-  <a href="#2.-run-experiments">Visualize Experiments</a>
-  <a href="#2.-run-experiments">Run Experiments in Cluster</a>
+  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>|
+  <a href="#1.-setup-experiments">Setup Experiments</a>|
+  <a href="#3.-visualize-experiments">Visualize Experiments</a>|
+  <a href="#4.-run-experiments">Run Experiments in Cluster</a>
 </p>
 
 ## **Create end-to-end ML projects with the following 4 steps**
@@ -19,7 +19,7 @@
 pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
 ```
 
-### 1. Setup the experiments
+### 1. Setup Experiments
 
 Create trainval.py with the following code
 
@@ -95,7 +95,7 @@ Optional arguments,
                                     Create a jupyter file to visualize the results. (default: )
 ```
 
-### 3. Visualize 
+### 3. Visualize Experiments
 
 Step 2 creates `trainval_results.ipynb`, open the file on Jupyter to get tables and plots
 
