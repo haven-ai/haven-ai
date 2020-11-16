@@ -35,12 +35,6 @@ def trainval(exp_dict, savedir, args):
 
         images = model.vis_on_loader(train_loader)
 
-    # rm = hr.ResultManager(exp_list=None, 
-    #                   savedir_base=os.path.split(savedir)[0], 
-    #                   filterby_list=None,
-    #                   verbose=0,
-    #                   exp_groups=None
-    #                  )
     hw.save_checkpoint(savedir, score_list=chk_dict['score_list'], images=[images])
     print('Experiment done\n')
 
@@ -48,16 +42,14 @@ def trainval(exp_dict, savedir, args):
 if __name__ == '__main__':
     # 8. define a list of experiments
     exp_list = []
-    for lr in [1e-3, 1e-4]:
+    for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, "bug"]:
         exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
 
     # 9. Launch experiments using magic command
     if os.path.exists('job_config.py'):
         import job_config
         jc = job_config.JOB_CONFIG
-
     else:
         jc = None 
 
-    hw.run_wizard(func=trainval, exp_list=exp_list, 
-                  job_config=jc)
+    hw.run_wizard(func=trainval, exp_list=exp_list, job_config=jc)

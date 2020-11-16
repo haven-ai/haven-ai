@@ -76,6 +76,8 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
             create_jupyter_file(fname=results_fname,
                                 savedir_base=savedir_base)
 
+    print('\nRunning %d experiments' % len(exp_list))
+
     # Run experiments
     # ===============
     if not args.run_jobs:

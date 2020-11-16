@@ -159,6 +159,6 @@ def get_image(pil_img, title):
     plt.title(title, fontsize=20)
     plt.axis('off')
     plt.tight_layout()
-    plt.savefig('.tmp/tmp.png', bbox_inches='tight', pad_inches=0)
+    plt.savefig('tmp.png', bbox_inches='tight', pad_inches=0)
     plt.close()
-    return np.array(Image.open('.tmp/tmp.png').convert('L'))
+    return np.array(Image.open('tmp.png').convert('L'))
