@@ -16,6 +16,21 @@
   <a href="#4-run-experiments-in-cluster">Run Experiments in Cluster</a>
 </p>
 
+
+
+
+<table align="center">
+  <tr>
+    <td>Launch Experiments</td>
+     <td>Visualize Experiments</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/ork.gif"></td>
+    <td valign="top"><img src="docs/vis.gif"></td>
+  </tr>
+ </table>
+
+
 ## **Create end-to-end ML projects with the following 4 steps**
 
 ### 0 Install
