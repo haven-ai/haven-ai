@@ -25,7 +25,7 @@
      <td>Visualize Experiments on Jupyter</td>
   </tr>
   <tr>
-    <td valign="top"><img src="docs/images/ork.gif"></td>
+    <td valign="top"><img src="docs/images/ork2.gif"></td>
     <td valign="top"><img src="docs/images/vis.gif"></td>
   </tr>
  </table>
