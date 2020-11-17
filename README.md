@@ -25,8 +25,8 @@
      <td>Visualize Experiments</td>
   </tr>
   <tr>
-    <td valign="top"><img src="docs/ork.gif"></td>
-    <td valign="top"><img src="docs/vis.gif"></td>
+    <td valign="top"><img src="docs/images/ork.gif"></td>
+    <td valign="top"><img src="docs/images/vis.gif"></td>
   </tr>
  </table>
 
