@@ -35,15 +35,26 @@ def latex_tab(db, output):
 
     hparam_txt = widgets.Label(value="Select Rows:", 
                                     layout=widgets.Layout(width='300px'),)
-    db.hparam_widget = widgets.SelectMultiple(options=db.rm.exp_params)
+
+    try:
+        db.latex_rows_widget = widgets.SelectMultiple(options=db.rm.exp_params,
+                            value=list(db.vars.get('latex_rows')))
+    except:
+        db.latex_rows_widget = widgets.SelectMultiple(options=db.rm.exp_params,
+                            value=[db.rm.exp_params[0]])
 
     metrics_txt = widgets.Label(value="Select Columns:", 
                                     layout=db.layout_label,)
-    db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
+    try:
+        db.latex_cols_widget =  widgets.SelectMultiple(value=list(db.vars.get('latex_columns')),
+                        options=[k for k in db.rm_original.score_keys if k is not 'None'])
+    except:
+        db.latex_cols_widget =  widgets.SelectMultiple(value=[db.rm_original.score_keys[0]],
+                        options=[k for k in db.rm_original.score_keys if k is not 'None'])
 
     button = widgets.VBox([ 
                             widgets.HBox([hparam_txt, metrics_txt]),
-                            widgets.HBox([db.hparam_widget, db.metrics_widget]),
+                            widgets.HBox([db.latex_rows_widget, db.latex_cols_widget]),
                             widgets.HBox([b_table]),
     ])
     output_plot = widgets.Output()
@@ -57,12 +68,12 @@ def latex_tab(db, output):
         with output_plot:
             db.update_rm()
 
-            db.vars['columns'] = list(db.hparam_widget.value)
-            db.vars['score_columns'] = list(db.metrics_widget.value)
+            db.vars['latex_rows'] = list(db.latex_rows_widget.value)
+            db.vars['latex_columns'] = list(db.latex_cols_widget.value)
             # print('cols', db.hparam_dict)
             # stop
-            score_table = db.rm.get_latex_table(columns=db.vars.get('score_columns'), 
-                                            rows=db.vars.get('columns'),
+            score_table = db.rm.get_latex_table(columns=db.vars.get('latex_columns'), 
+                                            rows=db.vars.get('latex_rows'),
                                             caption='Results')
             print(score_table) 
 

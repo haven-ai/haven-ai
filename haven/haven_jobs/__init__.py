@@ -151,7 +151,7 @@ class JobManager:
             self.kill_jobs()
 
         # view experiments
-        print("Checking job status in %d seconds" % wait_seconds)
+        # print("Checking job status...")
         time.sleep(wait_seconds)
         self.print_job_status(exp_list=exp_list)
 
@@ -162,8 +162,9 @@ class JobManager:
         for k in summary_dict.keys():
             n_jobs = len(summary_dict[k])
             if n_jobs:
-                print('\nExperiments %s: %d' % (k, n_jobs))
-                print(pd.DataFrame(summary_dict[k]).head())
+                # print('\nExperiments %s: %d' % (k, n_jobs))
+                pass
+                # print(pd.DataFrame(summary_dict[k]).head())
 
         summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
         print(summary_dict)
@@ -201,9 +202,14 @@ class JobManager:
         if len(submit_dict) == 0:
             raise ValueError('The threads have an error, most likely a permission error (see above)')
         
-        pprint.pprint(submit_dict)
-        print("%d/%d experiments submitted." % (len([s for s in submit_dict.values() if 'SUBMITTED' in s]),
-                                                len(exp_list)))                                         
+        for i, (k,v) in enumerate(submit_dict.items()):
+            print('***')
+            print('Exp %d/%d - %s' % (i+1, len(submit_dict), v['message']))
+            print('exp_id: %s' % hu.hash_dict(v['exp_dict']))
+            pprint.pprint(v['exp_dict'])
+            print()
+
+        print("%d experiments submitted." % len(exp_list))                                      
         if len(submit_dict) > 0:
             assert len(submit_dict) == len(exp_list), 'considered exps does not match expected exps'
         return submit_dict
@@ -275,7 +281,7 @@ class JobManager:
             else:
                 raise ValueError('wtf')
 
-        submit_dict[job_id] = message
+        submit_dict[job_id] = {'exp_dict':exp_dict, 'message':message}
 
     def launch_exp_dict(self, exp_dict, savedir, command, job=None):
         """Submit a job job and save job dict and exp_dict."""
@@ -292,7 +298,7 @@ class JobManager:
         workdir_job = os.path.join(savedir, "code")
 
         # Copy the experiment code into the experiment folder
-        hu.copy_code(self.workdir + "/", workdir_job)
+        hu.copy_code(self.workdir + "/", workdir_job, verbose=0)
 
         # Run  command
         job_id = self.submit_job(command, workdir_job, savedir_logs=savedir)
