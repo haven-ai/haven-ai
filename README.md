@@ -28,7 +28,8 @@
     <td valign="top"><img src="docs/images/ork2.gif"></td>
     <td valign="top"><img src="docs/images/vis.gif"></td>
   </tr>
- </table>
+    </table>
+    
 
 
 ## **Create end-to-end ML projects with the following 4 steps**
@@ -141,7 +142,43 @@ Using the `cli`,
 haven --fname trainval.py --function trainval --dataset mnist --model lenet --lr 0.001,0.1
 ```
 
+## Structure
 
+<table>
+      <tr>
+    <td>Codebase Structure</td>
+     <td>Result Folder Structure</td>
+  </tr>
+      <tr>
+    <td valign="top">
+          <pre>
+project/
+├── src/
+│   ├── __init__.py
+│   ├── datasets.py
+│   └── models.py
+├── scripts/
+│   └── train_on_single_image.py
+├── exp_configs.py
+├── README.md
+└── trainval.py          # a copy of the code
+          </pre>
+          </td>
+    <td valign="top">
+           <pre>
+results/
+├── <exp_id>/
+│   ├── code/            # a copy of the code
+│   ├── images/          # qualitative results
+│   ├── exp_dict.json    # defines the hyperparameters
+│   ├── score_list.pkl   # list of scores saved each epoch
+│   ├── model.pth        # saved model state
+│   └── job_dict.json    # contains the job info
+          </pre>
+       </td>
+  </tr>
+ </table>
+ 
 ## Projects based on Haven-AI
 
 - COVID19: https://www.elementai.com/news/2020/accelerating-the-creation-of-ai-models-to-combat-covid-19-with-element-ai-orkestrator?fbclid=IwAR33nO8gqq7Bf8F4NyG3WYlH3c7t7QkgPAZEru4UpP2FGzSYfHZ5nnPLKZI
