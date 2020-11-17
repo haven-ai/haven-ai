@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Try out the Google Colab Demo</a>
+  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>
 
 </p>
 <p align="center">
