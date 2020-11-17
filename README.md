@@ -21,12 +21,12 @@
 
 <table align="center">
   <tr>
-    <td>Launch Experiments</td>
-     <td>Visualize Experiments</td>
+    <td>Launch Experiments on Cluster</td>
+     <td>Visualize Experiments on Jupyter</td>
   </tr>
   <tr>
-    <td valign="top"><img src="docs/ork.gif"></td>
-    <td valign="top"><img src="docs/vis.gif"></td>
+    <td valign="top"><img src="docs/images/ork.gif"></td>
+    <td valign="top"><img src="docs/images/vis.gif"></td>
   </tr>
  </table>
 
