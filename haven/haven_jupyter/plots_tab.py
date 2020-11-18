@@ -25,8 +25,12 @@ except:
 
 
 def plots_tab(self, output):
-    llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                        value=self.vars.get('legend_list', [self.rm.exp_params[0]]))
+    try:
+        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                        value=self.vars.get('legend_list'))
+    except:
+        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                        value=[self.rm.exp_params[0]])
     # widgets.Text(
     #     value=str(self.vars.get('legend_list', '[model]')),
     #     description='legend_list:',
@@ -73,16 +77,26 @@ def plots_tab(self, output):
     #     description='y_metrics:',
     #     disabled=False
     # )
-
-    d_x_metric_columns = widgets.Dropdown(
+    try:
+        d_x_metric_columns = widgets.Dropdown(
                 options=metrics_list,
-                   value=self.vars.get('x_metric', metric_example[0]),
+                   value=self.vars.get('x_metric'),
                 layout=widgets.Layout(width='300px'),
                 disabled=False,
             )
-
-    t_groupby_list = widgets.SelectMultiple(options=['None'] + self.rm.exp_params,
-                    value=self.vars.get('groupby_list', ['None']),)
+    except:
+        d_x_metric_columns = widgets.Dropdown(
+                options=metrics_list,
+                   value=metric_example[0],
+                layout=widgets.Layout(width='300px'),
+                disabled=False,
+            )
+    try:
+        t_groupby_list = widgets.SelectMultiple(options=['None'] + self.rm.exp_params,
+                        value=self.vars.get('groupby_list',))
+    except:
+        t_groupby_list = widgets.SelectMultiple(options=['None'] + self.rm.exp_params,
+                        value= ['None'])
     # widgets.Text(
     #     value=str(self.vars.get('groupby_list')),
     #     description='groupby_list:',
@@ -103,8 +117,13 @@ def plots_tab(self, output):
                 disabled=False,
             )
 
-    t_title_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                    value=self.vars.get('title_list', [self.rm.exp_params[0]]),)
+    try:
+        t_title_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                    value=self.vars.get('title_list'))
+    except:
+        t_title_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                    value=[self.rm.exp_params[0]])
+                    
     # widgets.Text(
     #     value=str(self.vars.get('title_list', 'dataset')),
     #     description='title_list:',

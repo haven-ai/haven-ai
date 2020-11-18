@@ -97,6 +97,9 @@ def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
             label = plots_line.get_label(legend_list, exp_dict, show_key=True)
         else:
             label = exp_id
+        
+        if 'epoch' in result_dict:
+            label += "_epoch:%d" % result_dict['epoch']
         # if legend_list is None:
         #     label = hu.hash_dict(exp_dict)
         # else:

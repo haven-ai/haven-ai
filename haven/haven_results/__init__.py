@@ -374,7 +374,8 @@ class ResultManager:
         [type]
             [description]
         """
-        return images_fig.get_images(exp_list=self.exp_list, savedir_base=self.savedir_base, verbose=self.verbose, **kwargs)
+        return images_fig.get_images(exp_list=self.exp_list,
+                         savedir_base=self.savedir_base, verbose=self.verbose, **kwargs)
 
     def get_job_summary(self, columns=None, add_prefix=False, **kwargs):
         """[summary]

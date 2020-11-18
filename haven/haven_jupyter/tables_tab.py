@@ -141,7 +141,7 @@ def tables_tab(db, output):
                 
                 print('\nLogs')
                 print('-'*50)
-                pprint.pprint(logs['logs'])     
+                pprint.pprint(logs.get('logs'))     
     
     def on_failed_clicked(b):
         output_plot.clear_output()
@@ -171,7 +171,7 @@ def tables_tab(db, output):
                     
                     print('\nLogs')
                     print('-'*50)
-                    pprint.pprint(failed['logs'])
+                    pprint.pprint(failed.get('logs'))
 
     # Add call listeners
     b_table.on_click(on_table_clicked)

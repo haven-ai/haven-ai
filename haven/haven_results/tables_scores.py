@@ -156,7 +156,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         return df.to_latex(index=False)
 
     if return_columns:
-        return df, hparam_columns, metric_columns
+        return df, sorted(hparam_columns), sorted(metric_columns)
     return df
 
 def get_score_lists(exp_list, savedir_base, filterby_list=None, verbose=True,

@@ -29,9 +29,12 @@ def images_tab(self, output):
         description='figsize:',
         disabled=False
             )
-    llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                        value=self.vars.get('legend_list', [self.rm.exp_params[0]]))
-    
+    try:
+        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                        value=self.vars.get('legend_list'))
+    except:
+        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
+                        value=[self.rm.exp_params[0]])
     t_n_images = widgets.Text(
         value=str(self.vars.get('n_images', '5')),
         description='n_images:',
@@ -77,7 +80,8 @@ def images_tab(self, output):
             self.vars['n_images'] = int(t_n_images.value)
             self.vars['n_exps'] = int(t_n_exps.value)
             self.vars['dirname'] = t_dirname.value
-            self.rm_original.fig_image_list =  self.rm.get_images(legend_list=self.vars['legend_list'], 
+            self.rm_original.fig_image_list =  self.rm.get_images(
+                                                    legend_list=self.vars['legend_list'], 
                     n_images=self.vars['n_images'],
                     n_exps=self.vars['n_exps'],
                     figsize=self.vars['figsize'],
