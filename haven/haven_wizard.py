@@ -43,8 +43,10 @@ def make_wide(formatter, w=120, h=36):
         warnings.warn("argparse help formatter failed, falling back.")
         return formatter
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None, reset=None):
-    args = get_args()
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None, 
+               reset=None, args=None):
+    if args is None:
+        args = get_args()
 
     # Asserts
     # =======

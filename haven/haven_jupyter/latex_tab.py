@@ -47,10 +47,10 @@ def latex_tab(db, output):
                                     layout=db.layout_label,)
     try:
         db.latex_cols_widget =  widgets.SelectMultiple(value=list(db.vars.get('latex_columns')),
-                        options=[k for k in db.rm_original.score_keys if k is not 'None'])
+                        options=db.rm_original.score_keys)
     except:
         db.latex_cols_widget =  widgets.SelectMultiple(value=[db.rm_original.score_keys[0]],
-                        options=[k for k in db.rm_original.score_keys if k is not 'None'])
+                        options=db.rm_original.score_keys)
 
     button = widgets.VBox([ 
                             widgets.HBox([hparam_txt, metrics_txt]),
