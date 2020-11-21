@@ -44,7 +44,7 @@ pip install --upgrade git+https://github.com/haven-ai/haven-ai
 
 ### 1. Setup Experiments
 
-Create trainval.py with the following code
+Create `trainval.py` file and add the following code,
 
 ```python
 import tqdm
@@ -96,6 +96,8 @@ if __name__ == '__main__':
 
 ### 2. Run Experiments
 
+Run the following command in `terminal`,
+
 ```
 python trainval.py --reset 1 -v trainval_results.ipynb --savedir_base ../results
 ```
@@ -133,17 +135,12 @@ jupyter notebook
 
 ### 4. Run Experiments in Cluster
 
-Using the `api`,
+If you have access to the ElementAI cluster `api` then you can run the experiments in cluster (slurm option coming soon),
 
 ```
 python trainval.py --run_jobs 1 --reset 1
 ```
 
-Using the `cli`,
-
-```
-haven --fname trainval.py --function trainval --dataset mnist --model lenet --lr 0.001,0.1
-```
 
 ## Structure
 
