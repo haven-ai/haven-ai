@@ -6,10 +6,13 @@
 </p>
 
 <p align="center">
-  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> or see <a href="#papers-based-on-haven-ai">Papers that are based on Haven-AI</a>
+  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> || See <a href="#papers-based-on-haven-ai">Papers that are based on Haven-AI</a>
 
 </p>
-<p align="center">Create a benchmark in 4 steps:
+<p align="center">
+Create a Benchmark with these 4 Steps
+</p>
+<p align="center">
   <a href="#1-setup-experiments">(1) Setup Experiments</a>|
     <a href="#2-run-experiments">(2) Run Experiments</a>|
   <a href="#3-visualize-experiments">(3) Visualize Experiments</a>|
