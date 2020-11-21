@@ -36,7 +36,7 @@
 
 ### 0 Install
 ```
-pip install --upgrade --quiet git+https://github.com/haven-ai/haven-ai
+pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ```
 
 ### 1. Setup Experiments
