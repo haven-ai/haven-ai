@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a>
+  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> or see <a href="#papers-based-on-haven-ai">Papers that are based on Haven-AI</a>
 
 </p>
-<p align="center">
-  <a href="#1-setup-experiments">Setup Experiments</a>|
-    <a href="#2-run-experiments">Run Experiments</a>|
-  <a href="#3-visualize-experiments">Visualize Experiments</a>|
-  <a href="#4-run-experiments-in-cluster">Run Experiments in Cluster</a>
+<p align="center">Create a benchmark in 4 steps:
+  <a href="#1-setup-experiments">(1) Setup Experiments</a>|
+    <a href="#2-run-experiments">(2) Run Experiments</a>|
+  <a href="#3-visualize-experiments">(3) Visualize Experiments</a>|
+  <a href="#4-run-experiments-in-cluster">(4) Run Experiments in Cluster</a>
 </p>
 
 
@@ -179,7 +179,7 @@ results/
   </tr>
  </table>
  
-## Projects based on Haven-AI
+## Papers based on Haven-AI
 
 - COVID19: https://www.elementai.com/news/2020/accelerating-the-creation-of-ai-models-to-combat-covid-19-with-element-ai-orkestrator
 - LCFCN: https://github.com/ElementAI/LCFCN
