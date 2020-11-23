@@ -3,12 +3,12 @@ import sys, os, pprint
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.insert(0, path)
 
-from haven.haven_jobs import slurm_manager as sm
+# from haven.haven_jobs import slurm_manager as sm
 
   
-from haven import haven_chk as hc
-from haven import haven_results as hr
-from haven import haven_utils as hu
+# from haven import haven_chk as hc
+# from haven import haven_results as hr
+# from haven import haven_utils as hu
 import torch
 import torchvision
 import tqdm
@@ -17,12 +17,10 @@ import pprint
 import itertools
 import os
 import pylab as plt
-import exp_configs
-import job_configs
 import time
 import numpy as np
 from torch.utils.data import RandomSampler, DataLoader
-
+print()
 
 # Job submission
 # ==============
