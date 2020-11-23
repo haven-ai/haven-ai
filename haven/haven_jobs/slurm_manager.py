@@ -15,8 +15,24 @@ import requests
 # ==============
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
     job_spec = get_job_spec(job_config, command, savedir_logs, workdir=workdir)
-    job = api.v1_account_job_post(account_id=account_id, human=1, job_spec=job_spec)
-    job_id = job.id
+    
+    # read slurm setting
+    lines = "#! /bin/bash \n"
+    lines += "#SBATCH --account=%s \n" % job_configs.ACCOUNT_ID
+    # todo: check how the job_spec is defined
+    for key in list(job_spec.JOB_CONFIG.keys()):
+        lines += "#SBATCH --%s=%s \n" % (key, job_spec.JOB_CONFIG[key])
+    lines += command
+
+    exp_id = command.split("-ei ")[1].split(" ")[0]  
+    file_name = "%s.sh" % exp_id
+    hu.save_txt(file_name, lines)
+    # launch the exp
+    submit_command = "sbatch %s.sh" % exp_id
+    job_id = hu.subprocess_call(submit_command).split()[-1]
+
+    # delete the slurm.sh
+    os.remove(file_name)
     return job_id
 
 def get_job_spec(job_config, command, savedir_logs, workdir):
