@@ -156,6 +156,11 @@ def launch_slurm_job(command, savedir_base):
 
 
 if __name__ == "__main__":
+  # task 1
+
+  # task 2
+
+  
   # run with job scheduler
   exp_list = [{'model':{'name':'mlp', 'n_layers':20}, 
               'dataset':'mnist', 'batch_size':1}]
