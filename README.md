@@ -35,7 +35,7 @@ Create a Benchmark with these 4 Steps
     
 
 
-## **Create end-to-end ML projects with the following 4 steps**
+## **Create end-to-end ML benchmarks with the following 4 steps**
 
 ### 0 Install
 ```
