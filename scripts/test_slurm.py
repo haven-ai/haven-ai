@@ -117,8 +117,15 @@ if __name__ == "__main__":
   kill_job(job_id)
   job_info = get_job(job_id)
   hu.save_json('/home/issamou/shared/results/slurm/example/job_info_dead.json', job_info)
+  
+  # task 4 - get all jobs from an account as a list
+  """  
+  Get all jobs from an account as a list and save it in directory below
+  """
+  job_info_list = get_jobs(job_id)
+  hu.save_json('/home/issamou/shared/results/slurm/example/job_info_list.json', job_info_list)
 
-  # task 4 - run 10 jobs using threads
+  # task 5 - run 10 jobs using threads
   """
   Use thee parallel threads from Haven and run these jobs in parallel
   """
