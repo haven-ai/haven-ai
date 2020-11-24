@@ -61,7 +61,7 @@ def get_existing_slurm_job_commands(exp_list, savedir_base):
     return existing_job_commands
 
 
-def submit_job(command, savedir, workdir=None, job_config=None):
+def submit_job(command, savedir, job_config=None):
     # read slurm setting
     lines = "#! /bin/bash \n"
     if job_config is not None:
