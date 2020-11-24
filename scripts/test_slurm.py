@@ -61,11 +61,12 @@ def get_existing_slurm_job_commands(exp_list, savedir_base):
     return existing_job_commands
 
 
-def submit_job(command, savedir, job_config=None):
+def submit_job(command, savedir, workdir=None, job_config=None):
     # read slurm setting
     lines = "#! /bin/bash \n"
     if job_config is not None:
-        lines += "#SBATCH --account=%s \n" % job_config['ACCOUNT_ID']
+        lines += "#SBATCH --account=%s \n" % job_config['account_id']
+        lines += "#SBATCH --chdir=%s \n" % job_config['chdir']
         for key in list(job_config.keys()):
             lines += "#SBATCH --%s=%s \n" % (key, job_config[key])
     path_log = os.path.join(savedir, "logs.txt")
