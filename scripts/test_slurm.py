@@ -127,7 +127,6 @@ def submit_job(command, savedir):
 
     return job_id
 
-
 if __name__ == "__main__":
   # task 1 - submit example job
   """
@@ -141,7 +140,8 @@ if __name__ == "__main__":
   """
   Get job info as dict and save it as json in the directory specified below
   """
-  job_info = get_job(job_id)
+  job_info = get_job(job_id).replace('\n', '')
+  job_info = {v.split('=')[0]:v.split('=')[1] for v in job_info.split(' ') if '=' in v }
   hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_info)
 
   # # task 3 - kill job
