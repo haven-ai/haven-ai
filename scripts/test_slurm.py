@@ -37,6 +37,8 @@ def get_job(job_id):
     while True:
       try:
         job_info = hu.subprocess_call(command)
+        job_info = job_info.replace('\n', '')
+        job_info = {v.split('=')[0]:v.split('=')[1] for v in job_info.split(' ') if '=' in v }
       except:
         print("scontrol time out and retry now")
         time.sleep(1)
@@ -54,9 +56,15 @@ def get_jobs(account_id):
 # ===========
 def kill_job(job_id):
     """Kill a job job until it is dead."""
-    # todo: subprocess_call() time out?
     kill_command  = "scancel %s" % job_id
-    info = hu.subprocess_call(kill_command)     # no return message after scancel
+    while True:
+      try:
+        hu.subprocess_call(kill_command)     # no return message after scancel
+      except:
+        print("scancel time out and retry now")
+        time.sleep(1)
+        continue
+      break
     return
 import argparse
 
@@ -133,25 +141,23 @@ if __name__ == "__main__":
   Run echo 35 and forward the logs to <savedir>/logs.txt
   """
   command = 'echo 35'
-  savedir = '/home/xhdeng/shared/results/test_slurm/example'
+  savedir = '/home/xhdeng/shared/results/test_slurm/example_kill_job'
   job_id = submit_job(command, savedir)
 
-  # task 2 - get job info as dict
-  """
-  Get job info as dict and save it as json in the directory specified below
-  """
-  job_info = get_job(job_id).replace('\n', '')
-  job_info = {v.split('=')[0]:v.split('=')[1] for v in job_info.split(' ') if '=' in v }
-  hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_info)
+  # # task 2 - get job info as dict
+  # """
+  # Get job info as dict and save it as json in the directory specified below
+  # """
+  # hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_info)
 
-  # # task 3 - kill job
-  # """
-  # Kill job then gets its info as dict and save it as json in the directory specified below
-  # it should say something like CANCELLED
-  # """
-  # kill_job(job_id)
-  # job_info = get_job(job_id)
-  # hu.save_json('/home/issamou/shared/results/slurm/example/job_info_dead.json', job_info)
+  # task 3 - kill job
+  """
+  Kill job then gets its info as dict and save it as json in the directory specified below
+  it should say something like CANCELLED
+  """
+  kill_job(job_id)
+  job_info = get_job(job_id)
+  hu.save_json('/home/xhdeng/shared/results/test_slurm/example_kill_job/job_info_dead.json', job_info)
   
   # # task 4 - get all jobs from an account as a list
   # """  
