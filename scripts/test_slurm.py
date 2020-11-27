@@ -47,11 +47,26 @@ def get_job(job_id):
     return job_info
     
 
-def get_jobs(account_id):
+def get_jobs(user_name):
     # account_id = hu.subprocess_call('eai account get').split('\n')[-2].split(' ')[0]
-    return 
-           
+    ''' get the first 3 jobs'''
+    command = "squeue --user=%s" % user_name
+    while True:
+      try:
+        job_list = hu.subprocess_call(command)
+        job_list = job_list.split('\n')
+        job_list = [v.lstrip().split(" ")[0] for v in job_list[1:]]
+        result = []
+        for job_id in job_list:
+          result.append(get_job(job_id))
+      except:
+        print("scontrol time out and retry now")
+        time.sleep(1)
+        continue
+      break
+    return result
 
+           
 # Job kill
 # ===========
 def kill_job(job_id):
@@ -140,9 +155,9 @@ if __name__ == "__main__":
   """
   Run echo 35 and forward the logs to <savedir>/logs.txt
   """
-  command = 'echo 35'
-  savedir = '/home/xhdeng/shared/results/test_slurm/example_kill_job'
-  job_id = submit_job(command, savedir)
+  # command = 'echo 35'
+  # savedir = '/home/xhdeng/shared/results/test_slurm/example_get_jobs'
+  # job_id = submit_job(command, savedir)
 
   # # task 2 - get job info as dict
   # """
@@ -151,37 +166,35 @@ if __name__ == "__main__":
   # hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_info)
 
   # task 3 - kill job
-  """
-  Kill job then gets its info as dict and save it as json in the directory specified below
-  it should say something like CANCELLED
-  """
-  kill_job(job_id)
-  job_info = get_job(job_id)
-  hu.save_json('/home/xhdeng/shared/results/test_slurm/example_kill_job/job_info_dead.json', job_info)
+  # """
+  # Kill job then gets its info as dict and save it as json in the directory specified below
+  # it should say something like CANCELLED
+  # """
+  # kill_job(job_id)
+  # job_info = get_job(job_id)
+  # hu.save_json('/home/xhdeng/shared/results/test_slurm/example_kill_job/job_info_dead.json', job_info)
   
-  # # task 4 - get all jobs from an account as a list
+  # task 4 - get all jobs from an account as a list
   # """  
   # Get all jobs from an account as a list and save it in directory below
   # """
-  # job_info_list = get_jobs(job_id)
-  # hu.save_json('/home/issamou/shared/results/slurm/example/job_info_list.json', job_info_list)
+  # job_info_list = get_jobs(job_configs.USER_NAME)
+  # hu.save_json('/home/xhdeng/shared/results/test_slurm/example_get_jobs/job_info_list.json', job_info_list)
 
   # # task 5 - run 10 jobs using threads
-  # """
-  # Use thee parallel threads from Haven and run these jobs in parallel
-  # """
-  # pr = hu.Parallel()
-  # command_list = []
+  """
+  Use thee parallel threads from Haven and run these jobs in parallel
+  """
+  pr = hu.Parallel()
 
-  # for i in range(1,20):
-  #   command = 'echo %d' % i
-  #   savedir = '/home/issamou/shared/results/slurm/example_%d' % i
-  #   submit_job(command, savedir)
+  for i in range(1,20):
+    command = 'echo %d' % i
+    savedir = '/home/xhdeng/shared/results/test_slurm/example_%d' % i
     
-  #   pr.add(submit_job, command, savedir)
+    pr.add(submit_job, command, savedir)
 
-  # pr.run()
-  # pr.close()
+  pr.run()
+  pr.close()
     
 
  
