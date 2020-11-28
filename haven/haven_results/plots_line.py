@@ -244,7 +244,7 @@ def get_plot(exp_list, savedir_base,
                 # tools.pretty_plot
             elif mode == 'line':
                 # plot the mean in a line
-                axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
+                line_plot,  = axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
                     label=label, marker=marker, markevery=markevery)
 
                 if avg_across and hasattr(y_list, 'size'):
@@ -252,7 +252,7 @@ def get_plot(exp_list, savedir_base,
                     axis.fill_between(x_list, 
                             y_list - result_dict.get('y_std_list', 0),
                             y_list + result_dict.get('y_std_list', 0), 
-                            color = color,  
+                            color = line_plot.get_color(),  
                             alpha=0.1)
 
             elif mode == 'bar':

@@ -9,7 +9,7 @@ from .plots_tab import plots_tab
 from .tables_tab import tables_tab
 from .latex_tab import latex_tab
 from .images_tab import images_tab
-from . import utils_widgets as uw
+from . import widgets as wdg
 
 import os
 import pprint

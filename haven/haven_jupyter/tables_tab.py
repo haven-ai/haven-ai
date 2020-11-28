@@ -9,7 +9,7 @@ import pprint, json
 import copy
 import pprint
 import pandas as pd 
-
+from . import widgets as wdg
 try:
     import ast
     from ipywidgets import Button, HBox, VBox
@@ -24,22 +24,15 @@ except:
 
 
 def tables_tab(db, output):
-    d_columns_txt = widgets.Label(value="Select Hyperparam column", 
-                                    layout=db.layout_label,)
-    d_columns = widgets.Dropdown(
-                options=['None'] + db.rm.exp_params,
-                value='None',
-                layout=db.layout_dropdown,
-                disabled=False,
-            )
-    d_score_columns_txt = widgets.Label(value="Select Score column",
-                                        layout=db.layout_label,)
-    d_score_columns = widgets.Dropdown(
-            options=db.rm_original.score_keys,
-            value='None',
-            layout=db.layout_dropdown,
-            disabled=False,
-        )
+    w_columns = wdg.SelectMultiple(header="Hyperparameters:", 
+                            options=db.rm.exp_params,
+                            db_vars=db.vars, 
+                            var='columns')
+    w_score_columns = wdg.SelectMultiple(header="Metrics:", 
+                            options=db.rm.score_keys,
+                            db_vars=db.vars, 
+                            var='score_columns')
+
 
     bstatus = widgets.Button(description="Jobs Status")
     blogs = widgets.Button(description="Jobs Logs")
@@ -49,33 +42,15 @@ def tables_tab(db, output):
     b_meta = widgets.Button(description="Display Meta Table")
     b_diff = widgets.Button(description="Display Filtered Table")
 
-    # d_avg_across_columns = widgets.Text(
-    #     value=str(db.vars.get('avg_across', 'None')),
-    #     description='avg_across:',
-    #     disabled=False
-    # )
-    d_avg_across_txt = widgets.Label(value="avg_across:",)
-    d_avg_across_columns =  widgets.Dropdown(
-                options=['None'] + db.rm.exp_params,
-                value='None',
-                layout=db.layout_dropdown,
-                disabled=False,
-            )
-    hparam_txt = widgets.Label(value="Hyperparamters:", 
-                                    layout=widgets.Layout(width='300px'),)
-    db.hparam_widget = widgets.SelectMultiple(options=db.rm.exp_params)
-
-    metrics_txt = widgets.Label(value="Metrics:", 
-                                    layout=db.layout_label,)
-    db.metrics_widget =  widgets.SelectMultiple(options=[k for k in db.rm_original.score_keys if k is not 'None'])
+    w_avg_across = wdg.Dropdown(header='Avg Across',
+                                options=['None'] + db.rm.exp_params,
+                            db_vars=db.vars, 
+                            var='avg_across')
 
     button = widgets.VBox([ 
-                            widgets.HBox([hparam_txt, metrics_txt]),
-                            widgets.HBox([db.hparam_widget, db.metrics_widget]),
-                            widgets.HBox([b_table, bstatus, blogs, bfailed, d_avg_across_txt, d_avg_across_columns]),
+                            widgets.HBox([w_columns.get_widget(), w_score_columns.get_widget(), w_avg_across.get_widget()]),
+                            widgets.HBox([b_table, bstatus, blogs, bfailed, ]),
                            
-                            # widgets.HBox([d_columns_txt, d_score_columns_txt]),
-                            # widgets.HBox([d_columns, d_score_columns ]),
     ])
     output_plot = widgets.Output()
 
@@ -88,18 +63,9 @@ def tables_tab(db, output):
         with output_plot:
             db.update_rm()
 
-            db.vars['avg_across'] = d_avg_across_columns.value
-            avg_across_value = db.vars.get('avg_across', 'None')
-            if avg_across_value == "None":
-                avg_across_value = None
-
-            db.vars['columns'] = list(db.hparam_widget.value)
-            db.vars['score_columns'] = list(db.metrics_widget.value)
-            # print('cols', db.hparam_dict)
-            # stop
-            score_table = db.rm.get_score_table(columns=db.vars.get('columns'), 
-                                            score_columns=db.vars.get('score_columns'),
-                                            avg_across=avg_across_value)
+            score_table = db.rm.get_score_table(columns=w_columns.update(), 
+                                            score_columns=w_score_columns.update(),
+                                            avg_across=w_avg_across.update())
             display(score_table) 
 
     def on_job_status_clicked(b):
@@ -179,47 +145,5 @@ def tables_tab(db, output):
     blogs.on_click(on_logs_clicked)
     bfailed.on_click(on_failed_clicked)
 
-    d_columns.observe(on_table_clicked)
-    d_score_columns.observe(on_table_clicked)
-
-    # meta stuff and column filtration
-    def on_bmeta_clicked(b):
-        db.vars['show_meta'] = 1 - db.vars.get('show_meta', 0)
-        on_table_clicked(None)
-
-    def on_hparam_diff_clicked(b):
-        db.vars['hparam_diff'] = 2 - db.vars.get('hparam_diff', 0)
-        on_table_clicked(None)
-
-    b_meta.on_click(on_bmeta_clicked)
-    b_diff.on_click(on_hparam_diff_clicked)
 
 
-def columns_widget(label, column_list):
-    names = []
-    checkbox_objects = []
-    objects = [label]
-    for key in column_list:
-        c = widgets.Checkbox(value=False)
-        checkbox_objects.append(c)
-        l = widgets.Label(key)
-        l.layout.width='500ex'
-        objects.append(c)
-        objects.append(l)
-        names.append(key)
-
-    arg_dict = {names[i]: checkbox for i, checkbox in enumerate(checkbox_objects)}
-    ui = widgets.HBox(children=objects)
-    selected_data = []
-
-    def select_data(**kwargs):
-        selected_data.clear()
-
-        for key in kwargs:
-            if kwargs[key] is True:
-                selected_data.append(key)
-
-        print(selected_data)
-
-    # out = widgets.interactive_output(select_data, arg_dict)
-    return ui, arg_dict

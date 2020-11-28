@@ -9,7 +9,7 @@ import pprint, json
 import copy
 import pprint
 import pandas as pd 
-
+from . import widgets as wdg
 try:
     import ast
     from ipywidgets import Button, HBox, VBox
@@ -24,43 +24,26 @@ except:
 
 
 def images_tab(self, output):
-    tfigsize = widgets.Text(
-        value=str(self.vars.get('figsize', '(10,5)')),
-        description='figsize:',
-        disabled=False
-            )
-    try:
-        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                        value=self.vars.get('legend_list'))
-    except:
-        llegend_list = widgets.SelectMultiple(options=self.rm.exp_params,
-                        value=[self.rm.exp_params[0]])
-    t_n_images = widgets.Text(
-        value=str(self.vars.get('n_images', '5')),
-        description='n_images:',
-        disabled=False
-            )
+    db = self
 
-    t_n_exps = widgets.Text(
-        value=str(self.vars.get('n_exps', '3')),
-        description='n_exps:',
-        disabled=False
-            )
-    t_dirname = widgets.Text(
-        value=str(self.vars.get('dirname', 'images')),
-        description='dirname:',
-        disabled=False
-            )
+    w_legend = wdg.SelectMultiple(header="Legend:", 
+                            options=db.rm.exp_params,
+                            db_vars=db.vars, 
+                            var='legend_list')
+
+    w_n_exps = wdg.Text('n_exps:', default='3', type='int',db_vars=db.vars, var='n_exps')
+    w_n_images = wdg.Text('n_images:', default='5', type='int',db_vars=db.vars, var='n_images')
+    w_figsize = wdg.Text('figsize:', default='(10,5)', type='tuple', db_vars=db.vars, var='figsize')
+    w_dirname = wdg.Text('dirname:', default='images', type='str',db_vars=db.vars, var='dirname')
+
     bdownload = widgets.Button(description="Download Images", 
                                 layout=self.layout_button)
     bdownload_out = widgets.Output(layout=self.layout_button)
     brefresh = widgets.Button(description="Display Images")
     button = widgets.VBox([
-            widgets.HBox([ widgets.Label(value="Legend:", 
-                                    layout=widgets.Layout(width='300px'),) ,t_n_exps, t_n_images, ]),
-            widgets.HBox([llegend_list, tfigsize,t_dirname ]),
-            widgets.HBox([brefresh, bdownload, bdownload_out]),
-                        ])
+            widgets.HBox([w_legend.get_widget() ,w_n_exps.get_widget(), 
+                        w_n_images.get_widget(), w_figsize.get_widget(),w_dirname.get_widget() ]),
+            widgets.HBox([brefresh, bdownload, bdownload_out]),])
 
     output_plot = widgets.Output()
 
@@ -74,18 +57,13 @@ def images_tab(self, output):
             self.update_rm()
         
         
-            w, h = tfigsize.value.strip('(').strip(')').split(',')
-            self.vars['figsize'] = (int(w), int(h))
-            self.vars['legend_list'] = llegend_list.value
-            self.vars['n_images'] = int(t_n_images.value)
-            self.vars['n_exps'] = int(t_n_exps.value)
-            self.vars['dirname'] = t_dirname.value
+            
             self.rm_original.fig_image_list =  self.rm.get_images(
-                                                    legend_list=self.vars['legend_list'], 
-                    n_images=self.vars['n_images'],
-                    n_exps=self.vars['n_exps'],
-                    figsize=self.vars['figsize'],
-                    dirname=self.vars['dirname'])
+                                                    legend_list=w_legend.update(), 
+                    n_images=w_n_images.update(),
+                    n_exps=w_n_exps.update(),
+                    figsize=w_figsize.update(),
+                    dirname=w_dirname.update())
             show_inline_matplotlib_plots()
             
     brefresh.on_click(on_clicked)
