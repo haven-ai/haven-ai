@@ -126,7 +126,8 @@ class ResultManager:
             for exp_dict in self.exp_list_all:
                 exp_dict[mode_key] = 1
 
-        _, self.exp_params, self.score_keys = self.get_score_df(flatten_columns=True, show_meta=False, return_columns=True, show_max_min=False)
+        _, self.exp_params, self.score_keys = self.get_score_df(flatten_columns=True, show_meta=False, 
+                                        return_columns=True, show_max_min=False)
         self.score_keys += ['None']
 
         self.exp_groups['all'] = copy.deepcopy(self.exp_list_all)
