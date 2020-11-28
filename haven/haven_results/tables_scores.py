@@ -48,7 +48,10 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     if len(exp_list) == 0:
         if verbose:
             print('exp_list is empty...')
-        return
+        if return_columns:
+            return pd.DataFrame([]), [], []
+        else:
+            return pd.DataFrame([])
     exp_list = hu.filter_exp_list(exp_list, filterby_list, savedir_base=savedir_base, verbose=verbose)
 
     # aggregate results

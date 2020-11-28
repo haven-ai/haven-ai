@@ -9,6 +9,7 @@ sys.path.insert(0, path)
 # from haven import haven_chk as hc
 # from haven import haven_results as hr
 from haven import haven_utils as hu
+from haven import haven_examples as he
 import torch
 import torchvision
 import tqdm
@@ -22,7 +23,10 @@ import numpy as np
 from torch.utils.data import RandomSampler, DataLoader
 print()
 
-import job_configs
+try:
+  import job_configs
+except:
+  pass
 # from haven_utils import file_utils
 
 
@@ -150,6 +154,38 @@ def submit_job(command, savedir):
 
     return job_id
 
+# 1. define the training and validation function
+def trainval(exp_dict, savedir, args):
+    """
+    exp_dict: dictionary defining the hyperparameters of the experiment
+    savedir: the directory where the experiment will be saved
+    args: arguments passed through the command line
+    """
+    # 2. Create data loader and model 
+    train_loader = he.get_loader(name=exp_dict['dataset'], split='train', 
+                                 datadir=os.path.dirname(savedir),
+                                 exp_dict=exp_dict)
+    model = he.get_model(name=exp_dict['model'], exp_dict=exp_dict)
+
+    # 3. load checkpoint
+    chk_dict = hw.get_checkpoint(savedir)
+
+    # 4. Add main loop
+    for epoch in tqdm.tqdm(range(chk_dict['epoch'], 10), 
+                           desc="Running Experiment"):
+        # 5. train for one epoch
+        train_dict = model.train_on_loader(train_loader, epoch=epoch)
+
+        # 6. get and save metrics
+        score_dict = {'epoch':epoch, 'acc': train_dict['train_acc'], 
+                      'loss':train_dict['train_loss']}
+        chk_dict['score_list'] += [score_dict]
+
+        images = model.vis_on_loader(train_loader)
+
+    hw.save_checkpoint(savedir, score_list=chk_dict['score_list'], images=[images])
+    print('Experiment done\n')
+
 if __name__ == "__main__":
   # task 1 - submit example job
   """
@@ -182,19 +218,75 @@ if __name__ == "__main__":
   # hu.save_json('/home/xhdeng/shared/results/test_slurm/example_get_jobs/job_info_list.json', job_info_list)
 
   # # task 5 - run 10 jobs using threads
-  """
-  Use thee parallel threads from Haven and run these jobs in parallel
-  """
-  pr = hu.Parallel()
+  # """
+  # Use thee parallel threads from Haven and run these jobs in parallel
+  # """
+  # pr = hu.Parallel()
 
-  for i in range(1,20):
-    command = 'echo %d' % i
-    savedir = '/home/xhdeng/shared/results/test_slurm/example_%d' % i
+  # for i in range(1,20):
+  #   command = 'echo %d' % i
+  #   savedir = '/home/xhdeng/shared/results/test_slurm/example_%d' % i
     
-    pr.add(submit_job, command, savedir)
+  #   pr.add(submit_job, command, savedir)
 
-  pr.run()
-  pr.close()
+  # pr.run()
+  # pr.close()
+
+  # # task 6 with menu - run mnist experiments on these 5 learning rates
+  import argparse
+
+  parser = argparse.ArgumentParser()
+
+  parser.add_argument('-ei', '--exp_id')
+  args = parser.parse_args()
+  exp_list = []
+  for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 'bug']:
+      exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
+  
+  if args.exp_id is None:
+    # run jobs
     
+    print("\nTotal Experiments:", len(exp_list))
+    prompt = ("\nMenu:\n"
+              "  0)'ipdb' run ipdb for an interactive session; or\n"
+              "  1)'reset' to reset the experiments; or\n"
+              "  2)'run' to run the remaining experiments and retry the failed ones; or\n"
+              "  3)'status' to view the job status; or\n"
+              "  4)'kill' to kill the jobs.\n"
+              "Type option: "
+              )
+    
+    option = input(prompt)
+    if option == 'run':
+      # only run if job has failed or never ran before
+      
+      for exp_dict in exp_list:
+        exp_id = hu.hash_dict(exp_dict)
+        command = 'python test_slurm.py -ei %s' % exp_id
+
+    elif option == 'reset':
+      # ressset each experiment (delete the checkpoint and reset)
+      command = 'python test_slurm.py -ei %s' % exp_id
+      for exp_dict in exp_list:
+        exp_id = hu.hash_dict(exp_dict)
+        command = 'python test_slurm.py -ei %s' % exp_id
+
+    elif option == 'status':
+      # get job status of each exp
+      for exp_dict in exp_list:
+        exp_id = hu.hash_dict(exp_dict)
+    elif option == 'kill':
+      # make sure all jobs for the exps are dead
+      for exp_dict in exp_list:
+        exp_id = hu.hash_dict(exp_dict)
+
+  else:
+    for exp_dict in exp_list:
+      exp_id = hu.hash_dict(exp_dict)
+      savedir = '/home/xhdeng/shared/results/test_slurm/%s' % exp_id
+      if exp_id is not None and exp_id == args.exp_id:
+        trainval(exp_dict, savedir, args={})
+   
+  
 
  
