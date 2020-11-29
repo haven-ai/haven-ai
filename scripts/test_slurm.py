@@ -43,10 +43,13 @@ def get_job(job_id):
         job_info = hu.subprocess_call(command)
         job_info = job_info.replace('\n', '')
         job_info = {v.split('=')[0]:v.split('=')[1] for v in job_info.split(' ') if '=' in v }
-      except:
-        print("scontrol time out and retry now")
-        time.sleep(1)
-        continue
+      except Exception as e:
+        if "Socket timed out" in str(e):
+          print("scontrol time out and retry now")
+          time.sleep(1)
+          continue
+        else:
+          print(e)
       break
     return job_info
     
@@ -61,12 +64,15 @@ def get_jobs(user_name):
         job_list = job_list.split('\n')
         job_list = [v.lstrip().split(" ")[0] for v in job_list[1:]]
         result = []
-        for job_id in job_list:
-          result.append(get_job(job_id))
-      except:
-        print("scontrol time out and retry now")
-        time.sleep(1)
-        continue
+        for i in range(0, 3):
+          result.append(get_job(job_list[i]))
+      except Exception as e:
+        if "Socket timed out" in str(e):
+          print("scontrol time out and retry now")
+          time.sleep(1)
+          continue
+        else:
+          print(e)
       break
     return result
 
@@ -79,10 +85,13 @@ def kill_job(job_id):
     while True:
       try:
         hu.subprocess_call(kill_command)     # no return message after scancel
-      except:
-        print("scancel time out and retry now")
-        time.sleep(1)
-        continue
+      except Exception as e:
+        if "Socket timed out" in str(e):
+          print("scancel time out and retry now")
+          time.sleep(1)
+          continue
+        else:
+          print(e)
       break
     return
 import argparse
@@ -136,10 +145,13 @@ def submit_job(command, savedir):
     while True:
       try:
         job_id = hu.subprocess_call(submit_command).split()[-1]
-      except:
-        print("slurm time out and retry now")
-        time.sleep(1)
-        continue
+      except Exception as e:
+        if "Socket timed out" in str(e):
+          print("slurm time out and retry now")
+          time.sleep(1)
+          continue
+        else:
+          print(e)
       break
 
     # save the command and job id in job_dict.json
@@ -199,6 +211,7 @@ if __name__ == "__main__":
   # """
   # Get job info as dict and save it as json in the directory specified below
   # """
+  # job_info = get_job(job_id)
   # hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_info)
 
   # task 3 - kill job
