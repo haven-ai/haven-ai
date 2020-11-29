@@ -6,7 +6,7 @@ sys.path.insert(0, path)
 # from haven.haven_jobs import slurm_manager as sm
 
   
-# from haven import haven_chk as hc
+from haven import haven_chk as hc
 # from haven import haven_results as hr
 from haven import haven_utils as hu
 from haven import haven_examples as he
@@ -96,6 +96,15 @@ def kill_job(job_id):
     return
 import argparse
 
+def get_job_id(exp_id, savedir_base):
+  savedir = os.path.join(savedir_base, exp_id)
+  file_name = os.path.join(savedir, "job_dict.json")
+  if not os.path.exists(file_name):
+    print("no job id")
+    return -1
+  job_dict = hu.load_json(file_name)
+  return job_dict["job_id"]
+  
 
 def get_existing_slurm_job_commands(exp_list, savedir_base):
     existing_job_commands = []
@@ -246,6 +255,7 @@ if __name__ == "__main__":
   # pr.close()
 
   # # task 6 with menu - run mnist experiments on these 5 learning rates
+  savedir_base = "/home/xhdeng/shared/results/test_slurm/task6"
   import argparse
 
   parser = argparse.ArgumentParser()
@@ -272,31 +282,49 @@ if __name__ == "__main__":
     option = input(prompt)
     if option == 'run':
       # only run if job has failed or never ran before
-      
       for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
+        # todo: check directory exist in get_job_id?
+        # todo: create new folder in which step?
+        # todo: not launched parallel?
+        job_id = get_job_id(exp_id, savedir_base)
+        if job_id == -1:
+          continue
         command = 'python test_slurm.py -ei %s' % exp_id
+        submit_job(command, savedir_base)
 
     elif option == 'reset':
       # ressset each experiment (delete the checkpoint and reset)
       command = 'python test_slurm.py -ei %s' % exp_id
       for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
+        savedir = os.path.join(savedir_base, exp_id)
+        hc.delete_and_backup_experiment(savedir)
         command = 'python test_slurm.py -ei %s' % exp_id
+        # todo: check job running?
+        submit_job(command, savedir_base)
 
     elif option == 'status':
       # get job status of each exp
+      job_list = []
       for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
+        job_list.append(get_job(exp_id)) 
+      hu.save_json('/home/xhdeng/shared/results/test_slurm/example/job_info.json', job_list)
+
     elif option == 'kill':
       # make sure all jobs for the exps are dead
       for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
+        job_id = get_job_id(exp_id, savedir_base)
+        if job_id == -1:
+          continue
+        kill_job(job_id)
 
   else:
     for exp_dict in exp_list:
       exp_id = hu.hash_dict(exp_dict)
-      savedir = '/home/xhdeng/shared/results/test_slurm/%s' % exp_id
+      savedir = '/home/xhdeng/shared/results/test_slurm/task6/%s' % exp_id
       if exp_id is not None and exp_id == args.exp_id:
         trainval(exp_dict, savedir, args={})
    
