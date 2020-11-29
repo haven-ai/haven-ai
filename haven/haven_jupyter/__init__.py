@@ -67,40 +67,11 @@ class DashboardManager:
         )
 
     def display(self):
-        self.update_rm()
+        self.update_rm(display_meta=False)
 
-        # Select Exp Group
-        l_exp_group = widgets.Label(
-            value="Select exp_group", layout=self.layout_label,)
+        header = widgets.Label(value="Loading Dashboard...", layout=self.layout_label,)
+        display(header)
 
-        exp_group_list = list(self.rm_original.exp_groups.keys())
-        exp_group_selected = 'all'
-        if self.vars.get('exp_group', 'all') in exp_group_list:
-            exp_group_selected = self.vars.get('exp_group', 'all')
-
-        d_exp_group = widgets.Dropdown(
-            options=exp_group_list,
-            value=exp_group_selected,
-            layout=self.layout_dropdown,
-        )
-        self.rm_original.exp_list_all = self.rm_original.exp_groups.get(
-            d_exp_group.value, 'all')
-        l_n_exps = widgets.Label(value='Total Exps %d' % len(
-            self.rm_original.exp_list_all), layout=self.layout,)
-
-        def on_group_change(change):
-            if change['type'] == 'change' and change['name'] == 'value':
-                self.rm_original.exp_list_all = self.rm_original.exp_groups[change['new']]
-                l_n_exps.value = 'Total Exps %d' % len(
-                    self.rm_original.exp_list_all)
-
-        d_exp_group.observe(on_group_change)
-
-        display(widgets.VBox([l_exp_group,
-                              widgets.HBox(
-                                  [d_exp_group, l_n_exps, self.t_filterby_list])
-                              ]))
-        
         if self.enable_datatables:
             init_datatable_mode()
         tables = widgets.Output()
@@ -135,6 +106,8 @@ class DashboardManager:
             latex_tab(self, latex)
             share_tab(self, share)
 
+            header.value = 'Dashboard loaded.'
+
         display(main_out)
 
         if self.wide_display:
@@ -154,7 +127,7 @@ class DashboardManager:
         """
         display(HTML(style))
 
-    def update_rm(self):
+    def update_rm(self, display_meta=True):
         self.rm = hr.ResultManager(exp_list=self.rm_original.exp_list_all,
                                    savedir_base=str(self.t_savedir_base.value),
                                    filterby_list=hu.get_dict_from_str(
@@ -165,21 +138,22 @@ class DashboardManager:
                                    score_list_name=self.rm_original.score_list_name
                                    )
 
-        if len(self.rm.exp_list) == 0:
-            if self.rm.n_exp_all > 0:
-                display('No experiments selected out of %d '
-                        'for filtrby_list %s' % (self.rm.n_exp_all,
-                                                 self.rm.filterby_list))
-                display('Table below shows all experiments.')
-                score_table = hr.get_score_df(exp_list=self.rm_original.exp_list_all,
-                                              savedir_base=self.rm_original.savedir_base)
-                display(score_table)
-            else:
-                display('No experiments exist...')
-            return
-        else:
-            display('Selected %d/%d experiments using "filterby_list" from savedir_base "%s"' %
-                    (len(self.rm.exp_list), len(self.rm.exp_list_all), self.vars.get('savedir_base')))
+        # if len(self.rm.exp_list) == 0:
+        #     if self.rm.n_exp_all > 0:
+        #         display('No experiments selected out of %d '
+        #                 'for filtrby_list %s' % (self.rm.n_exp_all,
+        #                                          self.rm.filterby_list))
+        #         display('Table below shows all experiments.')
+        #         score_table = hr.get_score_df(exp_list=self.rm_original.exp_list_all,
+        #                                       savedir_base=self.rm_original.savedir_base)
+        #         display(score_table)
+        #     else:
+        #         display('No experiments exist...')
+        #     return
+        # else:
+        if display_meta:
+            display('%d/%d experiments selected, using "filterby_list" from savedir_base "%s"' %
+                (len(self.rm.exp_list), len(self.rm.exp_list_all), self.vars.get('savedir_base')))
 
 
 

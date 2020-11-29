@@ -167,7 +167,7 @@ def plots_tab(self, output):
 
 
             w, h = 10, 5
-            if len(self.vars['y_metrics']) > 1:
+            if len(w_y_metrics.update()) > 1:
                 figsize = (2*int(w), int(h))
                 self.vars['figsize'] = figsize
             else:

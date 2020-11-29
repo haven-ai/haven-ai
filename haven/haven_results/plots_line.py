@@ -29,12 +29,12 @@ def get_plot(exp_list, savedir_base,
              axis=None,
              ylim=None,
              xlim=None,
-             legend_fontsize=None,
-             y_fontsize=None,
-             x_fontsize=None,
-             ytick_fontsize=None,
-             xtick_fontsize=None,
-             title_fontsize=None,
+             legend_fontsize=12,
+             y_fontsize=14,
+             x_fontsize=14,
+             ytick_fontsize=12,
+             xtick_fontsize=12,
+             title_fontsize=18,
              legend_kwargs=None,
              map_title_list=tuple(),
              map_xlabel_list=tuple(),
@@ -220,10 +220,13 @@ def get_plot(exp_list, savedir_base,
                 label = exp_id
 
             color = None
-            marker = '*'
-            linewidth = None
-            markevery = None
-            markersize = None
+            marker = 'o'
+            linewidth = 3
+            try:
+                markevery = max(len(x_list)//10, 1)
+            except:
+                markevery = None
+            markersize = 10
 
             if len(style_dict):
                 marker = style_dict.get('marker', marker)

@@ -14,10 +14,11 @@ except:
 def autofix():
     pass
 
+WIDTH = '200px'
 class Display:
     def __init__(self, heading, options, value, db_vars, var):
         h = widgets.Label(value="Select Rows:", 
-                        layout=widgets.Layout(width='300px'),)
+                        layout=widgets.Layout(width=WIDTH),)
         sm = widgets.SelectMultiple(options=db.rm.exp_params,
                                                     value=list(db.vars.get('latex_rows')))
         return 
@@ -35,11 +36,11 @@ class Text:
             value = str(org_value)
         self.type = type
         self.header = widgets.Label(value=header, 
-                          layout=widgets.Layout(width='300px'),)
+                          layout=widgets.Layout(width=WIDTH),)
         self.text = widgets.Text(
                     value=value,
                     disabled=False,
-                    layout=widgets.Layout(width='300px'),)
+                    layout=widgets.Layout(width=WIDTH),)
         self.db_vars = db_vars
         self.var = var
         
@@ -69,9 +70,9 @@ class SelectMultiple:
             value = [v for v in org_value if v in options]
 
         self.header = widgets.Label(value=header, 
-                          layout=widgets.Layout(width='300px'),)
+                          layout=widgets.Layout(width=WIDTH),)
         self.select_multiple = widgets.SelectMultiple(options=options, value=value, 
-                          layout=widgets.Layout(width='300px'))
+                          layout=widgets.Layout(width=WIDTH))
         self.db_vars = db_vars
         self.var = var
         
@@ -92,12 +93,12 @@ class Dropdown:
             value = org_value
 
         self.header = widgets.Label(value=header, 
-                          layout=widgets.Layout(width='300px'),)
+                          layout=widgets.Layout(width=WIDTH),)
         self.dropdown = widgets.Dropdown(
                             options=options,
                             value=value,
                             disabled=False,
-                        layout=widgets.Layout(width='300px'),)
+                        layout=widgets.Layout(width=WIDTH),)
         self.db_vars = db_vars
         self.var = var
         
