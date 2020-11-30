@@ -166,6 +166,9 @@ def get_image(pil_img, title):
 
 def save_example_results(savedir_base='results'):
     import os, pandas
+    import requests, io
+    import matplotlib.pyplot as plt 
+
     from .. import haven_results as hr
     from .. import haven_utils as hu
     from PIL import Image
@@ -187,5 +190,8 @@ def save_example_results(savedir_base='results'):
         # save scores and images
         hu.save_json(os.path.join(savedir_base, exp_id, 'exp_dict.json'), exp_dict)
         hu.save_pkl(os.path.join(savedir_base, exp_id, 'score_list.pkl'), score_list)
-        img = Image.open(os.path.join(os.path.dirname(__file__), 'data/%d.png' % (i+1)))
-        hu.save_image(os.path.join(savedir_base, exp_id, 'images/1.png'), np.array(img))
+        
+        url = 'https://raw.githubusercontent.com/haven-ai/haven-ai/master/haven/haven_examples/data/%d.png' % (i+1)
+        response = requests.get(url).content
+        img = plt.imread(io.BytesIO(response), format='JPG')
+        hu.save_image(os.path.join(savedir_base, exp_id, 'images/1.png'), img[:,:,:3])
