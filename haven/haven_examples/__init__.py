@@ -162,3 +162,30 @@ def get_image(pil_img, title):
     plt.savefig('tmp.png', bbox_inches='tight', pad_inches=0)
     plt.close()
     return np.array(Image.open('tmp.png').convert('L'))
+
+
+def save_example_results(savedir_base='results'):
+    import os, pandas
+    from .. import haven_results as hr
+    from .. import haven_utils as hu
+    from PIL import Image
+
+    # create hyperparameters
+    exp_list = [{'dataset':'mnist', 'model': 'mlp',
+                'lr':lr} for lr in [1e-1, 1e-2, 1e-3]]
+
+    for i, exp_dict in enumerate(exp_list):
+        # get hash for experiment
+        exp_id = hu.hash_dict(exp_dict)
+        
+        # add scores for loss, and accuracy
+        score_list = []
+        for e in range(1,10):
+            score_list += [{'epoch':e, 
+                            'loss':1 - e*exp_dict['lr'] * 0.9, 
+                            'acc':e*exp_dict['lr'] * 0.1}]
+        # save scores and images
+        hu.save_json(os.path.join(savedir_base, exp_id, 'exp_dict.json'), exp_dict)
+        hu.save_pkl(os.path.join(savedir_base, exp_id, 'score_list.pkl'), score_list)
+        img = Image.open(os.path.join(os.path.dirname(__file__), 'data/%d.png' % (i+1)))
+        hu.save_image(os.path.join(savedir_base, exp_id, 'images/1.png'), np.array(img))
