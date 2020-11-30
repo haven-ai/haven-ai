@@ -44,7 +44,7 @@ def make_wide(formatter, w=120, h=36):
         return formatter
 
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None, 
-               reset=None, args=None):
+               reset=None, args=None, use_threads=True):
     if args is None:
         args = get_args()
 
@@ -94,6 +94,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
         # launch jobs
         from haven import haven_jobs as hjb
         assert job_config is not None
+        assert 'account_id' in job_config
         jm = hjb.JobManager(exp_list=exp_list,
                             savedir_base=savedir_base,
                             workdir=os.getcwd(),
@@ -104,7 +105,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
                    (savedir_base, args.datadir))
 
         print(command)
-        jm.launch_menu(command=command)
+        jm.launch_menu(command=command, in_parallel=use_threads)
 
 
 def create_jupyter_file(fname, savedir_base):
@@ -170,8 +171,8 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
     #-- exp_dict
     exp_dict_json_fname = os.path.join(savedir, "exp_dict.json")
-    if not os.path.exists(exp_dict_json_fname):
-        hu.save_json(exp_dict_json_fname, exp_dict)
+    # if not os.path.exists(exp_dict_json_fname):
+    hu.save_json(exp_dict_json_fname, exp_dict)
 
     #-- images
     os.makedirs(os.path.join(savedir, 'images'), exist_ok=True)
