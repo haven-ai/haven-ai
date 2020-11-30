@@ -3,7 +3,7 @@
 ## 1. Install Haven
 `pip install --upgrade git+https://github.com/haven-ai/haven-ai`
 
-This command installs the [Haven library](https://github.com/haven-ai/haven-ai) which helps in managing the experiments.
+This command installs the [Haven library](https://github.com/haven-ai/haven-ai), which helps in managing the experiments.
 
 ## 2. Experiement
 Run the experiment with the following command on terminal
