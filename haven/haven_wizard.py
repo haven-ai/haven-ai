@@ -43,8 +43,10 @@ def make_wide(formatter, w=120, h=36):
         warnings.warn("argparse help formatter failed, falling back.")
         return formatter
 
-def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_base=None, 
-               reset=None, args=None, use_threads=True):
+def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
+                savedir_base=None, 
+               reset=None, args=None, use_threads=True,
+               exp_id=None):
     if args is None:
         args = get_args()
 
@@ -52,13 +54,14 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
     # =======
     savedir_base = savedir_base or args.savedir_base
     reset = reset or args.reset
+    exp_id = exp_id or args.exp_id
     assert savedir_base is not None
 
     # Collect experiments
     # ===================
-    if args.exp_id is not None:
+    if exp_id is not None:
         # select one experiment
-        savedir = os.path.join(savedir_base, args.exp_id)
+        savedir = os.path.join(savedir_base, exp_id)
         exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
 
         exp_list = [exp_dict]
@@ -70,7 +73,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
             exp_list += exp_groups[exp_group_name]
 
     # save results folder
-    if args.exp_id is None:
+    if exp_id is None:
         results_fname = args.visualize_notebook
         if len(results_fname):
             if '.ipynb' not in results_fname:
@@ -78,6 +81,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, savedir_ba
             create_jupyter_file(fname=results_fname,
                                 savedir_base=savedir_base)
 
+    hu.check_duplicates(exp_list)
     print('\nRunning %d experiments' % len(exp_list))
 
     # Run experiments
