@@ -65,7 +65,10 @@ class SelectMultiple:
         org_value = db_vars.get(var)
 
         if org_value is None:
-            value = [options[0]]
+            if len(options) > 0:
+                value = [options[0]]
+            else:
+                vale = []
         else:
             value = [v for v in org_value if v in options]
 

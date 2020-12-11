@@ -221,12 +221,16 @@ def get_plot(exp_list, savedir_base,
 
             color = None
             marker = 'o'
-            linewidth = 3
+            linewidth = 2.8
+            
             try:
-                markevery = max(len(x_list)//10, 1)
+                markevery = len(x_list)//10
             except:
                 markevery = None
-            markersize = 10
+            if markevery == 0:
+                markevery = None 
+                
+            markersize = 6
 
             if len(style_dict):
                 marker = style_dict.get('marker', marker)

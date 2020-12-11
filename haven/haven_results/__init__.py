@@ -108,7 +108,6 @@ class ResultManager:
             exp_list = exp_list_with_scores
         self.exp_list_all = copy.deepcopy(exp_list)
 
-        self.score_keys  = ['None']
         self.savedir_base = savedir_base
         
         self.filterby_list = filterby_list
@@ -128,8 +127,6 @@ class ResultManager:
 
         _, self.exp_params, self.score_keys = self.get_score_df(flatten_columns=True, show_meta=False, 
                                         return_columns=True, show_max_min=False)
-        self.score_keys += ['None']
-
         self.exp_groups['all'] = copy.deepcopy(self.exp_list_all)
     
     def get_state_dict(self):

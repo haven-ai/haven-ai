@@ -129,7 +129,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         
 
         result_list += [result_dict]
-
+    
     # create table
     df = pd.DataFrame(result_list)
     hparam_columns = list(hparam_list)
@@ -138,14 +138,20 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     if avg_across is not None:
         df_avg = df.groupby('_' + avg_across)
         df_tmp = df_avg[hparam_columns].first().join(df_avg[metric_columns].agg([np.mean, np.std]))
-        del df_tmp['_' + avg_across]
+        
+        if ('_' + avg_across) in df_tmp.columns:
+            del df_tmp['_' + avg_across]
+        
         df_tmp = df_tmp.reset_index()
-        del df_tmp['_' + avg_across]
-        # del df_tmp[avg_across]
-        df = df_tmp 
 
-    df = df.sort_values(by='creation_time' )
-    del df['creation_time']
+        if ('_' + avg_across) in df_tmp.columns:
+            del df_tmp['_' + avg_across]
+            
+        df = df_tmp 
+        
+    if 'creation_time' in df.columns:
+        df = df.sort_values(by='creation_time' )
+        del df['creation_time']
 
     # wrap text for prettiness
     df = hu.pretty_print_df(df)
