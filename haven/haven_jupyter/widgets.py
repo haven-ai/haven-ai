@@ -68,7 +68,7 @@ class SelectMultiple:
             if len(options) > 0:
                 value = [options[0]]
             else:
-                vale = []
+                value = []
         else:
             value = [v for v in org_value if v in options]
 
@@ -91,7 +91,10 @@ class Dropdown:
         org_value = db_vars.get(var)
 
         if org_value is None or org_value not in options:
-            value = options[0]
+            if len(options) > 0:
+                value = options[0]
+            else:
+                value = None
         else:
             value = org_value
 

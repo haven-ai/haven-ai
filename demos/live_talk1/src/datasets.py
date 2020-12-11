@@ -15,7 +15,6 @@ def get_dataset(dataset_name, train_flag, datadir, exp_dict):
                                    torchvision.transforms.ToTensor(),
                                    torchvision.transforms.Normalize(
                                        (0.5,), (0.5,)),
-                                   view
                                ])
                                )
 

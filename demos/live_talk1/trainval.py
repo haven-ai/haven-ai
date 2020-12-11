@@ -46,7 +46,7 @@ def trainval(exp_dict, savedir, args):
     
     # -- Train & Val
     score_list = []
-    for e in range(0, 100):
+    for e in range(0, 50):
         score_dict = {"epoch": e}
 
         # - Visualize
@@ -89,6 +89,12 @@ if __name__ == "__main__":
 
     # Launch experiments using magic command
     import exp_configs
-    import job_configs
+    
+    if os.path.exists('job_configs.py'):
+        import job_configs  
+        job_config = job_configs.JOB_CONFIG
+    else:
+        job_config = None
+
     hw.run_wizard(func=trainval, exp_groups=exp_configs.EXP_GROUPS,  
-                  args=args, job_config=job_configs.JOB_CONFIG)
+                  args=args, job_config=job_config)
