@@ -1,126 +1,130 @@
-import torch
-
+import torch, tqdm
+import pylab as plt
+from haven import haven_utils as hu
 from torch import nn
 from torch.nn import functional as F
 import math
-from .base_networks import wrn
-# from .base import mxresnet
 import torchvision.models as models
+from . import optims
 
-
-def get_model(model_name, train_set=None, backpack=False):
-    if model_name in ["linear", "logistic"]:
-        batch = train_set[0]
-        model = Mlp_model(input_size=batch['images'].shape[0], hidden_sizes=[], n_classes=2, bias=False)
-        
-
-    if model_name == "mlp":
-        model = Mlp_model()
-
-    elif model_name == "resnet34":
-        model = ResNet([3, 4, 6, 3], num_classes=10)
-
-
-    return model
-
-def deactivate_batchnorm(m):
-    if isinstance(m, nn.BatchNorm2d):
-        m.reset_parameters()
-        m.eval()
-        with torch.no_grad():
-            m.weight.fill_(1.0)
-            m.bias.zero_()
-        m.weight.requires_grad = False
-        m.bias.requires_grad = False
-
-# =====================================================
-# MLP
-def Mlp_model(input_size=784, hidden_sizes=[512, 256], n_classes=10, bias=True, dropout=False):
-    modules = []
-    if len(hidden_sizes) == 0:
-        modules.append(nn.Linear(input_size, n_classes, bias=bias))
-    else:
-        for i, layer in enumerate(hidden_sizes):
-            if i == 0:
-                modules.append(nn.Linear(input_size, layer, bias=bias))
-            else:
-                modules.append(nn.Linear(hidden_sizes[i-1], layer, bias=bias))
-
-            modules.append(nn.ReLU())
-            if dropout:
-                modules.append(nn.Dropout(p=0.5))
-
-        modules.append(nn.Linear(hidden_sizes[-1], n_classes, bias=bias))
-
-    return nn.Sequential(*modules)
-
-# =====================================================
-# Linear Network
-class LinearNetwork(nn.Module):
-    def __init__(self, input_size, hidden_sizes, output_size, bias=True):
+class Model(nn.Module):
+    def __init__(self, exp_dict, device):
         super().__init__()
+        if exp_dict['model'] == 'mlp':
+            self.network = Mlp()
+        elif exp_dict['model'] == 'resnet34':
+            self.network = ResNet()
 
-        # iterate averaging:
-        self._prediction_params = None
+        self.to(device)
 
-        self.input_size = input_size
-        if output_size:
-            self.output_size = output_size
-            self.squeeze_output = False
-        else :
-            self.output_size = 1
-            self.squeeze_output = True
+        self.opt = optims.get_optim(opt_dict=exp_dict['opt'], parameters=self.parameters())
+        self.device= device
+        self.exp_dict= exp_dict
+            
+    def train_on_dataset(self, dataset):
+        sampler = torch.utils.data.RandomSampler(data_source=dataset, replacement=True, num_samples=10000)
+        loader = torch.utils.data.DataLoader(dataset, sampler=sampler, batch_size=self.exp_dict["batch_size"],
+                                            drop_last=True)
 
-        if len(hidden_sizes) == 0:
-            self.hidden_layers = []
-            self.output_layer = nn.Linear(self.input_size, self.output_size, bias=bias)
-        else:
-            self.hidden_layers = nn.ModuleList([nn.Linear(in_size, out_size, bias=bias) for in_size, out_size in zip([self.input_size] + hidden_sizes[:-1], hidden_sizes)])
-            self.output_layer = nn.Linear(hidden_sizes[-1], self.output_size, bias=bias)
+        self.train()
+        for batch in tqdm.tqdm(loader):
+            images, labels = batch
+            
+            loss = softmax_loss(self.network, images.to(self.device), labels.to(self.device))
 
-    def forward(self, x):
-        '''
-            x: The input patterns/features.
-        '''
-        x = x.view(-1, self.input_size)
-        out = x
+            self.opt.zero_grad()
+            loss.backward()
+            self.opt.step()
 
-        for layer in self.hidden_layers:
-            Z = layer(out)
-            # no activation in linear network.
-            out = Z
+        return loss
 
-        logits = self.output_layer(out)
-        if self.squeeze_output:
-            logits = torch.squeeze(logits)
+    @torch.no_grad()
+    def val_on_dataset(self, dataset, metric_name):
+        if metric_name == 'softmax_acc':
+            metric_function = softmax_accuracy
+        elif metric_name == 'softmax_loss':
+            metric_function = softmax_loss
 
-        return logits
+        loader = torch.utils.data.DataLoader(dataset, drop_last=False, batch_size=128)
+        print("> Computing %s..." % (metric_name))
 
-# =====================================================
-# Logistic
-class LinearRegression(torch.nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.linear = torch.nn.Linear(input_dim, output_dim, bias=False)
+        self.eval()
+        score_sum = 0.
+        for batch in tqdm.tqdm(loader):
+            images, labels = batch
+            score_sum += metric_function(self.network, images.to(self.device), labels.to(self.device)).item() * images.shape[0] 
+                
+        score = float(score_sum / len(loader.dataset))
 
-    def forward(self, x):
-        outputs = self.linear(x)
-        return outputs
+        return score
 
-# =====================================================
-# MLP
+    @torch.no_grad()
+    def vis_on_dataset(self, dataset, fname):
+        self.eval()
+
+        batch = dataset[0]
+        images, labels = batch
+        images = images[None].to(self.device)
+        labels = torch.as_tensor(labels)[None].to(self.device)
+        probs = torch.softmax(self.network.forward(images.view(images.shape[0], -1)), dim=1)
+        score, label = probs.max(dim=1)
+
+        f = plt.figure()
+        n_images = 5
+        for i in range(n_images):
+            images, labels = dataset[i]
+            images = images[None].to(self.device)
+            labels = torch.as_tensor(labels)[None].to(self.device)
+            probs = torch.softmax(self.network.forward(images.view(images.shape[0], -1)), dim=1)
+            score, label = probs.max(dim=1)
+
+            # figure
+            f.add_subplot(1, n_images, i + 1)
+            plt.title('P: %d - G: %d' % (label[0], labels[0]))
+            plt.imshow(images[0,0,:,:,None].cpu().numpy(), cmap='gray')
+            plt.axis('off')
+
+        plt.savefig(fname, bbox_inches='tight', pad_inches=0)
+        plt.close()
+
+
+    def get_state_dict(self):
+        return {'opt':self.opt.parameters(), 
+                'network':self.network.parameters()}
+
+    def set_state_dict(self, state_dict):
+        self.network.load_state_dict(state_dict['network'])
+        self.opt.load_state_dict(state_dict['opt'])
+
+
+# -------
+# Metrics
+# -------
+def softmax_accuracy(network, images, labels):
+    logits = network(images)
+    pred_labels = logits.argmax(dim=1)
+    acc = (pred_labels == labels).float().mean()
+
+    return acc
+    
+def softmax_loss(network, images, labels):
+    logits = network(images)
+    loss = torch.nn.CrossEntropyLoss()(logits, labels.long().view(-1))
+
+    return loss
+
+# --------
+# Networks
+# --------
 class Mlp(nn.Module):
     def __init__(self, input_size=784,
-                 hidden_sizes=[512, 256],
-                 n_classes=10,
-                 bias=True, dropout=False):
+                 hidden_sizes=[512, 256]):
         super().__init__()
 
-        self.dropout=dropout
         self.input_size = input_size
-        self.hidden_layers = nn.ModuleList([nn.Linear(in_size, out_size, bias=bias) for
+        self.hidden_layers = nn.ModuleList([nn.Linear(in_size, out_size, bias=True) for
                                             in_size, out_size in zip([self.input_size] + hidden_sizes[:-1], hidden_sizes)])
-        self.output_layer = nn.Linear(hidden_sizes[-1], n_classes, bias=bias)
+        self.output_layer = nn.Linear(hidden_sizes[-1], 10, bias=True)
 
     def forward(self, x):
         x = x.view(-1, self.input_size)
@@ -129,118 +133,6 @@ class Mlp(nn.Module):
             Z = layer(out)
             out = F.relu(Z)
 
-            if self.dropout:
-                out = F.dropout(out, p=0.5)
-
         logits = self.output_layer(out)
 
         return logits
-
-# =====================================================
-# ResNet
-class ResNet(nn.Module):
-    def __init__(self, num_blocks, num_classes=10):
-        super().__init__()
-        block = BasicBlock
-        self.in_planes = 64
-
-        self.conv1 = nn.Conv2d(
-            3, 64, kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
-        self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
-        self.linear = nn.Linear(512 * block.expansion, num_classes)
-
-    def _make_layer(self, block, planes, num_blocks, stride):
-        strides = [stride] + [1] * (num_blocks - 1)
-        layers = []
-        for stride in strides:
-            layers.append(block(self.in_planes, planes, stride))
-            self.in_planes = planes * block.expansion
-        return nn.Sequential(*layers)
-
-    def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.layer1(out)
-        out = self.layer2(out)
-        out = self.layer3(out)
-        out = self.layer4(out)
-        out = F.avg_pool2d(out, 4)
-        out = out.view(out.size(0), -1)
-        out = self.linear(out)
-        return out
-
-
-class BasicBlock(nn.Module):
-    expansion = 1
-
-    def __init__(self, in_planes, planes, stride=1):
-        super(BasicBlock, self).__init__()
-        self.conv1 = nn.Conv2d(
-            in_planes,
-            planes,
-            kernel_size=3,
-            stride=stride,
-            padding=1,
-            bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(
-            planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(
-                    in_planes,
-                    self.expansion * planes,
-                    kernel_size=1,
-                    stride=stride,
-                    bias=False), nn.BatchNorm2d(self.expansion * planes))
-
-    def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.bn2(self.conv2(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
-        return out
-
-
-class Bottleneck(nn.Module):
-    expansion = 4
-
-    def __init__(self, in_planes, planes, stride=1):
-        super(Bottleneck, self).__init__()
-        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(
-            planes,
-            planes,
-            kernel_size=3,
-            stride=stride,
-            padding=1,
-            bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(
-            planes, self.expansion * planes, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(self.expansion * planes)
-
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(
-                    in_planes,
-                    self.expansion * planes,
-                    kernel_size=1,
-                    stride=stride,
-                    bias=False), nn.BatchNorm2d(self.expansion * planes))
-
-    def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = F.relu(self.bn2(self.conv2(out)))
-        out = self.bn3(self.conv3(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
-        return out
