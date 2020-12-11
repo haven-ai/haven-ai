@@ -1,28 +1,21 @@
 from haven import haven_utils as hu
 
-RUNS = [0, 1, 2]
-
-opt_list = [
-     {'name': 'adam', 'lr': 1e-3},
-     {'name': 'sgd', 'lr': 1e-3},
-     {'name': 'adagrad', 'lr': 1e-3}
-    ]
-
 EXP_GROUPS = {}
-
-EXP_GROUPS['mnist'] = {"dataset": 'mnist',
+EXP_GROUPS['group0'] = [{"dataset": 'mnist',
+                        "batch_size": 128,
+                        "opt": {'name': 'adam', 'lr': 1e-3}},
+                        
+                        {"dataset": 'fashionmnist',
                         "model": 'mlp',
-                        "runs": RUNS,
+                        "batch_size": 128,
+                        "opt": {'name': 'adam', 'lr': 1e-3}}]
+
+EXP_GROUPS['group1'] = hu.cartesian_exp_group({"dataset": ['mnist','fashionmnist'],
                         "batch_size": [128],
-                        "opt": opt_list,
-        }
+                        "opt": [
+                                {'name': 'adam', 'lr': 1e-3},
+                                {'name': 'sgd', 'lr': 1e-3},
+                                {'name': 'adagrad', 'lr': 1e-3}
+                                ],
+        })
 
-EXP_GROUPS['fashionmnist'] = {"dataset": 'fashionmnist',
-                        "model": 'mlp',
-                        "runs": RUNS,
-                        "batch_size": [128],
-                        "opt": opt_list,
-        }
-
-
-EXP_GROUPS = {k: hu.cartesian_exp_group(v) for k, v in EXP_GROUPS.items()}

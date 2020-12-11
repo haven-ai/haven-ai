@@ -8,7 +8,7 @@ pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ### 1 Clone
 
 ```
-git@github.com:haven-ai/haven-ai.git
+git clone git@github.com:haven-ai/haven-ai.git
 ```
 
 ### 2 Run training and Validation
