@@ -108,6 +108,8 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
             metric_columns = score_columns or score_df.columns
             if len(score_list):
                 for k in metric_columns:
+                    if k not in score_df.columns:
+                        continue
                     v = np.array(score_df[k])
                     if 'float' in str(v.dtype):
                         v = v[~np.isnan(v)]

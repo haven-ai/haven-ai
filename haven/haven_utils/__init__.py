@@ -65,7 +65,12 @@ def mask_on_image(mask, image):
                                     colors=colors, bg_label=0, bg_color=None, kind='overlay')
     return mark_boundaries(image_label_overlay, mask)
 
-def save_image(fname, img, size=None, points=None, radius=10,
+def get_image(img, denorm=None, size=None, points=None, radius=10,
+              mask=None, heatmap=None):
+    return save_image(None, img, denorm, size, points, radius,
+               mask, heatmap, return_image=True)
+
+def save_image(fname, img, denorm=None, size=None, points=None, radius=10,
                mask=None, heatmap=None, makedirs=True, return_image=False):
     """Save an image into a file.
 
@@ -78,6 +83,8 @@ def save_image(fname, img, size=None, points=None, radius=10,
     makedirs : bool, optional
         If enabled creates the folder for saving the file, by default True
     """
+    if denorm:
+        img = denormalize(img, mode=denorm)
     if points is not None:
         if isinstance(img, np.ndarray):
             img = torch.FloatTensor(img)
@@ -94,9 +101,7 @@ def save_image(fname, img, size=None, points=None, radius=10,
     if mask is not None:
         img = mask_on_image(mask, img)
 
-    dirname = os.path.dirname(fname)
-    if makedirs and dirname != '':
-        os.makedirs(dirname, exist_ok=True)
+    
 
     if img.dtype == 'uint8':
         img = Image.fromarray(img)
@@ -111,7 +116,12 @@ def save_image(fname, img, size=None, points=None, radius=10,
         img = Image.fromarray(np.uint8(arr * 255))
     if return_image:
         return img
-    img.save(fname)
+
+    if fname is not None:
+        dirname = os.path.dirname(fname)
+        if makedirs and dirname != '':
+            os.makedirs(dirname, exist_ok=True)
+        img.save(fname)
 
 
 def load_txt(fname):
@@ -605,84 +615,84 @@ def denormalize(img, mode=0):  # TODO: Remove the default value or set to a vali
     return image
 
 
-def get_image(imgs, mask=None, label=False, enlarge=0, gray=False, denorm=0,
-              bbox_yxyx=None, annList=None, pretty=False, pointList=None,
-              **options):  # TODO: Issam, can you document this?
-    """[summary]
+# def get_image(imgs, mask=None, label=False, enlarge=0, gray=False, denorm=0,
+#               bbox_yxyx=None, annList=None, pretty=False, pointList=None,
+#               **options):  # TODO: Issam, can you document this?
+#     """[summary]
 
-    Parameters
-    ----------
-    imgs : [type]
-        [description]
-    mask : [type], optional
-        [description], by default None
-    label : bool, optional
-        [description], by default False
-    enlarge : int, optional
-        [description], by default 0
-    gray : bool, optional
-        [description], by default False
-    denorm : int, optional
-        [description], by default 0
-    bbox_yxyx : [type], optional
-        [description], by default None
-    annList : [type], optional
-        [description], by default None
-    pretty : bool, optional
-        [description], by default False
-    pointList : [type], optional
-        [description], by default None
+#     Parameters
+#     ----------
+#     imgs : [type]
+#         [description]
+#     mask : [type], optional
+#         [description], by default None
+#     label : bool, optional
+#         [description], by default False
+#     enlarge : int, optional
+#         [description], by default 0
+#     gray : bool, optional
+#         [description], by default False
+#     denorm : int, optional
+#         [description], by default 0
+#     bbox_yxyx : [type], optional
+#         [description], by default None
+#     annList : [type], optional
+#         [description], by default None
+#     pretty : bool, optional
+#         [description], by default False
+#     pointList : [type], optional
+#         [description], by default None
 
-    Returns
-    -------
-    [type]
-        [description]
-    """
-    # TODO: Comment these transformations and make sure they are correct. Difficult to follow.
-    imgs = denormalize(imgs, mode=denorm)
-    if isinstance(imgs, Image.Image):
-        imgs = np.array(imgs)
-    if isinstance(mask, Image.Image):
-        mask = np.array(mask)
+#     Returns
+#     -------
+#     [type]
+#         [description]
+#     """
+#     # TODO: Comment these transformations and make sure they are correct. Difficult to follow.
+#     imgs = denormalize(imgs, mode=denorm)
+#     if isinstance(imgs, Image.Image):
+#         imgs = np.array(imgs)
+#     if isinstance(mask, Image.Image):
+#         mask = np.array(mask)
 
-    imgs = t2n(imgs).copy()
-    imgs = l2f(imgs)
+#     imgs = t2n(imgs).copy()
+#     imgs = l2f(imgs)
 
-    if pointList is not None and len(pointList):
-        h, w = pointList[0]["h"], pointList[0]["w"]
-        mask_points = np.zeros((h, w))
-        for p in pointList:
-            y, x = p["y"], p["x"]
-            mask_points[int(h*y), int(w*x)] = 1
-        imgs = maskOnImage(imgs, mask_points, enlarge=1)
+#     if pointList is not None and len(pointList):
+#         h, w = pointList[0]["h"], pointList[0]["w"]
+#         mask_points = np.zeros((h, w))
+#         for p in pointList:
+#             y, x = p["y"], p["x"]
+#             mask_points[int(h*y), int(w*x)] = 1
+#         imgs = maskOnImage(imgs, mask_points, enlarge=1)
 
-    if pretty or annList is not None:
-        imgs = pretty_vis(imgs, annList, **options)
-        imgs = l2f(imgs)
+#     if pretty or annList is not None:
+#         imgs = pretty_vis(imgs, annList, **options)
+#         imgs = l2f(imgs)
 
-    if mask is not None and mask.sum() != 0:
-        imgs = maskOnImage(imgs, mask, enlarge)
+#     if mask is not None and mask.sum() != 0:
+#         imgs = maskOnImage(imgs, mask, enlarge)
 
-    if bbox_yxyx is not None:
-        _, _, h, w = imgs.shape
-        mask = bbox_yxyx_2_mask(bbox_yxyx, h, w)
-        imgs = maskOnImage(imgs, mask, enlarge=1)
+#     if bbox_yxyx is not None:
+#         _, _, h, w = imgs.shape
+#         mask = bbox_yxyx_2_mask(bbox_yxyx, h, w)
+#         imgs = maskOnImage(imgs, mask, enlarge=1)
 
-    # LABEL
-    elif (not gray) and (label or imgs.ndim == 2 or
-                         (imgs.ndim == 3 and imgs.shape[0] != 3) or
-                         (imgs.ndim == 4 and imgs.shape[1] != 3)):
+#     # LABEL
+#     elif (not gray) and (label or imgs.ndim == 2 or
+#                          (imgs.ndim == 3 and imgs.shape[0] != 3) or
+#                          (imgs.ndim == 4 and imgs.shape[1] != 3)):
 
-        imgs = label2Image(imgs)
+#         imgs = label2Image(imgs)
 
-        if enlarge:
-            imgs = zoom(imgs, 11)
+#         if enlarge:
+#             imgs = zoom(imgs, 11)
 
-    # Make sure it is 4-dimensional
-    if imgs.ndim == 3:
-        imgs = imgs[np.newaxis]
+#     # Make sure it is 4-dimensional
+#     if imgs.ndim == 3:
+#         imgs = imgs[np.newaxis]
 
-    return imgs
+#     return imgs
 
 
 def show_image(fname):  # TODO: Why the input is a filename instead of an image?
