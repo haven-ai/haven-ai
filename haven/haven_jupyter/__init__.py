@@ -11,6 +11,7 @@ from .latex_tab import latex_tab
 from .images_tab import images_tab
 from . import widgets as wdg
 
+import haven
 import os
 import pprint
 import json
@@ -106,7 +107,7 @@ class DashboardManager:
             latex_tab(self, latex)
             share_tab(self, share)
 
-            header.value = 'Dashboard loaded.'
+            header.value = f'Dashboard loaded (Haven-ai: {haven.__version__}).'
 
         display(main_out)
 
