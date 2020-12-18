@@ -107,7 +107,7 @@ class DashboardManager:
             latex_tab(self, latex)
             share_tab(self, share)
 
-            header.value = f'Dashboard loaded (Haven-ai: {haven.__version__}).'
+            header.value = f'Dashboard loaded (ver: {haven.__version__}).'
 
         display(main_out)
 
