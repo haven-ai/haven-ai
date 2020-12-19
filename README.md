@@ -167,7 +167,7 @@ project/
     <td valign="top">
            <pre>
 results/
-├── <exp_id>/
+├── experiment_1/
 │   ├── code/            # a copy of the code
 │   ├── images/          # qualitative results
 │   ├── exp_dict.json    # defines the hyperparameters
