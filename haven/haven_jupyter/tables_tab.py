@@ -27,11 +27,11 @@ def tables_tab(db, output):
     w_columns = wdg.SelectMultiple(header="Hyperparameters:", 
                             options=db.rm.exp_params,
                             db_vars=db.vars, 
-                            var='columns')
+                            var='columns', select_all=True)
     w_score_columns = wdg.SelectMultiple(header="Metrics:", 
                             options=db.rm.score_keys,
                             db_vars=db.vars, 
-                            var='score_columns')
+                            var='score_columns', select_all=True)
 
 
     bstatus = widgets.Button(description="Jobs Status")

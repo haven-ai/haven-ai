@@ -103,7 +103,8 @@ def plots_tab(self, output):
     w_legend = wdg.SelectMultiple(header="Legend:", 
                             options=db.rm.exp_params,
                             db_vars=db.vars, 
-                            var='legend_list')
+                            var='legend_list', 
+                            select_all=True)
 
     w_title = wdg.SelectMultiple(header="Title:", 
                             options=db.rm.exp_params,
@@ -111,7 +112,7 @@ def plots_tab(self, output):
                             var='title_list')
 
     w_groupby = wdg.SelectMultiple(header="GroupBy:", 
-                            options=db.rm.exp_params,
+                            options=['None'] + db.rm.exp_params,
                             db_vars=db.vars, 
                             var='groupby_list')
 
@@ -167,7 +168,11 @@ def plots_tab(self, output):
 
 
             w, h = 10, 5
-            if len(w_y_metrics.update()) > 1:
+            if len(w_y_metrics.update()) == 0:
+                display('No results saved yet.')
+                return
+
+            elif len(w_y_metrics.update()) > 1:
                 figsize = (2*int(w), int(h))
                 self.vars['figsize'] = figsize
             else:

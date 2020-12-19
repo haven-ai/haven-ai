@@ -61,12 +61,15 @@ class Text:
         return value
 
 class SelectMultiple:
-    def __init__(self, header, options, db_vars, var):
+    def __init__(self, header, options, db_vars, var, select_all=False):
         org_value = db_vars.get(var)
 
         if org_value is None:
             if len(options) > 0:
-                value = [options[0]]
+                if select_all:
+                    value = options
+                else:
+                    value = [options[0]]
             else:
                 value = []
         else:
