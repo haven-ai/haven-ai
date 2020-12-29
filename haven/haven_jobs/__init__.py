@@ -58,7 +58,7 @@ class JobManager:
         try:
             from . import toolkit_manager as ho
             self.ho = ho
-            self.api = ho.get_api(token=None)
+            self.api = self.ho.get_api(token=None)
             print('using toolkit')
         except:
             import slurm_manager as ho
@@ -81,19 +81,19 @@ class JobManager:
     # Base functions
     # --------------
     def get_jobs(self):
-        return ho.get_jobs(self.api, account_id=self.account_id)
+        return self.ho.get_jobs(self.api, account_id=self.account_id)
 
     def get_jobs_dict(self, job_id_list):
-        return ho.get_jobs_dict(self.api, job_id_list)
+        return self.ho.get_jobs_dict(self.api, job_id_list)
 
     def get_job(self, job_id):
-        return ho.get_job(self.api, job_id)
+        return self.ho.get_job(self.api, job_id)
 
     def kill_job(self, job_id):
-        return ho.kill_job(self.api, job_id)
+        return self.ho.kill_job(self.api, job_id)
 
     def submit_job(self, command, workdir, savedir_logs=None):
-        return ho.submit_job(api=self.api, 
+        return self.ho.submit_job(api=self.api, 
                              account_id=self.account_id, 
                              command=command, 
                              job_config=self.job_config, 
@@ -284,10 +284,10 @@ class JobManager:
 
             if job['state'] in ALIVE_STATES + COMPLETED_STATES:
                 # If the job is alive, do nothing
-                message = 'IGNORED: Job %s' % job.state
+                message = 'IGNORED: Job %s' % job['state']
 
             elif job['state'] in FAILED_STATES:
-                message = "SUBMITTED: Retrying %s Job" % job.state
+                message = "SUBMITTED: Retrying %s Job" % job['state']
                 job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=job)
                 job_id = job_dict['job_id']
             # This shouldn't happen
@@ -373,8 +373,7 @@ class JobManager:
 
                 fname_exp_dict = os.path.join(savedir, "exp_dict.json")
                 job = jobs_dict[job_id]
-                if not isinstance(job, dict):
-                    job = vars(job)
+                
 
                 if hasattr(job, 'command'):
                     command = job_dict['command']
@@ -460,7 +459,7 @@ class JobManager:
             elif job_python_command not in command_dict:
                 command_dict[job_python_command] = job
             else:
-                print("Job state", job.state, "Job command",
+                print("Job state", job['state'], "Job command",
                       job_python_command)
                 raise ValueError("Job %s is duplicated" % job_python_command)
 

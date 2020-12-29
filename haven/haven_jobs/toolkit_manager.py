@@ -95,23 +95,23 @@ def get_jobs_dict(api, job_id_list, query_size=20):
         job_id_string = job_id_string[:-1]
         jobs += api.v1_cluster_job_get(q=job_id_string).items
 
-    jobs_dict = {job.id: job for job in jobs}
+    jobs_dict = {job.id: vars(job) for job in jobs}
 
     return jobs_dict
 
 def get_job(api, job_id):
     """Get job information."""
     try:
-        return api.v1_job_get_by_id(job_id)
+        return vars(api.v1_job_get_by_id(job_id))
     except ApiException as e:
         raise ValueError("job id %s not found." % job_id)
 
 def get_jobs(api, account_id):
     # account_id = hu.subprocess_call('eai account get').split('\n')[-2].split(' ')[0]
-    return api.v1_account_job_get(account_id=account_id,
+    return [vars(j) for j in api.v1_account_job_get(account_id=account_id,
             limit=1000, 
             order='-created',
-            q="alive_recently=True").items
+            q="alive_recently=True").items]
             
 
     # return api.v1_me_job_get(limit=1000, 
@@ -125,14 +125,14 @@ def kill_job(api, job_id):
     """Kill a job job until it is dead."""
     job = get_job(api, job_id)
 
-    if not job.alive:
+    if not job['alive']:
         print('%s is already dead' % job_id)
     else:
         # toolkit
         api.v1_job_delete_by_id(job_id)
         print('%s CANCELLING...' % job_id)
         job = get_job(api, job_id)
-        while job.state == "CANCELLING":
+        while job['state'] == "CANCELLING":
             time.sleep(2.0)
             job = get_job(api, job_id)
 
