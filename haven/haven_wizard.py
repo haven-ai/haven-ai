@@ -45,7 +45,7 @@ def make_wide(formatter, w=120, h=36):
 
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
                 savedir_base=None, 
-               reset=None, args=None, use_threads=True,
+               reset=None, args=None, use_threads=False,
                exp_id=None):
     if args is None:
         args = get_args()

@@ -3,7 +3,6 @@ import time
 import sys
 import subprocess
 from .. import haven_utils as hu
-from .. import haven_results as hr
 from .. import haven_chk as hc
 import os
 from textwrap import wrap
@@ -13,9 +12,10 @@ import pandas as pd
 import numpy as np
 import getpass
 import pprint
-from .. import haven_jupyter as hj
-from . import toolkit_manager as ho
 
+ALIVE_STATES =  ['RUNNING', 'QUEUED', 'PENDING', 'QUEUING']
+COMPLETED_STATES =  ['COMPLETED', 'SUCCEEDED', 'COMPLETING']
+FAILED_STATES = ["FAILED", "CANCELLED", "INTERRUPTED", "TIMEOUT"]
 
 
 class JobManager:
@@ -55,7 +55,17 @@ class JobManager:
         self.account_id = account_id
 
         # define funcs
-        self.api = ho.get_api(token=None)
+        try:
+            from . import toolkit_manager as ho
+            self.ho = ho
+            self.api = ho.get_api(token=None)
+            print('using toolkit')
+        except:
+            import slurm_manager as ho
+            self.ho = ho
+            self.api = None
+            print('using slurm')
+
     
     def get_command_history(self, topk=10):
         job_list = self.get_jobs()
@@ -132,10 +142,9 @@ class JobManager:
 
         elif option == 'run':
             self.verbose = False
-            tmp_list = [s_dict['exp_dict'] for s_dict in summary_list if s_dict['job_state'] not in ['RUNNING', 
-                                                                                      'QUEUED', 
-                                                                                      'SUCCEEDED', 
-                                                                                      'QUEUING']]
+            tmp_list = [s_dict['exp_dict'] for s_dict in summary_list 
+                            if s_dict['job_state'] 
+                            not in ALIVE_STATES + COMPLETED_STATES]
 
             print('Selected %d/%d exps' % (len(tmp_list), len(exp_list)))
             exp_list = tmp_list
@@ -148,7 +157,10 @@ class JobManager:
 
         elif option == 'kill':
             self.verbose = False
-            self.kill_jobs()
+            tmp_list = [s_dict['exp_dict'] for s_dict in
+                         summary_list if s_dict['job_state'] in
+                          ALIVE_STATES]
+            self.kill_jobs(exp_list=tmp_list)
 
         # view experiments
         # print("Checking job status...")
@@ -171,6 +183,7 @@ class JobManager:
 
     def launch_exp_list(self, command,  exp_list=None, savedir_base=None, reset=0, in_parallel=True):
         exp_list = exp_list or self.exp_list
+        assert '<exp_id>' in command
 
         submit_dict = {}
 
@@ -269,11 +282,11 @@ class JobManager:
             job_id = hu.load_json(fname).get("job_id")
             job = self.get_job( job_id)
 
-            if job.alive or job.state == 'SUCCEEDED':
+            if job['state'] in ALIVE_STATES + COMPLETED_STATES:
                 # If the job is alive, do nothing
                 message = 'IGNORED: Job %s' % job.state
 
-            elif job.state in ["FAILED", "CANCELLED", "INTERRUPTED"]:
+            elif job['state'] in FAILED_STATES:
                 message = "SUBMITTED: Retrying %s Job" % job.state
                 job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=job)
                 job_id = job_dict['job_id']
@@ -291,18 +304,21 @@ class JobManager:
 
         fname_exp_dict = os.path.join(savedir, "exp_dict.json")
         hu.save_json(fname_exp_dict, exp_dict)
-        assert(hu.hash_dict(hu.load_json(fname_exp_dict))
-               == hu.hash_dict(exp_dict))
+        exp_id = hu.hash_dict(exp_dict)
+        assert(hu.hash_dict(hu.load_json(fname_exp_dict)) == exp_id)
+
 
         # Define paths
         workdir_job = os.path.join(savedir, "code")
 
         # Copy the experiment code into the experiment folder
+        print(f'Copying code for experiment {exp_id}')
         hu.copy_code(self.workdir + "/", workdir_job, verbose=0)
 
         # Run  command
         job_id = self.submit_job(command, workdir_job, savedir_logs=savedir)
-
+        print(f'Job submitted for experiment {exp_id} with job id {job_id}')
+        
         # Verbose
         if self.verbose:
             print("Job_id: %s command: %s" % (job_id, command))
@@ -357,22 +373,24 @@ class JobManager:
 
                 fname_exp_dict = os.path.join(savedir, "exp_dict.json")
                 job = jobs_dict[job_id]
+                if not isinstance(job, dict):
+                    job = vars(job)
 
                 if hasattr(job, 'command'):
-                    command = job.command[2]
+                    command = job_dict['command']
                 else:
                     command = None
 
                 # Job info
                 result_dict['started_at'] = hu.time_to_montreal(fname_exp_dict)
                 result_dict["job_id"] = job_id
-                result_dict["job_state"] = job.state
-                result_dict["restarts"] = len(job.runs)
+                result_dict["job_state"] = job["state"]
+                result_dict["restarts"] = len(job["runs"])
                 result_dict["command"] = command
                 
                 if get_logs:
                     # Logs info
-                    if job.state == "FAILED":
+                    if job["state"] == "FAILED":
                         logs_fname = os.path.join(savedir, "err.txt")
                     else:
                         logs_fname = os.path.join(savedir, "logs.txt")
@@ -416,10 +434,9 @@ class JobManager:
         df = hu.sort_df_columns(df)
         summary_dict['status'] = status
         summary_dict['table'] = df
-        summary_dict['queuing'] = df[df['job_state'] == 'QUEUING']
-        summary_dict['running'] = df[df['job_state'] == 'RUNNING']
-        summary_dict['succeeded'] = df[df['job_state'] == 'SUCCEEDED']
-        summary_dict['failed'] = df[df['job_state'] == 'FAILED']
+
+        for state in ALIVE_STATES + COMPLETED_STATES + FAILED_STATES:
+            summary_dict[state] = df[df['job_state'] == state]
 
         return summary_dict
 
