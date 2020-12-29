@@ -16,6 +16,8 @@ try:
 except:
     pass
 
+def to_dict(job):
+    return {'id':job.id, 'state':job.state, 'runs':job.runs, 'alive':job.alive}
 # Api
 # ==============
 def get_api(**kwargs):
@@ -95,20 +97,20 @@ def get_jobs_dict(api, job_id_list, query_size=20):
         job_id_string = job_id_string[:-1]
         jobs += api.v1_cluster_job_get(q=job_id_string).items
 
-    jobs_dict = {job.id: vars(job) for job in jobs}
+    jobs_dict = {job.id: to_dict(job) for job in jobs}
 
     return jobs_dict
 
 def get_job(api, job_id):
     """Get job information."""
     try:
-        return vars(api.v1_job_get_by_id(job_id))
+        return to_dict(api.v1_job_get_by_id(job_id))
     except ApiException as e:
         raise ValueError("job id %s not found." % job_id)
 
 def get_jobs(api, account_id):
     # account_id = hu.subprocess_call('eai account get').split('\n')[-2].split(' ')[0]
-    return [vars(j) for j in api.v1_account_job_get(account_id=account_id,
+    return [to_dict(j) for j in api.v1_account_job_get(account_id=account_id,
             limit=1000, 
             order='-created',
             q="alive_recently=True").items]
