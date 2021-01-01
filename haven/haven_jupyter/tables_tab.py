@@ -42,6 +42,10 @@ def tables_tab(db, output):
     b_meta = widgets.Button(description="Display Meta Table")
     b_diff = widgets.Button(description="Display Filtered Table")
 
+    # download logs
+    bdownload = widgets.Button(description="Download Logs")
+    bdownload_out = widgets.Output()
+
     w_avg_across = wdg.Dropdown(header='Avg Across',
                                 options=['None'] + db.rm.exp_params,
                             db_vars=db.vars, 
@@ -49,7 +53,7 @@ def tables_tab(db, output):
 
     button = widgets.VBox([ 
                             widgets.HBox([w_columns.get_widget(), w_score_columns.get_widget(), w_avg_across.get_widget()]),
-                            widgets.HBox([b_table, bstatus, blogs, bfailed, ]),
+                            widgets.HBox([b_table, bstatus, blogs, bfailed, bdownload, bdownload_out]),
                            
     ])
     output_plot = widgets.Output()
@@ -109,35 +113,56 @@ def tables_tab(db, output):
                 print('-'*50)
                 pprint.pprint(logs.get('logs'))     
     
+    def get_logs(failed_only=False):
+        summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
+                                               add_prefix=True)
+        summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
+        if 'FAILED' not in summary_dict:
+            stdout = ('NO FAILED JOBS')
+            return stdout
+
+        n_failed = len(summary_dict['FAILED'])
+        
+        if n_failed == 0:
+            stdout = ('no failed experiments\n')
+        else:
+            stdout = ''
+            for i, failed in enumerate(summary_dict['FAILED']):
+                stdout += ('\nFailed %d/%d ' % (i+1, n_failed) + '='*50)
+                stdout += ('\nexp_id: '+ failed['exp_id'])
+                stdout += ('\njob_id: '+ failed['job_id'])
+                stdout += ('\njob_state: '+ 'FAILED')
+                stdout += ('\nsavedir: ' + os.path.join(db.rm_original.savedir_base, failed['exp_id']))
+
+                stdout += ('\n\nexp_dict')
+                stdout += ('\n' + '-'*50 + '\n')
+                stdout += pprint.pformat(failed['exp_dict'])
+                
+                stdout += ('\n\nLogs\n')
+                stdout += ('-'*50+ '\n')
+                stdout += pprint.pformat(failed.get('logs'))
+                stdout += ('\n')
+    
+        return stdout
+        
     def on_failed_clicked(b):
         output_plot.clear_output()
         with output_plot:
             db.update_rm()
-            summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
-                                               add_prefix=True)
-            summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
-            if 'FAILED' not in summary_dict:
-                display('NO FAILED JOBS')
-                return
-            n_failed = len(summary_dict['FAILED'])
-        
-            if n_failed == 0:
-                display('no failed experiments')
-            else:
-                for i, failed in enumerate(summary_dict['FAILED']):
-                    print('\nFailed %d/%d' % (i+1, n_failed), '='*50)
-                    print('exp_id:', failed['exp_id'])
-                    print('job_id:', failed['job_id'])
-                    print('job_state:', 'FAILED')
-                    print('savedir:', os.path.join(db.rm_original.savedir_base, failed['exp_id']))
+            stdout = get_logs(failed_only=True)
+            print(stdout)
+            
 
-                    print('\nexp_dict')
-                    print('-'*50)
-                    pprint.pprint(failed['exp_dict'])
-                    
-                    print('\nLogs')
-                    print('-'*50)
-                    pprint.pprint(failed.get('logs'))
+    def on_download_clicked(b):
+        fname = 'logs.txt'
+        hu.save_txt(fname, get_logs(failed_only=True))
+        
+        bdownload_out.clear_output()
+
+        with bdownload_out:
+            display(FileLink(fname, result_html_prefix="Download: "))
+
+    bdownload.on_click(on_download_clicked)
 
     # Add call listeners
     b_table.on_click(on_table_clicked)

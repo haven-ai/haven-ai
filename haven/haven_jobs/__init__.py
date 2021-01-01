@@ -59,12 +59,12 @@ class JobManager:
             from . import toolkit_manager as ho
             self.ho = ho
             self.api = self.ho.get_api(token=None)
-            print('using toolkit')
+            print('Using toolkit.')
         except:
             import slurm_manager as ho
             self.ho = ho
             self.api = None
-            print('using slurm')
+            print('Using slurm.')
 
     
     def get_command_history(self, topk=10):

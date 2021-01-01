@@ -58,8 +58,7 @@ def plots_tab(self, output):
 
  
 
-    bdownload = widgets.Button(description="Download Plots",
-                               layout=self.layout_button)
+    bdownload = widgets.Button(description="Download Plots")
     bdownload_out = widgets.Output(layout=self.layout_button)
 
     def on_download_clicked(b):

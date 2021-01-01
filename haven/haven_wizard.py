@@ -1,4 +1,4 @@
-import os
+import os, sys
 import argparse
 import pandas as pd
 import pprint
@@ -105,8 +105,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                             job_config=job_config,
                             )
 
-        command = ('python trainval.py -ei <exp_id> -sb %s -d %s' %
-                   (savedir_base, args.datadir))
+        command = (f'python {os.path.split(sys.argv[0])[-1]} -ei <exp_id> -sb {savedir_base} -d {args.datadir}')
 
         print(command)
         jm.launch_menu(command=command, in_parallel=use_threads)
