@@ -61,7 +61,7 @@ class JobManager:
             self.api = self.ho.get_api(token=None)
             print('Using toolkit.')
         except:
-            import slurm_manager as ho
+            from . import slurm_manager as ho
             self.ho = ho
             self.api = None
             print('Using slurm.')
