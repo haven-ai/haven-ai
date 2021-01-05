@@ -2,7 +2,7 @@ from setuptools import setup
 import setuptools
 
 setup(name='haven-ai',
-      version='0.4.0',
+      version='0.4.1',
       description='Manage large-scale experiments',
       url='https://github.com/haven-ai/haven-ai',
       maintainer='Issam Laradji',
