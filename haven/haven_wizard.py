@@ -49,6 +49,9 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                exp_id=None):
     if args is None:
         args = get_args()
+    else:
+        for k, v in vars(get_args()).items():
+            setattr(args, k, v)
 
     # Asserts
     # =======
