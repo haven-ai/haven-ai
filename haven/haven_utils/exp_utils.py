@@ -128,6 +128,11 @@ def group_exp_list(exp_list, groupby_list):
     if not isinstance(groupby_list, list):
         groupby_list = [groupby_list]
     # groupby_list = hu.as_double_list(groupby_list)
+    exp_list = copy.deepcopy(exp_list)
+    exp_list_flat = [hu.flatten_column(exp_dict) for exp_dict in exp_list]
+    for e1, e2 in zip(exp_list_flat, exp_list):
+        e1['exp_dict'] = e2
+
     def split_func(x):
         x_list = []
         for k_list in groupby_list:
@@ -138,14 +143,14 @@ def group_exp_list(exp_list, groupby_list):
 
         return x_list
 
-    exp_list.sort(key=split_func)
+    exp_list_flat.sort(key=split_func)
 
     list_of_exp_list = []
-    group_dict = groupby(exp_list, key=split_func)
+    group_dict = groupby(exp_list_flat, key=split_func)
 
     # exp_group_dict = {}
     for k, v in group_dict:
-        v_list = list(v)
+        v_list = [vi['exp_dict'] for vi in list(v)]
         list_of_exp_list += [v_list]
     #     # print(k)
     #     exp_group_dict['_'.join(list(map(str, k)))] = v_list
@@ -428,6 +433,8 @@ def filter_exp_list(exp_list, filterby_list, savedir_base=None, verbose=True,
                 filterby_dict = copy.deepcopy(filterby_dict)
                
                 keys = filterby_dict.keys()
+
+                tmp_dict = {}
                 for k in keys:
                     if '.' in k:
                         v = filterby_dict[k]
@@ -444,8 +451,11 @@ def filter_exp_list(exp_list, filterby_list, savedir_base=None, verbose=True,
                             else:
                                 t = t.setdefault(ki, {})
 
-                        filterby_dict = dict_tree
-
+                        tmp_dict.update(dict_tree)
+                    else:
+                        tmp_dict[k] = filterby_dict[k]
+                    
+                filterby_dict = tmp_dict
                 assert (isinstance(filterby_dict, dict), 
                                  ('filterby_dict: %s is not a dict' % str(filterby_dict)))
 

@@ -219,6 +219,8 @@ class JobManager:
             print('***')
             print('Exp %d/%d - %s' % (i+1, len(submit_dict), v['message']))
             print('exp_id: %s' % hu.hash_dict(v['exp_dict']))
+            savedir = os.path.join(savedir_base, hu.hash_dict(v["exp_dict"]))
+            print(f'savedir: {savedir}')
             pprint.pprint(v['exp_dict'])
             print()
 
