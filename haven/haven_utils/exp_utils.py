@@ -157,6 +157,22 @@ def group_exp_list(exp_list, groupby_list):
 
     return list_of_exp_list
 
+def get_exp_diff(exp_list):
+    flat_list = [hu.flatten_column(e) for e in exp_list]
+
+    hparam_dict = {}
+    for f in flat_list:
+        for k,v in f.items():
+            if k not in hparam_dict:
+                hparam_dict[k] = set()
+            hparam_dict[k].add(v)
+    count_dict = []
+    for k,v in hparam_dict.items():
+        count_dict += [{'name':k, 'uniques':len(v)}]
+        
+    count_dict = sorted(count_dict, key = lambda i: -i['uniques'])
+    return count_dict
+
 def group_list(python_list, key, return_count=False):
     group_dict = {}
     for p in python_list:

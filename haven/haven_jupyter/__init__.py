@@ -70,7 +70,7 @@ class DashboardManager:
     def display(self):
         self.update_rm(display_meta=False)
 
-        header = widgets.Label(value="Loading Dashboard...", layout=self.layout_label,)
+        header = widgets.Label(value="Loading Dashboard...", layout=widgets.Layout(width='800px'),)
         display(header)
 
         if self.enable_datatables:
@@ -107,7 +107,8 @@ class DashboardManager:
             latex_tab(self, latex)
             share_tab(self, share)
 
-            header.value = f'Dashboard loaded (ver: {haven.__version__}).'
+            header.value = (f'Dashboard loaded (ver: {haven.__version__}). ' + 
+                            f'{len(self.rm_original.exp_list_all)} experiments selected from "{self.rm_original.savedir_base}"')
 
         display(main_out)
 
@@ -153,8 +154,7 @@ class DashboardManager:
         #     return
         # else:
         if display_meta:
-            display('%d/%d experiments selected, using "filterby_list" from savedir_base "%s"' %
-                (len(self.rm.exp_list), len(self.rm.exp_list_all), self.vars.get('savedir_base')))
+            display(f'{len(self.rm.exp_list)}/{len(self.rm.exp_list_all)} experiments selected using "filterby_list"')
 
 
 
