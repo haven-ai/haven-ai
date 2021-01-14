@@ -283,7 +283,7 @@ def subprocess_call(cmd_string):
         Error code or 0 if no error happened
     """
     return subprocess.check_output(
-        shlex.split(cmd_string), shell=False).decode("utf-8")
+        shlex.split(cmd_string), shell=False, stderr=subprocess.STDOUT).decode("utf-8")
 
 
 def copy_code(src_path, dst_path, verbose=1):
