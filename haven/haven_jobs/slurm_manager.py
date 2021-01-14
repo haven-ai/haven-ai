@@ -7,9 +7,8 @@ import copy
 import pandas as pd
 import numpy as np
 import getpass
-import pprint
-import requests
 import pandas as pd
+from subprocess import SubprocessError
 
 # Job submission
 # ==============
@@ -36,11 +35,14 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
     while True:
         try:
             job_id = hu.subprocess_call(submit_command).split()[-1]
-        except Exception as e:
-            if "Socket timed out" in str(e):
-                print("slurm time out and retry now")
+        except SubprocessError as e:
+            if "Socket timed out" in str(e.output):
+                print("sbatch time out and retry now")
                 time.sleep(1)
                 continue
+            else:
+                # other errors
+                exit(str(e.output)[2:-1].replace('\\n', ''))
         break
 
     # delete the bash.sh
@@ -66,11 +68,14 @@ def get_jobs(api, account_id):
     while True:
         try:
             job_list = hu.subprocess_call(command)
-        except Exception as e:
-            if "Socket timed out" in str(e):
+        except SubprocessError as e:
+            if "Socket timed out" in str(e.output):
                 print("squeue time out and retry now")
                 time.sleep(1)
                 continue
+            else:
+                # other errors
+                exit(str(e.output)[2:-1].replace('\\n', ''))
         break
 
     result = [{"job_id": j.split()[0], "state": j.split()[1]} for j in job_list.split('\n')[1:-1]]
@@ -87,11 +92,14 @@ def get_jobs_dict(api, job_id_list, query_size=20):
     while True:
         try:
             job_list = hu.subprocess_call(command)
-        except Exception as e:
-            if "Socket timed out" in str(e):
+        except SubprocessError as e:
+            if "Socket timed out" in str(e.output):
                 print("sacct time out and retry now")
                 time.sleep(1)
                 continue
+            else:
+                # other errors
+                exit(str(e.output)[2:-1].replace('\\n', ''))
         break
 
     lines = job_list.split('\n')
