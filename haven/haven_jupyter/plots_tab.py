@@ -100,7 +100,7 @@ def plots_tab(self, output):
                             var='y_metrics')
 
     w_legend = wdg.SelectMultiple(header="Legend:", 
-                            options=db.rm.exp_params,
+                            options=['exp_id'] + db.rm.exp_params,
                             db_vars=db.vars, 
                             var='legend_list', 
                             select_all=True)

@@ -324,6 +324,9 @@ def get_plot(exp_list, savedir_base,
 def get_label(original_list, exp_dict, format_str=None, show_key=False):
     label_list = []
     for k in original_list:
+        if k == 'exp_id':
+            label_list += [str(hu.hash_dict(exp_dict))]
+            
         depth_list = k.split('.')
         sub_dict = exp_dict
         for d in depth_list:
