@@ -433,9 +433,13 @@ class ResultManager:
             score_list = score_lists_dict[exp_id]
             plot_score_lists(score_list, x_metric, y_metric_list, exp_ids)
             
-    def plot_score_lists(self, score_lists, x_metric='epoch', y_metric_list=('train_loss',), exp_ids=None):
+    def plot_score_lists(self, score_lists=None, x_metric='epoch', y_metric_list=('train_loss',), exp_ids=None):
+        if score_lists is None:
+            score_lists = self.get_score_lists()[:3]
+
         if not isinstance(score_lists[0], list):
             score_lists = [score_lists]
+
         for i, sc in enumerate(score_lists):
             df = pd.DataFrame(sc)
             df = df.fillna(method='bfill').fillna(method='ffill')
