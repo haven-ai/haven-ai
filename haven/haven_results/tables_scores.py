@@ -19,7 +19,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
                  verbose=True, wrap_size=8, hparam_diff=0, flatten_columns=True,
                  show_meta=True, show_max_min=True, add_prefix=False,
                  score_list_name='score_list.pkl', in_latex_format=False, avg_across=None,
-                 return_columns=False):
+                 return_columns=False, show_exp_ids=False):
     """Get a table showing the scores for the given list of experiments 
 
     Parameters
@@ -79,6 +79,8 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         for hc in hparam_columns:
             hparam_list.add(hc)
         for k in hparam_columns:
+            if k == 'exp_id':
+                continue
             if add_prefix:
                 k_new = "(hparam) " + k
             else:
@@ -93,7 +95,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
         else:
             result_dict['creation_time'] = -1
 
-        if show_meta:
+        if show_exp_ids or 'exp_id' in hparam_columns:
             result_dict["exp_id"] = exp_id
 
         # hparam_columns = [k for k in result_dict.keys() if k not in ['creation_time']]
@@ -134,7 +136,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     
     # create table
     df = pd.DataFrame(result_list)
-    hparam_columns = list(hparam_list)
+    hparam_columns = [c for c in hparam_list if c not in ['exp_id']]
     metric_columns = [c for c in df.columns if c not in hparam_columns + ['creation_time']]
     # print(avg_across)
     if avg_across is not None:
@@ -171,7 +173,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     return df
 
 def get_score_lists(exp_list, savedir_base, filterby_list=None, verbose=True,
-                    score_list_name='score_list.pkl'):
+                    score_list_name='score_list.pkl', return_as_dict=False):
     """[summary]
     
     Parameters
@@ -203,7 +205,10 @@ def get_score_lists(exp_list, savedir_base, filterby_list=None, verbose=True,
 
     exp_list = hu.filter_exp_list(exp_list, filterby_list, savedir_base=savedir_base, verbose=verbose)
     score_lists = []
-
+    
+    if return_as_dict:
+        from collections import OrderedDict
+        score_lists_dict = OrderedDict()
     # aggregate results
     for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
@@ -216,8 +221,13 @@ def get_score_lists(exp_list, savedir_base, filterby_list=None, verbose=True,
             continue
         
         else:
-            score_lists += [hu.load_pkl(score_list_fname)]
-    
+            s_list = hu.load_pkl(score_list_fname)
+            if return_as_dict:
+                score_lists_dict[exp_id] = s_list
+            else:
+                score_lists += [s_list]
+    if return_as_dict:
+        return score_lists_dict
     return score_lists
 
 

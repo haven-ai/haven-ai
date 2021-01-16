@@ -25,13 +25,13 @@ except:
 
 def tables_tab(db, output):
     w_columns = wdg.SelectMultiple(header="Hyperparameters:", 
-                            options=db.rm.exp_params,
+                            options=['exp_id'] + db.rm.exp_params,
                             db_vars=db.vars, 
-                            var='columns', select_all=True)
+                            var='columns', select_all=False)
     w_score_columns = wdg.SelectMultiple(header="Metrics:", 
                             options=db.rm.score_keys,
                             db_vars=db.vars, 
-                            var='score_columns', select_all=True)
+                            var='score_columns', select_all=False)
 
 
     bstatus = widgets.Button(description="Jobs Status")

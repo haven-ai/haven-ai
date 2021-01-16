@@ -374,7 +374,7 @@ class ResultManager:
         """
         return images_fig.get_images(exp_list=self.exp_list,
                          savedir_base=self.savedir_base, verbose=self.verbose, **kwargs)
-
+    
     def get_job_summary(self, columns=None, add_prefix=False, **kwargs):
         """[summary]
         """
@@ -419,7 +419,38 @@ class ResultManager:
         print('saved: https://www.dropbox.com/home/%s' % out_fname)
 
 
+    def plot_score_lists_from_exp_ids(self, score_list=None, score_lists_dict=None, x_metric='epoch', y_metric_list=('train_loss',), exp_ids=None):
+        if score_lists_dict is None:
+            score_lists_dict = self.get_score_lists(return_as_dict=True)
+            
+        if exp_ids is None:
+            exp_id_list = list(score_lists_dict.keys())
+            exp_ids = []
+            for i in exp_indices:
+                exp_ids += [exp_id_list[i]]
+            
+        for exp_id in exp_ids:
+            score_list = score_lists_dict[exp_id]
+            plot_score_lists(score_list, x_metric, y_metric_list, exp_ids)
+            
+    def plot_score_lists(self, score_lists, x_metric='epoch', y_metric_list=('train_loss',), exp_ids=None):
+        if not isinstance(score_lists[0], list):
+            score_lists = [score_lists]
+        for i, sc in enumerate(score_lists):
+            df = pd.DataFrame(sc)
+            df = df.fillna(method='bfill').fillna(method='ffill')
+            
+            y_list = []
+            for y_metric in y_metric_list:
+                if y_metric in df.columns:
+                    y_list += [y_metric]
+            
+            df = df[[x_metric] + y_list]
 
-
-
-
+            fig, ax = plt.subplots(figsize=(14,7))
+            y, x = df[x_metric].values, df.drop(x_metric, axis=1).T
+            ax.stackplot(y, x, labels=x[0].keys())
+            ax.legend(loc='upper left')
+            if exp_ids is not None:
+                plt.title(exp_ids[i])
+            plt.show()
