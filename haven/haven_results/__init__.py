@@ -434,6 +434,12 @@ class ResultManager:
             plot_score_lists(score_list, x_metric, y_metric_list, exp_ids)
             
     def plot_score_lists(self, score_lists=None, x_metric='epoch', y_metric_list=('train_loss',), exp_ids=None):
+        if exp_ids is not None:
+            score_lists_dict = self.get_score_lists(return_as_dict=True)
+            score_lists = []
+            for ei in exp_ids:
+                score_lists += [score_lists_dict[ei]]
+
         if score_lists is None:
             score_lists = self.get_score_lists()[:3]
 
