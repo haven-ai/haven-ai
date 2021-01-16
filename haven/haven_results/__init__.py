@@ -453,4 +453,5 @@ class ResultManager:
             ax.legend(loc='upper left')
             if exp_ids is not None:
                 plt.title(exp_ids[i])
+            ax.set_xlabel(x_metric)
             plt.show()
