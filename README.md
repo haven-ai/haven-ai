@@ -5,20 +5,25 @@
     <img width="100%" src="docs/images/haven_logo.png"> 
 </p>
 
-<p align="center">
-  Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> || See <a href="#papers-based-on-haven-ai">Papers that are based on Haven-AI</a>
 
-</p>
-<p align="center">
-Create a Benchmark with these 4 Steps
-</p>
-<p align="center">
+
+
+
+    
+## **Getting Started**
+
+- Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> for a minimal example.
+- See <a href="#papers-based-on-haven-ai">Papers that are based on Haven-AI</a>.
+
+
+## **Create end-to-end ML benchmarks with the following 4 steps**
+
+<p align="left">
   <a href="#1-setup-experiments">(1) Setup Experiments</a>|
     <a href="#2-run-experiments">(2) Run Experiments</a>|
   <a href="#3-visualize-experiments">(3) Visualize Experiments</a>|
   <a href="#4-run-experiments-in-cluster">(4) Run Experiments in Cluster</a>
 </p>
-
 
 
 
@@ -32,10 +37,6 @@ Create a Benchmark with these 4 Steps
     <td valign="top"><img src="docs/images/vis.gif"></td>
   </tr>
     </table>
-    
-
-
-## **Create end-to-end ML benchmarks with the following 4 steps**
 
 ### 0 Install
 ```
