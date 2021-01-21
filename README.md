@@ -2,7 +2,7 @@
 
 
 <p align="center" width="100%">
-    <img width="100%" src="docs/images/haven_logo.png"> 
+    <img width="75%" src="docs/images/haven_logo.png"> 
 </p>
 
 
