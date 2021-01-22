@@ -1,4 +1,4 @@
-import tqdm, job_configs
+import tqdm, argparse
 import os
 
 from haven import haven_examples as he
@@ -46,4 +46,11 @@ if __name__ == '__main__':
         exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
 
     # 9. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=exp_list)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-sb', '--savedir_base', default=None,
+                        help='Define the base directory where the experiments will be saved.')
+    parser.add_argument("-r", "--reset",  default=0, type=int,
+                        help='Reset or resume the experiment.')
+
+    args, others = parser.parse_known_args()
+    hw.run_wizard(func=trainval, exp_list=exp_list, savedir_base=args.savedir_base, reset=args.reset)
