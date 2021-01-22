@@ -12,6 +12,8 @@
     
 ## **Getting Started**
 
+- Run a minimal example with <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab</a>.
+
 - Run experiments in sequence: 
 
 ```
