@@ -246,21 +246,23 @@ def get_best_exp_dict(exp_list, savedir_base, metric,
             continue
         
         score_list = hu.load_pkl(score_list_fname)
-
+        metric_scores = [score_dict[metric] for score_dict in score_list if metric in score_dict]
+        if len(metric_scores) == 0:
+            continue
         if metric_agg in ['min', 'min_last']:
             if metric_agg == 'min_last':
-                score = [score_dict[metric] for score_dict in score_list][-1]
+                score = metric_scores[-1]
             elif metric_agg == 'min':
-                score = np.min([score_dict[metric] for score_dict in score_list])
+                score = np.min(metric_scores)
             if best_score >= score:
                 best_score = score
                 exp_dict_best = exp_dict
 
         elif metric_agg in ['max', 'max_last']:
             if metric_agg == 'max_last':
-                score = [score_dict[metric] for score_dict in score_list][-1]
+                score = metric_scores[-1]
             elif metric_agg == 'max':
-                score = np.max([score_dict[metric] for score_dict in score_list])
+                score = np.max(metric_scores)
                 
             if best_score <= score:
                 best_score = score
@@ -313,7 +315,10 @@ def get_exp_list_from_exp_configs(exp_group_list, workdir, filterby_list=None, v
     exp_list = filter_exp_list(exp_list, filterby_list, verbose=verbose)
     return exp_list
 
-def get_exp_list(savedir_base, filterby_list=None, verbose=True):
+def get_exp_ids(savedir_base, filterby_list=None, verbose=True):
+    return get_exp_list(savedir_base, filterby_list, verbose, return_ids=True)
+
+def get_exp_list(savedir_base, filterby_list=None, verbose=True, return_ids=False):
     """[summary]
     
     Parameters
@@ -355,6 +360,8 @@ def get_exp_list(savedir_base, filterby_list=None, verbose=True):
         exp_list += [exp_dict]
 
     exp_list = filter_exp_list(exp_list, filterby_list)
+    if return_ids:
+        return [hu.hash_dict(e) for e in exp_list]
     return exp_list
 
 

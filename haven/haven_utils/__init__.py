@@ -4,7 +4,7 @@ import hashlib
 import itertools
 import json
 import tqdm
-
+import torchvision
 import pprint
 import os
 import pickle
@@ -71,7 +71,7 @@ def get_image(img, denorm=None, size=None, points=None, radius=10,
                mask, heatmap, return_image=True)
 
 def save_image(fname, img, denorm=None, size=None, points=None, radius=10,
-               mask=None, heatmap=None, makedirs=True, return_image=False):
+               mask=None, heatmap=None, makedirs=True, return_image=False, nrow=8):
     """Save an image into a file.
 
     Parameters
@@ -83,6 +83,10 @@ def save_image(fname, img, denorm=None, size=None, points=None, radius=10,
     makedirs : bool, optional
         If enabled creates the folder for saving the file, by default True
     """
+    if not isinstance(img, torch.Tensor):
+        img = torch.as_tensor(img)
+    if img.ndim == 4:
+        img = torchvision.utils.make_grid(img, nrow=nrow)
     if denorm:
         img = denormalize(img, mode=denorm)
     if points is not None:
