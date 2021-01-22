@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 .idea
 .tmp
+eai-python-client/
 job_config.py
 job_configs.py
 # trainval.py
