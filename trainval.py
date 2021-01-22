@@ -51,6 +51,11 @@ if __name__ == '__main__':
                         help='Define the base directory where the experiments will be saved.')
     parser.add_argument("-r", "--reset",  default=0, type=int,
                         help='Reset or resume the experiment.')
+    parser.add_argument("-j", "--run_jobs",  default=0, type=int,
+                        help='Run jobs in cluster.')
 
     args, others = parser.parse_known_args()
-    hw.run_wizard(func=trainval, exp_list=exp_list, savedir_base=args.savedir_base, reset=args.reset)
+
+    import job_configs
+    hw.run_wizard(func=trainval, exp_list=exp_list, savedir_base=args.savedir_base, reset=args.reset,
+                  job_config=job_configs.TOOLKIT_CONFIG)

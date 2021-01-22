@@ -21,14 +21,14 @@ python trainval.py --savedir_base /mnt/home/results -r 1
 - Run experiments in parallel in slurm:
 
 ```
-python trainval_toolkit.py --savedir_base /mnt/home/results -r 1 -j 1
+python trainval.py --savedir_base /mnt/home/results -r 1 -j 1
 ```
 
 
 - Run experiments in parallel in toolkit:
 
 ```
-python trainval_toolkit.py --savedir_base /mnt/home/results -r 1 -j 1
+python trainval.py --savedir_base /mnt/home/results -r 1 -j 1
 ```
 
 - Try out the <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab Demo</a> for a minimal example.

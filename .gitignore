@@ -7,7 +7,7 @@ __pycache__/
 .tmp
 eai-python-client/
 job_config.py
-job_configs.py
+# job_configs.py
 # trainval.py
 trainval_results.ipynb
 results/
