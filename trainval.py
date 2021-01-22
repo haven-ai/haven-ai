@@ -58,11 +58,11 @@ if __name__ == '__main__':
 
     
     if args.run_jobs == 1:
-        import job_configs
-        job_config = job_configs.JOB_CONFIG
-    elif args.run_jobs == 2:
         import slurm_config
         job_config = slurm_config.JOB_CONFIG
+    elif args.run_jobs == 2:
+        import job_configs
+        job_config = job_configs.JOB_CONFIG
 
     hw.run_wizard(func=trainval, exp_list=exp_list, savedir_base=args.savedir_base, reset=args.reset,
                   job_config=job_config)
