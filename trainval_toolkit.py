@@ -1,4 +1,4 @@
-import tqdm, job_configs
+import tqdm, toolkit_configs
 import os
 
 from haven import haven_examples as he
@@ -46,4 +46,4 @@ if __name__ == '__main__':
         exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
 
     # 9. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=exp_list, job_config=job_configs.JOB_CONFIG)
+    hw.run_wizard(func=trainval, exp_list=exp_list, job_config=toolkit_configs.JOB_CONFIG)

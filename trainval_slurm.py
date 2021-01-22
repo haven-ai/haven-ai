@@ -1,4 +1,4 @@
-import tqdm, job_config
+import tqdm, job_configs
 import os
 
 from haven import haven_examples as he
@@ -42,8 +42,8 @@ def trainval(exp_dict, savedir, args):
 if __name__ == '__main__':
     # 8. define a list of experiments
     exp_list = []
-    for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, "bug"]:
+    for lr in [1e-1, 1e-2, 1e-3]:
         exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
 
     # 9. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=exp_list, job_config=job_config.JOB_CONFIG)
+    hw.run_wizard(func=trainval, exp_list=exp_list, job_config=job_configs.JOB_CONFIG)
