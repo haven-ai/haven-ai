@@ -31,14 +31,14 @@ python trainval.py --savedir_base /mnt/home/results -r 1 -j 1 -v results.ipynb
 ```
 python trainval.py --savedir_base /mnt/home/results -r 1 -j 2 -v results.ipynb
 ```
-
-<img src="docs/images/ork2.gif">
-
+<p align="center" width="100%">
+<img width="65%" src="docs/images/ork2.gif">
+</p>
 
 - Visualize experiments by opening `results.ipynb` and get the following output.
-
-<img src="docs/images/vis.gif">
-
+<p align="center" width="100%">
+<img width="65%" src="docs/images/vis.gif">
+</p>
 
 ### Install
 ```
