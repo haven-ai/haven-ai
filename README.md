@@ -17,148 +17,33 @@
 - Run experiments in sequence: 
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1
+python trainval.py --savedir_base /mnt/home/results -r 1  -v results.ipynb
 ```
 
-- Run experiments in parallel in slurm:
+- Run experiments in parallel using **slurm**:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j 1
+python trainval.py --savedir_base /mnt/home/results -r 1 -j 1 -v results.ipynb
 ```
 
-
-- Run experiments in parallel in toolkit:
+- Run experiments in parallel using **toolkit**:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j 2
+python trainval.py --savedir_base /mnt/home/results -r 1 -j 2 -v results.ipynb
 ```
 
-## **Create end-to-end ML benchmarks with the following 4 steps**
-
-<p align="left">
-  <a href="#1-setup-experiments">(1) Setup Experiments</a>|
-    <a href="#2-run-experiments">(2) Run Experiments</a>|
-  <a href="#3-visualize-experiments">(3) Visualize Experiments</a>|
-  <a href="#4-run-experiments-in-cluster">(4) Run Experiments in Cluster</a>
-</p>
+<img src="docs/images/ork2.gif">
 
 
+- Visualize experiments by opening `results.ipynb` and get the following output.
 
-<table align="center">
-  <tr>
-    <td>Launch Experiments on Cluster</td>
-     <td>Visualize Experiments on Jupyter</td>
-  </tr>
-  <tr>
-    <td valign="top"><img src="docs/images/ork2.gif"></td>
-    <td valign="top"><img src="docs/images/vis.gif"></td>
-  </tr>
-    </table>
+<img src="docs/images/vis.gif">
 
-### 0 Install
+
+### Install
 ```
 pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ```
-
-### 1. Setup Experiments
-
-Create `trainval.py` file and add the following code,
-
-```python
-import tqdm
-import os
-
-from haven import haven_examples as he
-from haven import haven_wizard as hw
-
-# 1. define the training and validation function
-def trainval(exp_dict, savedir, args):
-    """
-    exp_dict: dictionary defining the hyperparameters of the experiment
-    savedir: the directory where the experiment will be saved
-    args: arguments passed through the command line
-    """
-    # 2. Create data loader and model 
-    train_loader = he.get_loader(name=exp_dict['dataset'], split='train', 
-                                 datadir=os.path.dirname(savedir),
-                                 exp_dict=exp_dict)
-    model = he.get_model(name=exp_dict['model'], exp_dict=exp_dict)
-
-    # 3. load checkpoint
-    chk_dict = hw.get_checkpoint(savedir)
-
-    # 4. Add main loop
-    for epoch in tqdm.tqdm(range(chk_dict['epoch'], 10), 
-                           desc="Running Experiment"):
-        # 5. train for one epoch
-        train_dict = model.train_on_loader(train_loader, epoch=epoch)
-
-        # 6. get and save metrics
-        score_dict = {'epoch':epoch, 'acc': train_dict['train_acc'], 
-                      'loss':train_dict['train_loss']}
-        chk_dict['score_list'] += [score_dict]
-
-    hw.save_checkpoint(savedir, score_list=chk_dict['score_list'])
-    print('Experiment done\n')
-
-# 7. create main
-if __name__ == '__main__':
-    # 8. define a list of experiments
-    exp_list = [{'dataset':'syn', 'model':'linear', 'lr':lr} 
-                 for lr in [1e-3, 1e-4]]
-             
-    # 9. Launch experiments using magic command
-    hw.run_wizard(func=trainval, exp_list=exp_list)
-```
-
-
-### 2. Run Experiments
-
-Run the following command in `terminal`,
-
-```
-python trainval.py --reset 1 -v trainval_results.ipynb --savedir_base ../results
-```
-
-Optional arguments,
-
-```python
-  -h, --help                        show this help message and exit
-  -e EXP_GROUP_LIST [EXP_GROUP_LIST ...], --exp_group_list EXP_GROUP_LIST [EXP_GROUP_LIST ...]
-                                    Define which exp groups to run. (default: None)
-  -sb SAVEDIR_BASE, --savedir_base SAVEDIR_BASE
-                                    Define the base directory where the experiments will be saved. (default: None)
-  -d DATADIR, --datadir DATADIR     Define the dataset directory. (default: None)
-  -r RESET, --reset RESET           Reset or resume the experiment. (default: 0)
-  -ei EXP_ID, --exp_id EXP_ID       Run a specific experiment based on its id. (default: None)
-  -j RUN_JOBS, --run_jobs RUN_JOBS  Run the experiments as jobs in the cluster. (default: 0)
-  -nw NUM_WORKERS, --num_workers NUM_WORKERS
-                                    Specify the number of workers in the dataloader. (default: 0)
-  -v VISUALIZE_NOTEBOOK, --visualize_notebook VISUALIZE_NOTEBOOK
-                                    Create a jupyter file to visualize the results. (default: )
-```
-
-### 3. Visualize Experiments
-
-Step 2 creates `trainval_results.ipynb`, open the file on Jupyter to get tables and plots
-
-![](docs/images/table1.png)
-
-You can launch Jupyter with,
-
-```bash
-jupyter nbextension enable --py widgetsnbextension --sys-prefix
-jupyter notebook
-```
-
-### 4. Run Experiments in Cluster
-
-If you have access to the ElementAI cluster `api` then you can run the experiments in cluster (slurm option coming soon),
-
-```
-python trainval.py --run_jobs 1 --reset 1
-```
-
 
 ## Structure
 

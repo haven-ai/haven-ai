@@ -8,6 +8,7 @@ __pycache__/
 eai-python-client/
 job_config.py
 job_configs.py
+results.ipynb
 # trainval.py
 trainval_results.ipynb
 results/
