@@ -35,7 +35,8 @@ def trainval(exp_dict, savedir, args):
 
         images = model.vis_on_loader(train_loader)
 
-    hw.save_checkpoint(savedir, score_list=chk_dict['score_list'], images=[images])
+        hw.save_checkpoint(savedir, score_list=chk_dict['score_list'], images=[images])
+    
     print('Experiment done\n')
 
 # 7. create main
@@ -63,6 +64,8 @@ if __name__ == '__main__':
     elif args.run_jobs == 2:
         import job_configs
         job_config = job_configs.JOB_CONFIG
+    else:
+        job_config = None
 
     hw.run_wizard(func=trainval, exp_list=exp_list, savedir_base=args.savedir_base, reset=args.reset,
                   job_config=job_config)
