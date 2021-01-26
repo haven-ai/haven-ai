@@ -46,7 +46,8 @@ def make_wide(formatter, w=120, h=36):
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
                 savedir_base=None, 
                reset=None, args=None, use_threads=False,
-               exp_id=None, python_binary_path='python', python_file_path=None):
+               exp_id=None, python_binary_path='python', python_file_path=None,
+               workdir=None):
     if args is None:
         args = get_args()
     else:
@@ -102,12 +103,16 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         from haven import haven_jobs as hjb
         assert job_config is not None
         assert 'account_id' in job_config
+
+        if workdir is None:
+            workdir = os.getcwd()
+
         jm = hjb.JobManager(exp_list=exp_list,
                             savedir_base=savedir_base,
-                            workdir=os.getcwd(),
+                            workdir=workdir,
                             job_config=job_config,
                             )
-                            
+
         if python_file_path is None:
             python_file_path = os.path.split(sys.argv[0])[-1]
 
