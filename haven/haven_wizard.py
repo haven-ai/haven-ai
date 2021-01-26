@@ -46,7 +46,7 @@ def make_wide(formatter, w=120, h=36):
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
                 savedir_base=None, 
                reset=None, args=None, use_threads=False,
-               exp_id=None, python_binary_path='python'):
+               exp_id=None, python_binary_path='python', python_file_path=None):
     if args is None:
         args = get_args()
     else:
@@ -107,8 +107,11 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                             workdir=os.getcwd(),
                             job_config=job_config,
                             )
+                            
+        if python_file_path is None:
+            python_file_path = os.path.split(sys.argv[0])[-1]
 
-        command = (f'{python_binary_path} {os.path.split(sys.argv[0])[-1]} -ei <exp_id> -sb {savedir_base} -d {args.datadir}')
+        command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base} -d {args.datadir}')
 
         print(command)
         jm.launch_menu(command=command, in_parallel=use_threads)
