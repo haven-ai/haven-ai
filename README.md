@@ -8,6 +8,11 @@
 
 
 
+### Install
+```
+pip install --upgrade git+https://github.com/haven-ai/haven-ai
+```
+
 
     
 ## **Getting Started**
@@ -39,11 +44,6 @@ python trainval.py --savedir_base /mnt/home/results -r 1 -j 2 -v results.ipynb
 <p align="center" width="100%">
 <img width="65%" src="docs/images/vis.gif">
 </p>
-
-### Install
-```
-pip install --upgrade git+https://github.com/haven-ai/haven-ai
-```
 
 ## Structure
 
