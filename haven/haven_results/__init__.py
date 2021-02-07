@@ -392,7 +392,6 @@ class ResultManager:
         fname : [type]
             [description]
         """
-        from haven.haven_share import haven_dropbox as hd
         if savedir_base == '':
             savedir_base = self.savedir_base
         exp_id_list = [hu.hash_dict(exp_dict) for exp_dict in self.exp_list]

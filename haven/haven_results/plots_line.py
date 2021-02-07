@@ -205,8 +205,8 @@ def get_plot(exp_list, savedir_base,
             
             y_list = result_dict['y_list']
             x_list = result_dict['x_list']
-            for eid in list(result_dict['visited_exp_ids']):
-                visited_exp_ids.add(eid)
+            # for eid in list(result_dict['visited_exp_ids']):
+            visited_exp_ids.add(exp_id)
             if len(x_list) == 0 or np.array(y_list).dtype == 'object':
                 x_list = np.NaN
                 y_list = np.NaN
@@ -215,7 +215,11 @@ def get_plot(exp_list, savedir_base,
 
             # map properties of exp
             if legend_list is not None:
-                label = get_label(legend_list, exp_dict, format_str=legend_format)
+                if len(visited_exp_ids) > 1:
+                    show_legend_key = False
+                else:
+                    show_legend_key = True
+                label = get_label(legend_list, exp_dict, format_str=legend_format, show_key=show_legend_key)
             else:
                 label = exp_id
 
@@ -322,8 +326,9 @@ def get_plot(exp_list, savedir_base,
     return fig, axis
 
 def get_label(original_list, exp_dict, format_str=None, show_key=False):
+    key_list = []
     label_list = []
-    for k in original_list:
+    for i, k in enumerate(original_list):
         if k == 'exp_id':
             label_list += [str(hu.hash_dict(exp_dict))]
             
@@ -334,17 +339,24 @@ def get_label(original_list, exp_dict, format_str=None, show_key=False):
                 sub_dict = None
                 break
             sub_dict = sub_dict[d]
-        if show_key:
-            label_list += ['%s:%s' % (k, str(sub_dict))]
+
+        if i < (len(original_list) - 1):
+            key_list += [f'{k}|' ]
+            label_list += [f'{str(sub_dict):{int(len(k))}}|' ]
         else:
-            label_list += [str(sub_dict)]
+            key_list += [f'{k}' ]
+            label_list += [f'{str(sub_dict)}' ]
+       
         
     if format_str:
         label = format_str.format(*label_list)
     else:
-        label = '_'.join(label_list)
+        label = ' '.join(label_list)
+        if show_key:
+            label = ' '.join(key_list) + '\n' + label
+            
     
-    label = '\n'.join(wrap(label, 40))
+    # label = '\n'.join(wrap(label, 40))
     return label
 
 

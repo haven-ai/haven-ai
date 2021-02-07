@@ -3,6 +3,7 @@ from .. import haven_utils
 from .. import haven_results as hr
 from .. import haven_utils as hu 
 from .. import haven_share as hd
+from . import widgets as wdg
 
 import os
 import pprint, json
@@ -25,19 +26,18 @@ except:
 
 def share_tab(self, output):
     with output:
-        l_savedir_base = widgets.Label(value="savedir_base:", layout=self.layout_label,)
-        l_filterby_list= widgets.Label(value="filterby_list:", layout=self.layout_label,)
-        
-
-        bdownload = widgets.Button(description="Zip to Download Experiments", 
-                                layout=self.layout_button)
-                                
+        ldownload = widgets.Label(value="Get 'score_list.pkl' and 'exp_dict' for each experiment.", 
+                                #    layout=self.layout_button
+                                   )
+        bdownload = widgets.Button(description="Download Results", 
+                                   layout=self.layout_button)
+                               
         bdownload_out = widgets.Output(layout=self.layout_button)
 
-        bdownload_dropbox = widgets.Button(description="Upload to Dropbox", 
-                                layout=self.layout_button)
+        # bdownload_dropbox = widgets.Button(description="Upload to Dropbox", 
+        #                         layout=self.layout_button)
                                 
-        bdownload_out_dropbox  = widgets.Output(layout=self.layout_button)
+        # bdownload_out_dropbox  = widgets.Output(layout=self.layout_button)
 
         l_fname_list = widgets.Text(
             value=str(self.vars.get('fname_list', '')),
@@ -46,18 +46,18 @@ def share_tab(self, output):
             disabled=False
                 )
 
-        l_dropbox_path = widgets.Text(
-            value=str(self.vars.get('dropbox_path', '/shared')),
-            description='dropbox_path:',
-            layout=self.layout_dropdown,
-            disabled=False
-                )
-        l_access_token_path = widgets.Text(
-            value=str(self.vars.get('access_token', '')),
-            description='access_token:',
-            layout=self.layout_dropdown,
-            disabled=False
-                )
+        # l_dropbox_path = widgets.Text(
+        #     value=str(self.vars.get('dropbox_path', '/shared')),
+        #     description='dropbox_path:',
+        #     layout=self.layout_dropdown,
+        #     disabled=False
+        #         )
+        # l_access_token_path = widgets.Text(
+        #     value=str(self.vars.get('access_token', '')),
+        #     description='access_token:',
+        #     layout=self.layout_dropdown,
+        #     disabled=False
+        #         )
         def on_upload_clicked(b):
             fname = 'results.zip'
             bdownload_out_dropbox.clear_output()
@@ -86,20 +86,15 @@ def share_tab(self, output):
             with bdownload_out:
                 display('%d exps zipped.' % len(self.rm.exp_list))
             display(FileLink(fname, result_html_prefix="Download: "))
-            # bdownload_out.clear_output()
-            # with bdownload_out:
-            #     display('%d exps zipped.' % len(self.rm.exp_list))
                 
             
         bdownload.on_click(on_download_clicked)
         bdownload_zip = widgets.VBox([bdownload, bdownload_out])
-        bdownload_dropbox.on_click(on_upload_clicked)
-        bdownload_dropbox_vbox = widgets.VBox([ bdownload_dropbox, bdownload_out_dropbox])
+        # bdownload_dropbox.on_click(on_upload_clicked)
+        # bdownload_dropbox_vbox = widgets.VBox([ bdownload_dropbox, bdownload_out_dropbox])
         display(widgets.VBox([
-                        widgets.HBox([l_savedir_base, self.t_savedir_base, ]), 
-                        widgets.HBox([l_filterby_list, self.t_filterby_list,  ]),
-                        widgets.HBox([l_fname_list, l_dropbox_path, l_access_token_path]),
-                        widgets.HBox([bdownload_zip,
-                                    bdownload_dropbox_vbox])
+                        # widgets.HBox([l_fname_list, l_dropbox_path, l_access_token_path]),
+                        ldownload,
+                        widgets.HBox([bdownload_zip])
         ]) 
         )
