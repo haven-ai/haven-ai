@@ -36,6 +36,13 @@ python trainval.py --savedir_base /mnt/home/results -r 1 -j 1 -v results.ipynb
 ```
 python trainval.py --savedir_base /mnt/home/results -r 1 -j 2 -v results.ipynb
 ```
+
+- Run experiments in parallel using **Google Cloud Platform (GCP)**:
+
+```
+To be added
+```
+
 <p align="center" width="100%">
 <img width="65%" src="docs/images/ork2.gif">
 </p>
