@@ -13,16 +13,12 @@ def get_args():
                         help='Define which exp groups to run.')
     parser.add_argument('-sb', '--savedir_base', default=None,
                         help='Define the base directory where the experiments will be saved.')
-    parser.add_argument('-d', '--datadir', default=None,
-                        help='Define the dataset directory.')
     parser.add_argument("-r", "--reset",  default=0, type=int,
                         help='Reset or resume the experiment.')
     parser.add_argument("-ei", "--exp_id", default=None,
                         help='Run a specific experiment based on its id.')
     parser.add_argument("-j", "--run_jobs", default=0, type=int,
                         help='Run the experiments as jobs in the cluster.')
-    parser.add_argument("-nw", "--num_workers", type=int, default=0,
-                        help='Specify the number of workers in the dataloader.')
     parser.add_argument("-v", "--visualize_notebook", type=str, default='',
                         help='Create a jupyter file to visualize the results.')
 
@@ -118,10 +114,10 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         if python_file_path is None:
             python_file_path = os.path.split(sys.argv[0])[-1]
 
-        command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base} -d {args.datadir}')
+        command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base}')
 
         for k, v in custom_args.items():
-            if k not in ['savedir_base', 'datadir', 'd', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'run_jobs', 'r', 'reset']:
+            if k not in ['savedir_base', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'run_jobs', 'r', 'reset', 'v', 'visualize_notebook']:
                 command += f" --{k} {v}"
 
         print(command)
