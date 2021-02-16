@@ -124,7 +124,7 @@ def plots_tab(self, output):
                             db_vars=db.vars, 
                             var='mode')
     w_bar_agg = wdg.Dropdown(header='Plot Agg',
-                                options=['last', 'max', 'mean'],
+                                options=['last', 'max', 'mean', 'min'],
                             db_vars=db.vars, 
                             var='bar_agg')
     w_avg_across = wdg.Dropdown(header='Avg Across',
