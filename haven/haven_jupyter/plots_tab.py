@@ -123,7 +123,7 @@ def plots_tab(self, output):
                                 options=['line', 'bar'],
                             db_vars=db.vars, 
                             var='mode')
-    w_bar_agg = wdg.Dropdown(header='Plot Agg',
+    w_bar_agg = wdg.Dropdown(header='Plot Agg (for "Plot Mode = bar" ',
                                 options=['last', 'max', 'mean', 'min'],
                             db_vars=db.vars, 
                             var='bar_agg')
