@@ -50,7 +50,9 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                workdir=None):
     if args is None:
         args = get_args()
+        custom_args = {}
     else:
+        custom_args = vars(args).copy()
         for k, v in vars(get_args()).items():
             setattr(args, k, v)
 
@@ -117,6 +119,10 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
             python_file_path = os.path.split(sys.argv[0])[-1]
 
         command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base} -d {args.datadir}')
+
+        for k, v in custom_args.items():
+            if k not in ['savedir_base', 'datadir', 'd', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'run_jobs', 'r', 'reset']:
+                command += f" --{k} {v}"
 
         print(command)
         jm.launch_menu(command=command, in_parallel=use_threads)
