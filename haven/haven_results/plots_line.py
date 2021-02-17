@@ -345,9 +345,10 @@ def get_label(original_list, exp_dict, format_str=None, show_key=False):
         if i < (len(original_list) - 1):
             if format_str:
               key_list += [f'{k}' ]
+              label_list += [f'{str(sub_dict):{int(len(k))}}' ]
             else:
               key_list += [f'{k}|' ]
-            label_list += [f'{str(sub_dict):{int(len(k))}}|' ]
+              label_list += [f'{str(sub_dict):{int(len(k))}}|' ]
         else:
             key_list += [f'{k}' ]
             label_list += [f'{str(sub_dict)}' ]
