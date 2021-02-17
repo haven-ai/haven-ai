@@ -343,7 +343,10 @@ def get_label(original_list, exp_dict, format_str=None, show_key=False):
             sub_dict = sub_dict[d]
 
         if i < (len(original_list) - 1):
-            key_list += [f'{k}|' ]
+            if format_str:
+              key_list += [f'{k}' ]
+            else:
+              key_list += [f'{k}|' ]
             label_list += [f'{str(sub_dict):{int(len(k))}}|' ]
         else:
             key_list += [f'{k}' ]
