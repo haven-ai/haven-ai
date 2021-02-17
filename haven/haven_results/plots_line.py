@@ -50,7 +50,8 @@ def get_plot(exp_list, savedir_base,
              x_cumsum=False,
              score_list_name='score_list.pkl',
              result_step=0,
-             map_legend_list=dict()):
+             map_legend_list=dict(),
+             xticks=None):
     """Plots the experiment list in a single figure.
     
     Parameters
@@ -321,7 +322,8 @@ def get_plot(exp_list, savedir_base,
         axis.legend(fontsize=legend_fontsize, **legend_kwargs)
 
     plt.tight_layout()
-    
+    if xticks is not None:
+       plt.xticks(*xticks)
 
     return fig, axis
 
