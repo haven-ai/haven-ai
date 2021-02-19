@@ -94,7 +94,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         elif args.job_scheduler in ['1']:
             job_scheduler = 'toolkit'
 
-        elif args.job_scheduler in ['toolkit', 'slurm']:
+        elif args.job_scheduler in ['toolkit', 'slurm', 'gcp']:
             job_scheduler = args.job_scheduler
 
         else:
@@ -109,7 +109,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                  savedir=savedir,
                  args=args)
 
-    elif job_scheduler in ['toolkit', 'slurm']:
+    else:
         # launch jobs
         from haven import haven_jobs as hjb
         assert job_config is not None
