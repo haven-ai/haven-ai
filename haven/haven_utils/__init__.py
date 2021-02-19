@@ -84,6 +84,8 @@ def save_image(fname, img, denorm=None, size=None, points=None, radius=10,
         If enabled creates the folder for saving the file, by default True
     """
     if not isinstance(img, torch.Tensor):
+        if img.min() >= 0 and img.max() > 1:
+            img = img / 255.
         img = torch.as_tensor(img)
     if img.ndim == 4:
         img = torchvision.utils.make_grid(img, nrow=nrow)

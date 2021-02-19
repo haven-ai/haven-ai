@@ -27,7 +27,8 @@ class JobManager:
                  workdir=None,
                  job_config=None,
                  verbose=1,
-                 account_id=None):
+                 account_id=None,
+                 job_scheduler='toolkit'):
         """[summary]
 
         Parameters
@@ -54,17 +55,18 @@ class JobManager:
         self.savedir_base = savedir_base
         self.account_id = account_id
 
+        print(f'Using {job_scheduler}.')
+        
         # define funcs
-        try:
+        if job_scheduler == 'toolkit':
             from . import toolkit_manager as ho
             self.ho = ho
             self.api = self.ho.get_api(token=None)
-            print('Using toolkit.')
-        except:
+            
+        elif job_scheduler == 'slurm':
             from . import slurm_manager as ho
             self.ho = ho
             self.api = None
-            print('Using slurm.')
 
     
     def get_command_history(self, topk=10):

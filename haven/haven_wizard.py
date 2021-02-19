@@ -17,7 +17,7 @@ def get_args():
                         help='Reset or resume the experiment.')
     parser.add_argument("-ei", "--exp_id", default=None,
                         help='Run a specific experiment based on its id.')
-    parser.add_argument("-j", "--run_jobs", default=0, type=int,
+    parser.add_argument("-j", "--job_scheduler", default=None, type=str,
                         help='Run the experiments as jobs in the cluster.')
     parser.add_argument("-v", "--visualize_notebook", type=str, default='',
                         help='Create a jupyter file to visualize the results.')
@@ -40,10 +40,9 @@ def make_wide(formatter, w=120, h=36):
         return formatter
 
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
-                savedir_base=None, 
-               reset=None, args=None, use_threads=False,
-               exp_id=None, python_binary_path='python', python_file_path=None,
-               workdir=None):
+                savedir_base=None, reset=None, args=None, use_threads=False,
+                exp_id=None, python_binary_path='python', python_file_path=None,
+                workdir=None, job_scheduler=None):
     if args is None:
         args = get_args()
         custom_args = {}
@@ -88,7 +87,20 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
 
     # Run experiments
     # ===============
-    if not args.run_jobs:
+    if job_scheduler is None:
+        if args.job_scheduler in [None, '0']:
+            job_scheduler = None
+
+        elif args.job_scheduler in ['1']:
+            job_scheduler = 'toolkit'
+
+        elif args.job_scheduler in ['toolkit', 'slurm']:
+            job_scheduler = args.job_scheduler
+
+        else:
+            raise ValueError(f'{args.job_scheduler} does not exist') 
+
+    if job_scheduler is None:
         for exp_dict in exp_list:
             savedir = create_experiment(exp_dict, savedir_base, reset=reset,
                                         verbose=True)
@@ -96,7 +108,8 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
             func(exp_dict=exp_dict,
                  savedir=savedir,
                  args=args)
-    else:
+
+    elif job_scheduler in ['toolkit', 'slurm']:
         # launch jobs
         from haven import haven_jobs as hjb
         assert job_config is not None
@@ -109,6 +122,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                             savedir_base=savedir_base,
                             workdir=workdir,
                             job_config=job_config,
+                            job_scheduler=job_scheduler,
                             )
 
         if python_file_path is None:
@@ -117,7 +131,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base}')
 
         for k, v in custom_args.items():
-            if k not in ['savedir_base', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'run_jobs', 'r', 'reset', 'v', 'visualize_notebook']:
+            if k not in ['savedir_base', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'job_scheduler', 'r', 'reset', 'v', 'visualize_notebook']:
                 command += f" --{k} {v}"
 
         print(command)
