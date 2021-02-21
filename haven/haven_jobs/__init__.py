@@ -54,8 +54,6 @@ class JobManager:
         self.verbose = verbose
         self.savedir_base = savedir_base
         self.account_id = account_id
-
-        print(f'Using {job_scheduler}.')
         
         # define funcs
         if job_scheduler == 'toolkit':

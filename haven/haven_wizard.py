@@ -88,17 +88,20 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
     # Run experiments
     # ===============
     if job_scheduler is None:
-        if args.job_scheduler in [None, '0']:
-            job_scheduler = None
+        job_scheduler = args.job_scheduler
 
-        elif args.job_scheduler in ['1']:
-            job_scheduler = 'toolkit'
+    if job_scheduler in [None, "None", '0']:
+        job_scheduler = None
 
-        elif args.job_scheduler in ['toolkit', 'slurm', 'gcp']:
-            job_scheduler = args.job_scheduler
+    elif job_scheduler in ['toolkit', 'slurm', 'gcp']:
+        job_scheduler = args.job_scheduler
 
-        else:
-            raise ValueError(f'{args.job_scheduler} does not exist') 
+    elif job_scheduler in ['1']:
+        job_scheduler = 'toolkit'
+
+    else:
+        raise ValueError(f'{job_scheduler} does not exist')
+
 
     if job_scheduler is None:
         for exp_dict in exp_list:
@@ -111,6 +114,8 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
 
     else:
         # launch jobs
+        print(f'Using Job Scheduler: {job_scheduler}')
+        
         from haven import haven_jobs as hjb
         assert job_config is not None
         assert 'account_id' in job_config
