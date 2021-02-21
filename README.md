@@ -64,14 +64,10 @@ To be added
           <pre>
 project/
 ├── src/
-│   ├── __init__.py
 │   ├── datasets.py
 │   └── models.py
-├── scripts/
-│   └── train_on_single_image.py
 ├── exp_configs.py
-├── README.md
-└── trainval.py          # a copy of the code
+└── trainval.py          
           </pre>
           </td>
     <td valign="top">
