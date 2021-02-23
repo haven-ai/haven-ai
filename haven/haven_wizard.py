@@ -4,6 +4,7 @@ import pandas as pd
 import pprint
 
 from . import haven_utils as hu
+import numpy as np 
 
 
 def get_args():
@@ -42,7 +43,7 @@ def make_wide(formatter, w=120, h=36):
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
                 savedir_base=None, reset=None, args=None, use_threads=False,
                 exp_id=None, python_binary_path='python', python_file_path=None,
-                workdir=None, job_scheduler=None):
+                workdir=None, job_scheduler=None, save_logs=True):
     if args is None:
         args = get_args()
         custom_args = {}
@@ -128,6 +129,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                             workdir=workdir,
                             job_config=job_config,
                             job_scheduler=job_scheduler,
+                            save_logs=save_logs,
                             )
 
         if python_file_path is None:

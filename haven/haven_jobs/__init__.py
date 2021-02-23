@@ -28,7 +28,8 @@ class JobManager:
                  job_config=None,
                  verbose=1,
                  account_id=None,
-                 job_scheduler='toolkit'):
+                 job_scheduler='toolkit',
+                 save_logs=True):
         """[summary]
 
         Parameters
@@ -54,6 +55,7 @@ class JobManager:
         self.verbose = verbose
         self.savedir_base = savedir_base
         self.account_id = account_id
+        self.save_logs = save_logs
         
         # define funcs
         if job_scheduler == 'toolkit':
@@ -219,6 +221,7 @@ class JobManager:
             print('***')
             print('Exp %d/%d - %s' % (i+1, len(submit_dict), v['message']))
             print('exp_id: %s' % hu.hash_dict(v['exp_dict']))
+            print('job_id: %s' % k)
             savedir = os.path.join(savedir_base, hu.hash_dict(v["exp_dict"]))
             print(f'savedir: {savedir}')
             pprint.pprint(v['exp_dict'])
@@ -318,7 +321,11 @@ class JobManager:
         hu.copy_code(self.workdir + "/", workdir_job, verbose=0)
 
         # Run  command
-        job_id = self.submit_job(command, workdir_job, savedir_logs=savedir)
+        if self.save_logs:
+            savedir_logs = savedir
+        else:
+            savedir_logs = None
+        job_id = self.submit_job(command, workdir_job, savedir_logs=savedir_logs)
         print(f'Job submitted for experiment {exp_id} with job id {job_id}')
         
         # Verbose
