@@ -50,6 +50,8 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
     else:
         custom_args = vars(args).copy()
         for k, v in vars(get_args()).items():
+            if k in custom_args:
+                continue
             setattr(args, k, v)
 
     # Asserts

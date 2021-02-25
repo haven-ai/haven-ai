@@ -332,15 +332,15 @@ def get_label(original_list, exp_dict, format_str=None, show_key=False):
     label_list = []
     for i, k in enumerate(original_list):
         if k == 'exp_id':
-            label_list += [str(hu.hash_dict(exp_dict))]
-            
-        depth_list = k.split('.')
-        sub_dict = exp_dict
-        for d in depth_list:
-            if sub_dict is None or d not in sub_dict:
-                sub_dict = None
-                break
-            sub_dict = sub_dict[d]
+            sub_dict = str(hu.hash_dict(exp_dict))
+        else:
+            depth_list = k.split('.')
+            sub_dict = exp_dict
+            for d in depth_list:
+                if sub_dict is None or d not in sub_dict:
+                    sub_dict = None
+                    break
+                sub_dict = sub_dict[d]
 
         if i < (len(original_list) - 1):
             if format_str:

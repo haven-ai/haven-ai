@@ -74,6 +74,9 @@ class SelectMultiple:
                 value = []
         else:
             value = [v for v in org_value if v in options]
+            if len(value) == 0 and len(options) > 0:
+                value = [options[0]]
+
 
         self.header = widgets.Label(value=header, 
                           layout=widgets.Layout(width=WIDTH),)
