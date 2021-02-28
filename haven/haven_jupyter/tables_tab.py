@@ -77,7 +77,8 @@ def tables_tab(db, output):
         with output_plot:
             db.update_rm()
             summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
-                                               add_prefix=True)
+                                               add_prefix=True, 
+                                               job_scheduler=db.rm.job_scheduler)
             summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
             display(summary_dict)
 
@@ -94,7 +95,8 @@ def tables_tab(db, output):
         output_plot.clear_output()
         with output_plot:
             summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
-                                               add_prefix=True)
+                                               add_prefix=True, 
+                                               job_scheduler=db.rm.job_scheduler)
             
             n_logs = len(summary_list)
         
@@ -115,7 +117,8 @@ def tables_tab(db, output):
     
     def get_logs(failed_only=False):
         summary_list = db.rm.get_job_summary(verbose=db.rm.verbose,
-                                               add_prefix=True)
+                                               add_prefix=True, 
+                                               job_scheduler=db.rm.job_scheduler)
         summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
         if 'FAILED' not in summary_dict:
             stdout = ('NO FAILED JOBS')

@@ -137,7 +137,8 @@ class DashboardManager:
                                    verbose=self.rm_original.verbose,
                                    mode_key=self.rm_original.mode_key,
                                    has_score_list=self.rm_original.has_score_list,
-                                   score_list_name=self.rm_original.score_list_name
+                                   score_list_name=self.rm_original.score_list_name,
+                                   job_scheduler=self.rm_original.job_scheduler
                                    )
 
         # if len(self.rm.exp_list) == 0:
