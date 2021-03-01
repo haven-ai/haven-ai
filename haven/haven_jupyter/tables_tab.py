@@ -87,9 +87,11 @@ def tables_tab(db, output):
             for state in summary_dict:
                 n_jobs = len(summary_dict[state])
                 if n_jobs:
-                    display('Experiments %s: %d' %(state, n_jobs))
                     df = pd.DataFrame(summary_dict[state])
-                    display(df.head())
+                    df_head = df.head()
+                    display(f'Experiments {state}: {n_jobs} - Only {len(df_head)} experiments are shown.')
+                    
+                    display(df_head)
 
     def on_logs_clicked(b):
         output_plot.clear_output()
