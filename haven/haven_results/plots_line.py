@@ -178,6 +178,7 @@ def get_plot(exp_list, savedir_base,
     
     bar_count = 0
     visited_exp_ids = set()
+    plot_idx = 0 
     for exp_dict, style_dict in zip(exp_list, style_list):
         exp_id = hu.hash_dict(exp_dict)
         if exp_id in visited_exp_ids:
@@ -206,8 +207,8 @@ def get_plot(exp_list, savedir_base,
             
             y_list = result_dict['y_list']
             x_list = result_dict['x_list']
-            # for eid in list(result_dict['visited_exp_ids']):
-            visited_exp_ids.add(exp_id)
+            for eid in list(result_dict['visited_exp_ids']):
+                visited_exp_ids.add(eid)
             if len(x_list) == 0 or np.array(y_list).dtype == 'object':
                 x_list = np.NaN
                 y_list = np.NaN
@@ -216,13 +217,15 @@ def get_plot(exp_list, savedir_base,
 
             # map properties of exp
             if legend_list is not None:
-                if len(visited_exp_ids) > 1:
+                if plot_idx != 0:
                     show_legend_key = False
                 else:
                     show_legend_key = True
                 label = get_label(legend_list, exp_dict, format_str=legend_format, show_key=show_legend_key)
             else:
                 label = exp_id
+
+            plot_idx += 1
 
             color = None
             marker = 'o'
