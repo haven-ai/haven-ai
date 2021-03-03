@@ -135,7 +135,10 @@ class ResultManager:
         pass
     def load_state_dict(self, state_dict):
         pass
-
+    
+    def get_savedir_list(self):
+        return [os.path.join(self.savedir_base, hu.hash_dict(e_dict)) for e_dict in self.exp_list]
+        
     def get_plot(self, groupby_list=None, savedir_plots=None, filterby_list=None, **kwargs):
         fig_list = []
         filterby_list = filterby_list or self.filterby_list
