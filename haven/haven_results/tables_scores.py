@@ -105,7 +105,10 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
                 print('%s: %s is missing' % (exp_id, score_list_name))
             
         else:
-            score_list = hu.load_pkl(score_list_fname)
+            try:
+                score_list = hu.load_pkl(score_list_fname)
+            except:
+                print('%s: %s is corrupt' % (exp_id, score_list_name))
             score_df = pd.DataFrame(score_list)
             metric_columns = score_columns or score_df.columns
             if len(score_list):

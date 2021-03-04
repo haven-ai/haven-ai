@@ -187,134 +187,138 @@ def get_plot(exp_list, savedir_base,
         savedir = os.path.join(savedir_base, exp_id)
         score_list_fname = os.path.join(savedir, score_list_name)
 
+        # skipt if it does not exist
         if not os.path.exists(score_list_fname):
             if verbose:
                 print('%s: %s does not exist...' % (exp_id,score_list_name))
             continue
+        
+        # get result
+        result_dict = get_result_dict(exp_dict, 
+                        savedir_base, 
+                        x_metric, 
+                        y_metric,
+                        plot_confidence=plot_confidence,
+                        exp_list=exp_list, 
+                        avg_across=avg_across,
+                        verbose=verbose,
+                        x_cumsum=x_cumsum,
+                        score_list_name=score_list_name,
+                        result_step=result_step)
+        # it is None if one of score_list.pkl is corrupted
+        if result_dict is None:
+            continue 
 
+        y_list = result_dict['y_list']
+        x_list = result_dict['x_list']
+        for eid in list(result_dict['visited_exp_ids']):
+            visited_exp_ids.add(eid)
+        if len(x_list) == 0 or np.array(y_list).dtype == 'object':
+            x_list = np.NaN
+            y_list = np.NaN
+            if verbose:
+                print('%s: "(%s, %s)" not in score_list' % (exp_id, y_metric, x_metric))
+
+        # map properties of exp
+        if legend_list is not None:
+            if plot_idx != 0:
+                show_legend_key = False
+            else:
+                show_legend_key = True
+            label = get_label(legend_list, exp_dict, format_str=legend_format, show_key=show_legend_key)
         else:
-            result_dict = get_result_dict(exp_dict, 
-                            savedir_base, 
-                            x_metric, 
-                            y_metric,
-                            plot_confidence=plot_confidence,
-                            exp_list=exp_list, 
-                            avg_across=avg_across,
-                            verbose=verbose,
-                            x_cumsum=x_cumsum,
-                            score_list_name=score_list_name,
-                            result_step=result_step)
+            label = exp_id
+
+        plot_idx += 1
+
+        color = None
+        marker = 'o'
+        linewidth = 2.8
+        
+        try:
+            markevery = len(x_list)//10
+        except:
+            markevery = None
+        if markevery == 0:
+            markevery = None 
             
-            y_list = result_dict['y_list']
-            x_list = result_dict['x_list']
-            for eid in list(result_dict['visited_exp_ids']):
-                visited_exp_ids.add(eid)
-            if len(x_list) == 0 or np.array(y_list).dtype == 'object':
-                x_list = np.NaN
-                y_list = np.NaN
-                if verbose:
-                    print('%s: "(%s, %s)" not in score_list' % (exp_id, y_metric, x_metric))
+        markersize = 6
 
-            # map properties of exp
-            if legend_list is not None:
-                if plot_idx != 0:
-                    show_legend_key = False
-                else:
-                    show_legend_key = True
-                label = get_label(legend_list, exp_dict, format_str=legend_format, show_key=show_legend_key)
-            else:
-                label = exp_id
+        if len(style_dict):
+            marker = style_dict.get('marker', marker)
+            label = style_dict.get('label', label)
+            color = style_dict.get('color', color)
+            linewidth = style_dict.get('linewidth', linewidth)
+            markevery = style_dict.get('markevery', markevery)
+            markersize = style_dict.get('markersize', markersize)
 
-            plot_idx += 1
+        if label in map_legend_list:
+            label = map_legend_list[label]
+        # plot
+        if mode == 'pretty_plot':
+            # plot the mean in a line
+            # pplot = pp.add_yxList
+            axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
+                label=str(label), marker=marker, markevery=markevery)
+            # tools.pretty_plot
+        elif mode == 'line':
+            # plot the mean in a line
+            line_plot,  = axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
+                label=label, marker=marker, markevery=markevery)
 
-            color = None
-            marker = 'o'
-            linewidth = 2.8
+            if avg_across and hasattr(y_list, 'size'):
+                # add confidence interval
+                axis.fill_between(x_list, 
+                        y_list - result_dict.get('y_std_list', 0),
+                        y_list + result_dict.get('y_std_list', 0), 
+                        color = line_plot.get_color(),  
+                        alpha=0.1)
+
+        elif mode == 'bar':
+            # plot the mean in a line
+            if bar_agg == 'max':
+                y_agg = np.max(y_list)    
+            elif bar_agg == 'min':
+                y_agg = np.min(y_list)
+            elif bar_agg == 'mean':
+                y_agg = np.mean(y_list)
+            elif bar_agg == 'last':
+                y_agg = [y for y in y_list if isinstance(y, float)][-1]
+                
+                
+            width = 0.
+            import math
             
-            try:
-                markevery = len(x_list)//10
-            except:
-                markevery = None
-            if markevery == 0:
-                markevery = None 
+            if math.isnan(y_agg):
+                s = 'NaN'
+                continue
                 
-            markersize = 6
-
-            if len(style_dict):
-                marker = style_dict.get('marker', marker)
-                label = style_dict.get('label', label)
-                color = style_dict.get('color', color)
-                linewidth = style_dict.get('linewidth', linewidth)
-                markevery = style_dict.get('markevery', markevery)
-                markersize = style_dict.get('markersize', markersize)
-
-            if label in map_legend_list:
-                label = map_legend_list[label]
-            # plot
-            if mode == 'pretty_plot':
-                # plot the mean in a line
-                # pplot = pp.add_yxList
-                axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
-                    label=str(label), marker=marker, markevery=markevery)
-                # tools.pretty_plot
-            elif mode == 'line':
-                # plot the mean in a line
-                line_plot,  = axis.plot(x_list, y_list, color=color, linewidth=linewidth, markersize=markersize,
-                    label=label, marker=marker, markevery=markevery)
-
-                if avg_across and hasattr(y_list, 'size'):
-                    # add confidence interval
-                    axis.fill_between(x_list, 
-                            y_list - result_dict.get('y_std_list', 0),
-                            y_list + result_dict.get('y_std_list', 0), 
-                            color = line_plot.get_color(),  
-                            alpha=0.1)
-
-            elif mode == 'bar':
-                # plot the mean in a line
-                if bar_agg == 'max':
-                    y_agg = np.max(y_list)    
-                elif bar_agg == 'min':
-                    y_agg = np.min(y_list)
-                elif bar_agg == 'mean':
-                    y_agg = np.mean(y_list)
-                elif bar_agg == 'last':
-                    y_agg = [y for y in y_list if isinstance(y, float)][-1]
-                    
-                    
-                width = 0.
-                import math
-                
-                if math.isnan(y_agg):
-                    s = 'NaN'
-                    continue
-                    
-                else:
-                    s="%.3f" % y_agg
-
-                axis.bar([bar_count + width], 
-                        [y_agg],
-                        color=color,
-                        label=label,
-                        # label='%s - (%s: %d, %s: %.3f)' % (label, x_metric, x_list[-1], y_metric, y_agg)
-                        )
-                if color is not None:
-                    bar_color = color
-                else:
-                    bar_color = 'black'
-
-                # minimum, maximum = axis.get_ylim()
-                # y_height = .05 * (maximum - minimum)
-
-                # axis.text(bar_count, y_agg + .01, "%.3f"%y_agg, color=bar_color, fontweight='bold')
-                axis.text(x=bar_count, y = y_agg*1.01, 
-                            s=s, 
-                            fontdict=dict(fontsize=(y_fontsize or 12)), color='black', 
-                            fontweight='bold')
-                axis.set_xticks([])
-                bar_count += 1
             else:
-                raise ValueError('mode %s does not exist. Options: (line, bar)' % mode)
+                s="%.3f" % y_agg
+
+            axis.bar([bar_count + width], 
+                    [y_agg],
+                    color=color,
+                    label=label,
+                    # label='%s - (%s: %d, %s: %.3f)' % (label, x_metric, x_list[-1], y_metric, y_agg)
+                    )
+            if color is not None:
+                bar_color = color
+            else:
+                bar_color = 'black'
+
+            # minimum, maximum = axis.get_ylim()
+            # y_height = .05 * (maximum - minimum)
+
+            # axis.text(bar_count, y_agg + .01, "%.3f"%y_agg, color=bar_color, fontweight='bold')
+            axis.text(x=bar_count, y = y_agg*1.01, 
+                        s=s, 
+                        fontdict=dict(fontsize=(y_fontsize or 12)), color='black', 
+                        fontweight='bold')
+            axis.set_xticks([])
+            bar_count += 1
+        else:
+            raise ValueError('mode %s does not exist. Options: (line, bar)' % mode)
 
     legend_kwargs = legend_kwargs or {"loc":2, "bbox_to_anchor":(1.05,1),
                                       'borderaxespad':0., "ncol":1}
@@ -389,7 +393,11 @@ def get_result_dict(exp_dict,
     # get scores
     if not avg_across:
         # get score list
-        score_list = hu.load_pkl(score_list_fname)
+        try:
+            score_list = hu.load_pkl(score_list_fname)
+        except:
+            return None 
+
         x_list = []
         y_list = []
         for score_dict in score_list:
@@ -431,7 +439,12 @@ def get_result_dict(exp_dict,
 
             visited_exp_ids.add(sub_id)
 
-            sub_score_list = hu.load_pkl(sub_score_list_fname)
+            try:
+                sub_score_list = hu.load_pkl(sub_score_list_fname)
+            except:
+                if verbose:
+                    print('%s: %s is corrupt...' % (sub_id, score_list_name))
+                return None
 
             for score_dict in sub_score_list:
                 if x_metric in score_dict and y_metric in score_dict:
