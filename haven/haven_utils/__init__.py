@@ -322,8 +322,7 @@ def copy_code(src_path, dst_path, verbose=1):
     os.makedirs(dst_path, exist_ok=True)
 
     # Define the command for copying the code using rsync
-    rsync_code = "rsync -av -r -q  --delete-before --exclude='.tmp/' --exclude='.git/' " \
-                 " --exclude='*.pyc' --exclude='__pycache__/' %s %s" % (
+    rsync_code = "rsync -av -r -q  --delete-before --exclude='.*' %s %s" % (
                      src_path, dst_path)
 
     # Run the command in the terminal
