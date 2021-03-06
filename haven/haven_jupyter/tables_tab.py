@@ -107,6 +107,7 @@ def tables_tab(db, output):
                 print('exp_id:', logs['exp_id'])
                 print('job_id:', logs['job_id'])
                 print('job_state:', logs['job_state'])
+                print('command:', logs['command'])
                 print('savedir:', os.path.join(db.rm_original.savedir_base, logs['exp_id']))
 
                 print('\nexp_dict')
@@ -137,6 +138,7 @@ def tables_tab(db, output):
                 stdout += ('\nexp_id: '+ failed['exp_id'])
                 stdout += ('\njob_id: '+ failed['job_id'])
                 stdout += ('\njob_state: '+ 'FAILED')
+                stdout += ('\ncommand:'+ failed.get('command'))
                 stdout += ('\nsavedir: ' + os.path.join(db.rm_original.savedir_base, failed['exp_id']))
 
                 stdout += ('\n\nexp_dict')

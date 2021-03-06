@@ -384,17 +384,17 @@ class JobManager:
                 job = jobs_dict[job_id]
                 
 
-                if hasattr(job, 'command'):
-                    command = job_dict['command']
-                else:
-                    command = None
+                # if hasattr(job, 'command'):
+                #     command = job_dict['command']
+                # else:
+                #     command = None
 
                 # Job info
                 result_dict['started_at'] = hu.time_to_montreal(fname_exp_dict)
                 result_dict["job_id"] = job_id
                 result_dict["job_state"] = job["state"]
                 result_dict["restarts"] = len(job["runs"])
-                result_dict["command"] = command
+                result_dict["command"] = job_dict['command']
                 
                 if get_logs:
                     # Logs info
