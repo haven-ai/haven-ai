@@ -15,6 +15,7 @@ import time
 import numpy as np
 import pylab as plt
 import torch
+import pandas as pd
 
 from .. import haven_img as hi
 from .image_utils import *
@@ -911,6 +912,9 @@ def flatten_dict(key_name, v_dict):
         
     return leaf_dict
 
+def get_diff_hparam(exp_list):
+    df = pd.DataFrame([flatten_column(e) for e in exp_list])
+    return get_diff_columns(df, min_threshold=2, max_threshold='auto')
 
 def get_diff_columns(df, min_threshold=2, max_threshold='auto'):
     df.reset_index()

@@ -19,6 +19,14 @@ from .latex_tables import get_latex_table
 from . import images_fig
 # from . import tools
 
+def load_score(savedir_base, exp_dict, metric):
+    df = pd.DataFrame(hu.load_pkl(os.path.join(savedir_base, 
+                         hu.hash_dict(exp_dict), 
+                         'score_list.pkl')))
+    if metric not in df:
+        return None
+    series = df[metric]
+    return series[series.last_valid_index()]
 
 class ResultManager:
     def __init__(self, 
@@ -33,7 +41,8 @@ class ResultManager:
                  save_history=False,
                  score_list_name='score_list.pkl',
                  account_id=None,
-                 job_scheduler='toolkit'):
+                 job_scheduler='toolkit',
+                 topk_tuple=None):
         """[summary]
         
         Parameters
@@ -108,7 +117,7 @@ class ResultManager:
                                                                 score_list_name))]
         if has_score_list:
             exp_list = exp_list_with_scores
-        self.exp_list_all = copy.deepcopy(exp_list)
+        
 
         self.savedir_base = savedir_base
         
@@ -120,7 +129,26 @@ class ResultManager:
         self.exp_list = hu.filter_exp_list(exp_list, 
                                         filterby_list=filterby_list, 
                                         savedir_base=savedir_base,
-                                        verbose=verbose)        
+                                        verbose=verbose) 
+        
+        if topk_tuple is not None:
+            k, metric, desc = topk_tuple
+           
+            scores = []
+            tmp_list = []
+            for e in self.exp_list:
+                score = load_score(savedir_base, e, metric)
+                if score is None:
+                    continue
+                scores += [score]
+                tmp_list += [e]            
+            sorted_ind = np.argsort(scores)
+            if desc:
+                sorted_ind = sorted_ind[::-1]
+            sorted_ind = sorted_ind[:k]
+            self.exp_list = list(np.array(tmp_list)[sorted_ind])
+
+        self.exp_list_all = copy.deepcopy(self.exp_list)
         if mode_key:
             for exp_dict in exp_list:
                 exp_dict[mode_key] = 1

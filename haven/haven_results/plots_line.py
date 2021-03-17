@@ -116,6 +116,8 @@ def get_plot(exp_list, savedir_base,
                              savedir_base=savedir_base, 
                              verbose=verbose,
                              return_style_list=True)
+    if legend_list is None:
+        legend_list = hu.get_diff_hparam(exp_list)
     # if len(exp_list) == 0:
     if axis is None:
         fig, axis = plt.subplots(nrows=1, ncols=1,

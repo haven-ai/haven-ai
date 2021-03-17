@@ -24,6 +24,9 @@ except:
 
 
 def tables_tab(db, output):
+    if db.vars.get('columns') is None:
+        db.vars['columns'] = hu.get_diff_hparam(db.rm.exp_list)
+
     w_columns = wdg.SelectMultiple(header="Hyperparameters:", 
                             options=['exp_id'] + db.rm.exp_params,
                             db_vars=db.vars, 

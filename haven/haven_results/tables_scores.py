@@ -163,7 +163,7 @@ def get_score_df(exp_list, savedir_base, filterby_list=None, columns=None,
     # wrap text for prettiness
     df = hu.pretty_print_df(df)
 
-    if hparam_diff > 0 and len(df) > 1:
+    if (hparam_diff > 0 and len(df) > 1) or columns is None:
         cols = hu.get_diff_columns(df, min_threshold=hparam_diff, max_threshold='auto')
         df = df[cols]
 

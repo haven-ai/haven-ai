@@ -99,6 +99,8 @@ def plots_tab(self, output):
                             db_vars=db.vars, 
                             var='y_metrics')
 
+    if db.vars.get('legend_list') is None:
+        db.vars['legend_list'] = hu.get_diff_hparam(db.rm.exp_list)
     w_legend = wdg.SelectMultiple(header="Legend:", 
                             options=['exp_id'] + db.rm.exp_params,
                             db_vars=db.vars, 
