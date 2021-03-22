@@ -43,7 +43,7 @@ def make_wide(formatter, w=120, h=36):
 def run_wizard(func, exp_list=None, exp_groups=None, job_config=None, 
                 savedir_base=None, reset=None, args=None, use_threads=False,
                 exp_id=None, python_binary_path='python', python_file_path=None,
-                workdir=None, job_scheduler=None, save_logs=True):
+                workdir=None, job_scheduler=None, save_logs=True, filter_duplicates=False):
     if args is None:
         args = get_args()
         custom_args = {}
@@ -76,6 +76,14 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         for exp_group_name in args.exp_group_list:
             exp_list += exp_groups[exp_group_name]
 
+    if filter_duplicates:
+        n_total = len(exp_list)
+        exp_list = hu.filter_duplicates(exp_list)
+        print(f'Filtered {len(exp_list)}/{n_total}')
+        
+    hu.check_duplicates(exp_list)
+    print('\nRunning %d experiments' % len(exp_list))
+
     # save results folder
     if exp_id is None:
         results_fname = args.visualize_notebook
@@ -85,8 +93,6 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
             create_jupyter_file(fname=results_fname,
                                 savedir_base=savedir_base)
 
-    hu.check_duplicates(exp_list)
-    print('\nRunning %d experiments' % len(exp_list))
 
     # Run experiments
     # ===============

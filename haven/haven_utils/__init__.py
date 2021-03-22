@@ -850,6 +850,20 @@ def ignore_duplicates(list_of_dicts):
             dict_list += [data_dict]
     return dict_list
 
+def filter_duplicates(list_of_dicts):
+    # ensure no duplicates in exp_list
+    tmp_list = []
+    hash_list = set()
+    for data_dict in list_of_dicts:
+        dict_id = hash_dict(data_dict)
+        if dict_id in hash_list:
+            continue
+        else:
+            hash_list.add(dict_id)
+        tmp_list += [data_dict]
+
+    return tmp_list
+
 def check_duplicates(list_of_dicts):
     # ensure no duplicates in exp_list
     hash_list = set()
