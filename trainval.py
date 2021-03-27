@@ -52,16 +52,16 @@ if __name__ == '__main__':
                         help='Define the base directory where the experiments will be saved.')
     parser.add_argument("-r", "--reset",  default=0, type=int,
                         help='Reset or resume the experiment.')
-    parser.add_argument("-j", "--run_jobs",  default=0, type=int,
-                        help='Run jobs in cluster.')
+    parser.add_argument("-j", "--job_scheduler",  default=0, type=int,
+                        help='Choose Job Scheduler.')
 
     args, others = parser.parse_known_args()
 
     
-    if args.run_jobs == 1:
+    if args.job_scheduler == "slurm":
         import slurm_config
         job_config = slurm_config.JOB_CONFIG
-    elif args.run_jobs == 2:
+    elif args.job_scheduler == "toolkit":
         import job_configs
         job_config = job_configs.JOB_CONFIG
     else:
