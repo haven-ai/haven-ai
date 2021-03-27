@@ -32,13 +32,13 @@ python trainval.py --savedir_base /mnt/home/results -r 1  -v results.ipynb
 - Run experiments in parallel using **slurm** tested under **Compute Canada** servers:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j 1 -v results.ipynb
+python trainval.py --savedir_base /mnt/home/results -r 1 -j slurm -v results.ipynb
 ```
 
 - Run experiments in parallel using **toolkit**:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j 2 -v results.ipynb
+python trainval.py --savedir_base /mnt/home/results -r 1 -j toolkit -v results.ipynb
 ```
 
 - Run experiments in parallel using **Google Cloud Platform (GCP)**:
