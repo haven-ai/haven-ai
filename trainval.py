@@ -52,7 +52,7 @@ if __name__ == '__main__':
                         help='Define the base directory where the experiments will be saved.')
     parser.add_argument("-r", "--reset",  default=0, type=int,
                         help='Reset or resume the experiment.')
-    parser.add_argument("-j", "--job_scheduler",  default=0, type=int,
+    parser.add_argument("-j", "--job_scheduler",  default=None,
                         help='Choose Job Scheduler.')
 
     args, others = parser.parse_known_args()
