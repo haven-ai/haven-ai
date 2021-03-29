@@ -6,7 +6,7 @@ from torch.utils.data import TensorDataset
 from haven import haven_utils as hu
 from haven import haven_wizard as hw
 
-def get_loader(name, split, datadir, exp_dict):
+def get_loader(name, split, datadir, exp_dict, download=True):
     if name == 'syn':
         # get dataset and loader
         X = torch.randn(5000, 1, 28, 28)
@@ -19,7 +19,7 @@ def get_loader(name, split, datadir, exp_dict):
         train = True if split == 'train' else False
         transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
         dataset = torchvision.datasets.MNIST(root=datadir, 
-                                             train=train, download=True,
+                                             train=train, download=download,
                                              transform=transform)
         loader = torch.utils.data.DataLoader(dataset, batch_size=256)
 
@@ -28,7 +28,7 @@ def get_loader(name, split, datadir, exp_dict):
         train = True if split == 'train' else False
         transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
         dataset = torchvision.datasets.MNIST(root=datadir, 
-                                             train=train, download=True,
+                                             train=train, download=download,
                                              transform=transform)
         loader = torch.utils.data.DataLoader(dataset, batch_size=256)
 
