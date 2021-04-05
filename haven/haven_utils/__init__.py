@@ -974,3 +974,60 @@ def timeit(func, n_times=10, **args):
         func(**args)
 
     print('time:', (time.time()-s)/(n_times-1))
+   
+
+# Create Helper
+def make_binary_linear(n, d, margin, separable=True, seed=42):
+    np.random.seed(seed)
+    labels = [-1, 1]
+    w = np.random.randn(d); w /= np.linalg.norm(w)
+    p = np.random.randn(d-1); l = (-p@w[:d-1])/w[-1]
+    p = np.append(p, [l])
+    v0 = p - margin*w
+    v1 = p + margin*w
+    yv = np.copy(labels)
+    # Start generating points with rejection sampling
+    X = []; y = []
+    for i in range(n-2):
+        s = 1
+        label = np.random.choice(labels)
+        # Generate a random point with mean at the center 
+        xi = np.random.randn(d)
+        xi = (xi / np.linalg.norm(xi))*s
+        dist = xi@w
+        while dist*label <= margin:
+            u = v0-v1 if label == -1 else v1-v0
+            u /= np.linalg.norm(u)
+            xi = xi + u
+            xi = (xi / np.linalg.norm(xi))*s
+            dist = xi@w
+        X.append(xi)
+        y.append(label)
+    X = np.array(X).astype(float); y = np.array(y)
+    # shuffle
+    ind = np.random.permutation(n-2)
+    X = X[ind]; y = y[ind]
+    # Put the support vectors at the beginning
+    X = np.r_[np.array([v0, v1]), X]
+    y = np.r_[np.array(yv), y]
+    if not separable:
+        flip_ind = np.random.choice(n, int(n*0.01))
+        y[flip_ind] = -y[flip_ind]
+    y[y==-1] = 0
+    X = np.c_[np.ones(n), X]
+    return X, y
+
+def get_split_torch_dataset(X, y, split):
+  from sklearn.model_selection import train_test_split
+  splits = train_test_split(X, y, test_size=0.2, shuffle=False, random_state=42)
+  X_train, X_test, Y_train, Y_test = splits
+  X_train, X_test = torch.FloatTensor(X_train), torch.FloatTensor(X_test)
+  Y_train, Y_test = torch.LongTensor(Y_train), torch.LongTensor(Y_test)
+
+  if split=='train':
+      dataset = torch.utils.data.TensorDataset(X_train, Y_train)
+  elif split=='val':
+      dataset = torch.utils.data.TensorDataset(X_test, Y_test)
+  dataset.n_input = X.shape[1]
+  
+  return dataset
