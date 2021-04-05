@@ -143,7 +143,7 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         if python_file_path is None:
             python_file_path = os.path.split(sys.argv[0])[-1]
 
-        command = (f'{python_binary_path} {python_file_path} -ei <exp_id> -sb {savedir_base}')
+        command = (f'{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base}')
 
         for k, v in custom_args.items():
             if k not in ['savedir_base', 'sb', 'ei', 'exp_id', 'e', 'exp_group_list', 'j', 'job_scheduler', 'r', 'reset', 'v', 'visualize_notebook']:
