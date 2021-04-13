@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome external contributions! Please find instructionsn on how to contribute below.
+We welcome your contributions! Please find instructionsn on how to contribute below.
 
 ## Pre-commit hooks
 
