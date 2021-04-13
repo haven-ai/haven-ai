@@ -19,8 +19,10 @@ def trainval(exp_dict, savedir, args):
                                  exp_dict=exp_dict)
     model = he.get_model(name=exp_dict['model'], exp_dict=exp_dict)
 
-    # 3. load checkpoint
+    # 3. resume or initialize checkpoint
     chk_dict = hw.get_checkpoint(savedir)
+    if len(chk_dict['model_state_dict']):
+        model.set_state_dict(chk_dict['model_state_dict'])
 
     # 4. Add main loop
     for epoch in tqdm.tqdm(range(chk_dict['epoch'], 3), 

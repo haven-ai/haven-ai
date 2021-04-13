@@ -322,15 +322,13 @@ def get_checkpoint(savedir, return_model_state_dict=False):
         chk_dict['epoch'] = 0
     else:
         chk_dict['epoch'] = score_list[-1]['epoch'] + 1
-
+       
+    chk_dict['model_state_dict'] = {}
     model_state_dict_fname = os.path.join(savedir, 'model.pth')
     if return_model_state_dict:
         if os.path.exists(model_state_dict_fname):
             chk_dict['model_state_dict'] = hu.torch_load(
                 model_state_dict_fname)
-        else:
-            chk_dict['model_state_dict'] = {}
-
     return chk_dict
 
 

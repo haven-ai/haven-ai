@@ -13,10 +13,16 @@ Haven-AI a library that helps you easily turn your code base into an effective, 
 The goal of this library is help you quickly and efficiently find solutions to machine learning problems, get papers accepted, and win at competitions.
 
 ### Install
+
+Master:
 ```
 pip install --upgrade git+https://github.com/haven-ai/haven-ai
 ```
 
+Dev:
+```
+pip install --upgrade git+https://github.com/haven-ai/haven-ai@dev
+```
 
     
 ## **Getting Started**
