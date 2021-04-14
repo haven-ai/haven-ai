@@ -242,7 +242,7 @@ def get_plot(
 
         try:
             markevery = len(x_list) // 10
-        except:
+        except Exception:
             markevery = None
         if markevery == 0:
             markevery = None
@@ -421,7 +421,7 @@ def get_result_dict(
         # get score list
         try:
             score_list = hu.load_pkl(score_list_fname)
-        except:
+        except Exception:
             return None
 
         x_list = []
@@ -466,7 +466,7 @@ def get_result_dict(
 
             try:
                 sub_score_list = hu.load_pkl(sub_score_list_fname)
-            except:
+            except Exception:
                 if verbose:
                     print("%s: %s is corrupt..." % (sub_id, score_list_name))
                 return None

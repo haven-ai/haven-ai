@@ -120,7 +120,7 @@ def get_score_df(
         else:
             try:
                 score_list = hu.load_pkl(score_list_fname)
-            except:
+            except Exception:
                 print("%s: %s is corrupt" % (exp_id, score_list_name))
             score_df = pd.DataFrame(score_list)
             metric_columns = score_columns or score_df.columns

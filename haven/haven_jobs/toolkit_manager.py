@@ -13,7 +13,7 @@ import requests
 try:
     import eai_toolkit_client
     from eai_toolkit_client.rest import ApiException
-except:
+except Exception:
     pass
 
 

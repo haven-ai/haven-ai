@@ -35,7 +35,7 @@ def upload_file_to_dropbox(src_fname, out_fname, access_token):
     dbx = dropbox.Dropbox(access_token)
     try:
         dbx.files_delete_v2(out_fname)
-    except:
+    except Exception:
         pass
     # with open(src_fname, 'rb') as f:
     #     dbx.files_upload(f.read(), out_fname)

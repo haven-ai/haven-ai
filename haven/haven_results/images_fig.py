@@ -117,7 +117,7 @@ def get_images(
                 plt.tight_layout()
                 fig_list += [fig]
 
-            except:
+            except Exception:
                 print("skipping - %s, image corrupted" % img_fname)
 
         exp_count += 1

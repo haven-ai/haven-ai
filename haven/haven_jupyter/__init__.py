@@ -221,15 +221,15 @@ exp_list = None
 filterby_list = None
 
 # get experiments
-rm = hr.ResultManager(exp_list=exp_list, 
-                      savedir_base=savedir_base, 
+rm = hr.ResultManager(exp_list=exp_list,
+                      savedir_base=savedir_base,
                       filterby_list=filterby_list,
                       verbose=0,
                       exp_groups=None
                      )
 
 # launch dashboard
-# make sure you have 'widgetsnbextension' enabled; 
+# make sure you have 'widgetsnbextension' enabled;
 # otherwise see README.md in https://github.com/ElementAI/haven
 
 hj.get_dashboard(rm, vars(), wide_display=True)
@@ -292,7 +292,7 @@ def init_datatable_mode():
 
                     $('#container').css( 'display', 'block' );
                     table.columns.adjust().draw();
-                    
+
                 })
             });
         """
