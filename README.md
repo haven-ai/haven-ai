@@ -32,19 +32,19 @@ pip install --upgrade git+https://github.com/haven-ai/haven-ai@dev
 - Run experiments in sequence: 
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1  -v results.ipynb
+python trainval.py --savedir_base ../results -r 1
 ```
 
 - Run experiments in parallel using **slurm** tested under **Compute Canada** servers:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j slurm -v results.ipynb
+python trainval.py --savedir_base ../results -r 1 -j slurm
 ```
 
 - Run experiments in parallel using **toolkit**:
 
 ```
-python trainval.py --savedir_base /mnt/home/results -r 1 -j toolkit -v results.ipynb
+python trainval.py --savedir_base ../results -r 1 -j toolkit
 ```
 
 - Run experiments in parallel using **Google Cloud Platform (GCP)**:
