@@ -9,7 +9,8 @@ import numpy as np
 
 def get_args():
     parser = argparse.ArgumentParser(formatter_class=make_wide(argparse.ArgumentDefaultsHelpFormatter))
-
+    
+    group = parser.add_argument_group("General arguments")
     parser.add_argument('-e', '--exp_group_list', nargs="+",
                         help='Define which exp groups to run.')
     parser.add_argument('-sb', '--savedir_base', default=None,
@@ -22,6 +23,21 @@ def get_args():
                         help='Run the experiments as jobs in the cluster.')
     parser.add_argument("-v", "--visualize_notebook", type=str, default='',
                         help='Create a jupyter file to visualize the results.')
+    
+    group = parser.add_argument_group("WandB arguments")
+    parser.add_argument("-wb", "--wandb_activate", type=bool, default=False,
+                        help="activate WandB monitoring")
+    parser.add_argument("-wbp", "--wandb_project", type=str, default=None,
+                        help="name of the WandB project to save your runs in")
+    parser.add_argument("-wbn", "--wandb_name", type=str, default=None,
+                        help="name of the run. can be used to group some runs together")
+    parser.add_argument("-wbe", "--wandb_entity", type=str, default=None,
+                        help="for submitting runs on shared WandB account")
+    # if you can't use $(wandb login) e.g. if you are on a cluster
+    parser.add_argument("-wbk", "--wandb_key", type=str, default=None,
+                        help="WandB auth key")
+    parser.add_argument("-wbkl", "--wandb_key_loc", type=str, default=None,
+                        help="WandB auth key location (if you don't want to pass the key as an argument, store it in this location)")
 
     args, others = parser.parse_known_args()
 
@@ -116,10 +132,44 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
         for exp_dict in exp_list:
             savedir = create_experiment(exp_dict, savedir_base, reset=reset,
                                         verbose=True)
+            # WandB logging
+            def wandb_initialization(wandb_activate, wandb_project, wandb_key=None, wandb_name=None, wandb_entity=None):
+                if args.wandb_activate:
+                    # https://docs.wandb.com/quickstart
+                    import wandb as logger
+                    
+                    # if you can't use $(wandb login)
+                    if args.wandb_key is not None:
+                        logger.login(key=args.wandb_key)
+                    elif args.wandb_key_loc is not None:
+                        #TODO(make sure this is ok)
+                        with open(args.wandb_key_loc, 'r') as file:
+                            key = file.read().replace('\n', '')
+                        logger.login(key=key)
+
+                    wandb_dict = {'project':wandb_project}
+                    if wandb_name is not None:
+                        wandb_dict.update({'group':wandb_name})
+                    if wandb_entity is not None:
+                        wandb_dict.update({'entity':wandb_entity})
+                    logger.init(**wandb_dict, reinit=True)
+                    
+                    # log hparams
+                    logger.config.update(exp_dict)
+                    
+                    return logger
+                
+                else:
+                    return None
+
+            logger = wandb_initialization(args.wandb_activate, args.wandb_project, args.wandb_key, 
+                args.wandb_name, args.wandb_entity)
+
             # do trainval
             func(exp_dict=exp_dict,
                  savedir=savedir,
-                 args=args)
+                 args=args,
+                 logger=logger)
 
     else:
         # launch jobs

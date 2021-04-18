@@ -7,7 +7,7 @@ from haven import haven_results as hr
 
 
 # 1. define the training and validation function
-def trainval(exp_dict, savedir, args):
+def trainval(exp_dict, savedir, args, logger=None):
     """
     exp_dict: dictionary defining the hyperparameters of the experiment
     savedir: the directory where the experiment will be saved
@@ -18,7 +18,7 @@ def trainval(exp_dict, savedir, args):
                                  datadir=os.path.dirname(savedir),
                                  exp_dict=exp_dict)
     model = he.get_model(name=exp_dict['model'], exp_dict=exp_dict)
-
+    
     # 3. resume or initialize checkpoint
     chk_dict = hw.get_checkpoint(savedir)
     if len(chk_dict['model_state_dict']):
@@ -34,6 +34,12 @@ def trainval(exp_dict, savedir, args):
         score_dict = {'epoch':epoch, 'acc': train_dict['train_acc'], 
                       'loss':train_dict['train_loss']}
         chk_dict['score_list'] += [score_dict]
+        
+        def logging(logger, score_dict):
+            if logger is not None:
+                for key, values in score_dict.items():
+                    logger.log({key:values})
+        logging(logger, score_dict)
 
         images = model.vis_on_loader(train_loader)
 
@@ -46,16 +52,33 @@ if __name__ == '__main__':
     # 8. define a list of experiments
     exp_list = []
     for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
-        exp_list += [{'lr':lr, 'dataset':'syn', 'model':'linear'}]
+        exp_list += [{'lr':lr, 'dataset':'mnist', 'model':'linear'}]
 
     # 9. Launch experiments using magic command
     parser = argparse.ArgumentParser()
+    
+    group = parser.add_argument_group("General arguments")
     parser.add_argument('-sb', '--savedir_base', default=None,
                         help='Define the base directory where the experiments will be saved.')
     parser.add_argument("-r", "--reset",  default=0, type=int,
                         help='Reset or resume the experiment.')
     parser.add_argument("-j", "--job_scheduler",  default=None,
                         help='Choose Job Scheduler.')
+    
+    group = parser.add_argument_group("WandB arguments")
+    parser.add_argument("-wb", "--wandb_activate", type=bool, default=False,
+                        help="activate WandB monitoring")
+    parser.add_argument("-wbp", "--wandb_project", type=str, default=None,
+                        help="name of the WandB project to save your runs in")
+    parser.add_argument("-wbn", "--wandb_name", type=str, default=None,
+                        help="name of the run. can be used to group some runs together")
+    parser.add_argument("-wbe", "--wandb_entity", type=str, default=None,
+                        help="for submitting runs on shared WandB account")
+    # if you can't use $(wandb login) e.g. if you are on a cluster
+    parser.add_argument("-wbk", "--wandb_key", type=str, default=None,
+                        help="WandB auth key")
+    parser.add_argument("-wbkl", "--wandb_key_loc", type=str, default=None,
+                        help="WandB auth key location (if you don't want to pass the key as an argument, store it in this location)")
 
     args, others = parser.parse_known_args()
 
