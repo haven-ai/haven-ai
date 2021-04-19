@@ -33,9 +33,8 @@ def get_args():
                         help="name of the run. can be used to group some runs together")
     parser.add_argument("-wbe", "--wandb_entity", type=str, default=None,
                         help="for submitting runs on shared WandB account")
-    # if you can't use $(wandb login) e.g. if you are on a cluster
     parser.add_argument("-wbk", "--wandb_key", type=str, default=None,
-                        help="WandB auth key")
+                        help="WandB auth key, if you can't use $(wandb login)")
     parser.add_argument("-wbkl", "--wandb_key_loc", type=str, default=None,
                         help="WandB auth key location (if you don't want to pass the key as an argument, store it in this location)")
 
@@ -133,37 +132,9 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
             savedir = create_experiment(exp_dict, savedir_base, reset=reset,
                                         verbose=True)
             # WandB logging
-            def wandb_initialization(wandb_activate, wandb_project, wandb_key=None, wandb_name=None, wandb_entity=None):
-                if args.wandb_activate:
-                    # https://docs.wandb.com/quickstart
-                    import wandb as logger
-                    
-                    # if you can't use $(wandb login)
-                    if args.wandb_key is not None:
-                        logger.login(key=args.wandb_key)
-                    elif args.wandb_key_loc is not None:
-                        #TODO(make sure this is ok)
-                        with open(args.wandb_key_loc, 'r') as file:
-                            key = file.read().replace('\n', '')
-                        logger.login(key=key)
-
-                    wandb_dict = {'project':wandb_project}
-                    if wandb_name is not None:
-                        wandb_dict.update({'group':wandb_name})
-                    if wandb_entity is not None:
-                        wandb_dict.update({'entity':wandb_entity})
-                    logger.init(**wandb_dict, reinit=True)
-                    
-                    # log hparams
-                    logger.config.update(exp_dict)
-                    
-                    return logger
-                
-                else:
-                    return None
-
-            logger = wandb_initialization(args.wandb_activate, args.wandb_project, args.wandb_key, 
-                args.wandb_name, args.wandb_entity)
+            logger = hu.wandb_initialization(exp_dict, args.wandb_activate, args.wandb_project,
+                    wandb_key=args.wandb_key, wandb_key_loc=args.wandb_key_loc, 
+                    wandb_name=args.wandb_name, wandb_entity=args.wandb_entity)
 
             # do trainval
             func(exp_dict=exp_dict,
@@ -172,6 +143,9 @@ def run_wizard(func, exp_list=None, exp_groups=None, job_config=None,
                  logger=logger)
 
     else:
+        #TODO(figure out how to properly set WandB in parralel.
+        # maybe we'll need to run hu.wandb_initialization inside trainval)
+
         # launch jobs
         print(f'Using Job Scheduler: {job_scheduler}')
         

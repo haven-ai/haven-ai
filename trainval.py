@@ -4,6 +4,7 @@ import os
 from haven import haven_examples as he
 from haven import haven_wizard as hw
 from haven import haven_results as hr
+from haven import haven_utils as hu
 
 
 # 1. define the training and validation function
@@ -35,11 +36,7 @@ def trainval(exp_dict, savedir, args, logger=None):
                       'loss':train_dict['train_loss']}
         chk_dict['score_list'] += [score_dict]
         
-        def logging(logger, score_dict):
-            if logger is not None:
-                for key, values in score_dict.items():
-                    logger.log({key:values})
-        logging(logger, score_dict)
+        hu.wandb_logging(logger, score_dict)
 
         images = model.vis_on_loader(train_loader)
 
@@ -74,9 +71,8 @@ if __name__ == '__main__':
                         help="name of the run. can be used to group some runs together")
     parser.add_argument("-wbe", "--wandb_entity", type=str, default=None,
                         help="for submitting runs on shared WandB account")
-    # if you can't use $(wandb login) e.g. if you are on a cluster
     parser.add_argument("-wbk", "--wandb_key", type=str, default=None,
-                        help="WandB auth key")
+                        help="WandB auth key, if you can't use $(wandb login)")
     parser.add_argument("-wbkl", "--wandb_key_loc", type=str, default=None,
                         help="WandB auth key location (if you don't want to pass the key as an argument, store it in this location)")
 

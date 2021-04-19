@@ -25,6 +25,41 @@ from .exp_utils import *
 from datetime import datetime
 from PIL import Image
 
+def wandb_initialization(exp_dict, wandb_activate, wandb_project, wandb_key=None, 
+        wandb_key_loc=None, wandb_name=None, wandb_entity=None):
+    # function to inititialize the WandB logger
+    # https://docs.wandb.com/quickstart
+    if wandb_activate:
+        import wandb as logger
+        
+        # if you can't use $(wandb login)
+        if wandb_key is not None:
+            logger.login(key=args.wandb_key)
+        elif wandb_key_loc is not None:
+            #TODO(make sure this is ok)
+            with open(args.wandb_key_loc, 'r') as file:
+                key = file.read().replace('\n', '')
+            logger.login(key=key)
+
+        wandb_dict = {'project':wandb_project}
+        if wandb_name is not None:
+            wandb_dict.update({'group':wandb_name})
+        if wandb_entity is not None:
+            wandb_dict.update({'entity':wandb_entity})
+        logger.init(**wandb_dict, reinit=True)
+        
+        # log hparams
+        logger.config.update(exp_dict)
+        
+        return logger
+    
+    else:
+        return None
+
+def wandb_logging(logger, score_dict):
+    if logger is not None:
+        for key, values in score_dict.items():
+            logger.log({key:values})
 
 def get_function_from_file():
     pass
