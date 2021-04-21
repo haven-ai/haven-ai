@@ -20,9 +20,6 @@ def get_args():
     parser.add_argument(
         "-j", "--job_scheduler", default=None, type=str, help="Run the experiments as jobs in the cluster."
     )
-    parser.add_argument(
-        "-v", "--visualize_notebook", type=str, default="", help="Create a jupyter file to visualize the results."
-    )
 
     args, others = parser.parse_known_args()
 
@@ -60,6 +57,7 @@ def run_wizard(
     job_scheduler=None,
     save_logs=True,
     filter_duplicates=False,
+    results_fname=None
 ):
     if args is None:
         args = get_args()
@@ -102,11 +100,10 @@ def run_wizard(
     print("\nRunning %d experiments" % len(exp_list))
 
     # save results folder
-    if exp_id is None:
-        results_fname = args.visualize_notebook
+    if exp_id is None and results_fname is not None:
         if len(results_fname):
             if ".ipynb" not in results_fname:
-                results_fname += ".ipynb"
+                raise ValueError('.ipynb should be the file extension')
             create_jupyter_file(fname=results_fname, savedir_base=savedir_base)
 
     # Run experiments
@@ -170,8 +167,6 @@ def run_wizard(
                 "job_scheduler",
                 "r",
                 "reset",
-                "v",
-                "visualize_notebook",
             ]:
                 command += f" --{k} {v}"
 

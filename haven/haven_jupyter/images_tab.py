@@ -27,6 +27,8 @@ except Exception:
 def images_tab(self, output):
     db = self
 
+    if db.vars.get("legend_list") is None:
+        db.vars["legend_list"] = hu.get_diff_hparam(db.rm.exp_list)
     w_legend = wdg.SelectMultiple(header="Legend:", options=db.rm.exp_params, db_vars=db.vars, var="legend_list")
 
     w_n_exps = wdg.Text("n_exps:", default="3", type="int", db_vars=db.vars, var="n_exps")

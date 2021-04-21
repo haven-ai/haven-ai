@@ -138,24 +138,9 @@ def plots_tab(self, output):
         ]
     )
 
-    # button = widgets.VBox([widgets.HBox([brefresh, bdownload, bdownload_out]),
-    #                        widgets.HBox([t_y_metric,  d_x_metric_columns]),
-    #                        widgets.HBox([t_title_list, d_style]),
-
-    #                        widgets.HBox([t_groupby_list, llegend_list, ]),
-    #                        widgets.HBox([t_mode, t_bar_agg]),
-    #                        widgets.HBox([ltitle_format, llegend_format]),
-    #                        widgets.HBox([d_avg_across_columns]),
-
-    #                        ])
-
     output_plot = widgets.Output()
 
     def on_clicked(b):
-        # if d_style.value == 'True':
-        #     from IPython import get_ipython
-        #     ipython = get_ipython()
-        #     ipython.magic("matplotlib widget")
         output_plot.clear_output()
         with output_plot:
             self.update_rm()
@@ -195,7 +180,6 @@ def plots_tab(self, output):
 
             show_inline_matplotlib_plots()
 
-    # d_style.observe(on_clicked)
     brefresh.on_click(on_clicked)
 
     with output:

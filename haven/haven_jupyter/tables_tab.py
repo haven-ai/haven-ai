@@ -25,14 +25,14 @@ except Exception:
 
 
 def tables_tab(db, output):
-    if db.vars.get("columns") is None:
-        db.vars["columns"] = hu.get_diff_hparam(db.rm.exp_list)
-
+    if db.vars.get("legend_list") is None:
+        db.vars["legend_list"] = hu.get_diff_hparam(db.rm.exp_list)
+        
     w_columns = wdg.SelectMultiple(
-        header="Hyperparameters:",
+        header="Legend:",
         options=["exp_id"] + db.rm.exp_params,
         db_vars=db.vars,
-        var="columns",
+        var="legend_list",
         select_all=False,
     )
     w_score_columns = wdg.SelectMultiple(
