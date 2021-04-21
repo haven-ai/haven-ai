@@ -13,23 +13,25 @@ import numpy as np
 import getpass
 import pprint
 
-ALIVE_STATES =  ['RUNNING', 'QUEUED', 'PENDING', 'QUEUING']
-COMPLETED_STATES =  ['COMPLETED', 'SUCCEEDED', 'COMPLETING']
+ALIVE_STATES = ["RUNNING", "QUEUED", "PENDING", "QUEUING"]
+COMPLETED_STATES = ["COMPLETED", "SUCCEEDED", "COMPLETING"]
 FAILED_STATES = ["FAILED", "CANCELLED", "INTERRUPTED", "TIMEOUT", "NODE_FAIL"]
 
 
 class JobManager:
     """Job manager."""
 
-    def __init__(self,
-                 exp_list=None,
-                 savedir_base=None,
-                 workdir=None,
-                 job_config=None,
-                 verbose=1,
-                 account_id=None,
-                 job_scheduler='toolkit',
-                 save_logs=True):
+    def __init__(
+        self,
+        exp_list=None,
+        savedir_base=None,
+        workdir=None,
+        job_config=None,
+        verbose=1,
+        account_id=None,
+        job_scheduler="toolkit",
+        save_logs=True,
+    ):
         """[summary]
 
         Parameters
@@ -45,9 +47,9 @@ class JobManager:
         verbose : int, optional
             [description], by default 1
         """
-        if account_id is None and job_config is not None and 'account_id' in job_config:
-            account_id = job_config['account_id']
-            del job_config['account_id']
+        if account_id is None and job_config is not None and "account_id" in job_config:
+            account_id = job_config["account_id"]
+            del job_config["account_id"]
 
         self.exp_list = exp_list
         self.job_config = job_config
@@ -56,26 +58,27 @@ class JobManager:
         self.savedir_base = savedir_base
         self.account_id = account_id
         self.save_logs = save_logs
-        
+
         # define funcs
-        if job_scheduler == 'toolkit':
+        if job_scheduler == "toolkit":
             from . import toolkit_manager as ho
+
             self.ho = ho
             self.api = self.ho.get_api(token=None)
-            
-        elif job_scheduler == 'slurm':
+
+        elif job_scheduler == "slurm":
             from . import slurm_manager as ho
+
             self.ho = ho
             self.api = None
 
-    
     def get_command_history(self, topk=10):
         job_list = self.get_jobs()
 
         count = 0
         for j in job_list:
-            if hasattr(j, 'command'):
-                print(count,':',j.command[2])
+            if hasattr(j, "command"):
+                print(count, ":", j.command[2])
             if count > topk:
                 break
             count += 1
@@ -95,73 +98,76 @@ class JobManager:
         return self.ho.kill_job(self.api, job_id)
 
     def submit_job(self, command, workdir, savedir_logs=None):
-        return self.ho.submit_job(api=self.api, 
-                             account_id=self.account_id, 
-                             command=command, 
-                             job_config=self.job_config, 
-                             workdir=workdir,
-                             savedir_logs=savedir_logs)
+        return self.ho.submit_job(
+            api=self.api,
+            account_id=self.account_id,
+            command=command,
+            job_config=self.job_config,
+            workdir=workdir,
+            savedir_logs=savedir_logs,
+        )
 
     # Main functions
     # --------------
-    def launch_menu(self, command=None, exp_list=None, get_logs=False, wait_seconds=3,
-                    in_parallel=True):
+    def launch_menu(self, command=None, exp_list=None, get_logs=False, wait_seconds=3, in_parallel=True):
         exp_list = exp_list or self.exp_list
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
-        summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
+        summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
 
         print("\nTotal Experiments:", len(exp_list))
         print("Experiment Status:", summary_dict)
-        prompt = ("\nMenu:\n"
-                  "  0)'ipdb' run ipdb for an interactive session; or\n"
-                  "  1)'reset' to reset the experiments; or\n"
-                  "  2)'run' to run the remaining experiments and retry the failed ones; or\n"
-                  "  3)'status' to view the job status; or\n"
-                  "  4)'kill' to kill the jobs.\n"
-                  "Type option: "
-                  )
-        
+        prompt = (
+            "\nMenu:\n"
+            "  0)'ipdb' run ipdb for an interactive session; or\n"
+            "  1)'reset' to reset the experiments; or\n"
+            "  2)'run' to run the remaining experiments and retry the failed ones; or\n"
+            "  3)'status' to view the job status; or\n"
+            "  4)'kill' to kill the jobs.\n"
+            "Type option: "
+        )
+
         option = input(prompt)
 
-        option_list = ['reset', 'run', 'status', 'logs', 'kill']
+        option_list = ["reset", "run", "status", "logs", "kill"]
         if option not in option_list:
-            raise ValueError(
-                'Prompt input has to be one of these choices %s' % option_list)
+            raise ValueError("Prompt input has to be one of these choices %s" % option_list)
 
-        if option == 'ipdb':
-            import ipdb; ipdb.set_trace()
-            print('Example:\nsummary_dict = self.get_summary(get_logs=True, exp_list=exp_list)')
+        if option == "ipdb":
+            import ipdb
 
-        elif option == 'status':
+            ipdb.set_trace()
+            print("Example:\nsummary_dict = self.get_summary(get_logs=True, exp_list=exp_list)")
+
+        elif option == "status":
             # view experiments
             self.print_job_status(exp_list=exp_list)
             return
 
-        elif option == 'reset':
+        elif option == "reset":
             self.verbose = False
             for e_list in chunk_list(exp_list, n=100):
                 self.launch_exp_list(command=command, exp_list=e_list, reset=1, in_parallel=in_parallel)
 
-        elif option == 'run':
+        elif option == "run":
             self.verbose = False
-            tmp_list = [s_dict['exp_dict'] for s_dict in summary_list 
-                            if s_dict['job_state'] 
-                            not in ALIVE_STATES + COMPLETED_STATES]
+            tmp_list = [
+                s_dict["exp_dict"]
+                for s_dict in summary_list
+                if s_dict["job_state"] not in ALIVE_STATES + COMPLETED_STATES
+            ]
 
-            print('Selected %d/%d exps' % (len(tmp_list), len(exp_list)))
+            print("Selected %d/%d exps" % (len(tmp_list), len(exp_list)))
             exp_list = tmp_list
             if len(exp_list) == 0:
-                print('All experiments have ran.')
+                print("All experiments have ran.")
                 return
 
             for e_list in chunk_list(exp_list, n=100):
                 self.launch_exp_list(command=command, exp_list=e_list, reset=0, in_parallel=in_parallel)
 
-        elif option == 'kill':
+        elif option == "kill":
             self.verbose = False
-            tmp_list = [s_dict['exp_dict'] for s_dict in
-                         summary_list if s_dict['job_state'] in
-                          ALIVE_STATES]
+            tmp_list = [s_dict["exp_dict"] for s_dict in summary_list if s_dict["job_state"] in ALIVE_STATES]
             self.kill_jobs(exp_list=tmp_list)
 
         # view experiments
@@ -171,8 +177,8 @@ class JobManager:
 
     def print_job_status(self, exp_list):
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
-        summary_dict = hu.group_list(summary_list, key='job_state', return_count=False)
-        
+        summary_dict = hu.group_list(summary_list, key="job_state", return_count=False)
+
         for k in summary_dict.keys():
             n_jobs = len(summary_dict[k])
             if n_jobs:
@@ -180,12 +186,12 @@ class JobManager:
                 pass
                 # print(pd.DataFrame(summary_dict[k]).head())
 
-        summary_dict = hu.group_list(summary_list, key='job_state', return_count=True)
+        summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
         print(summary_dict)
 
-    def launch_exp_list(self, command,  exp_list=None, savedir_base=None, reset=0, in_parallel=True):
+    def launch_exp_list(self, command, exp_list=None, savedir_base=None, reset=0, in_parallel=True):
         exp_list = exp_list or self.exp_list
-        assert '<exp_id>' in command
+        assert "<exp_id>" in command
 
         submit_dict = {}
 
@@ -198,7 +204,7 @@ class JobManager:
                 savedir_base = savedir_base or self.savedir_base
                 savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
 
-                com = command.replace('<exp_id>', exp_id)
+                com = command.replace("<exp_id>", exp_id)
                 pr.add(self.launch_or_ignore_exp_dict, exp_dict, com, reset, savedir, submit_dict)
 
             pr.run()
@@ -211,25 +217,25 @@ class JobManager:
                 savedir_base = savedir_base or self.savedir_base
                 savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
 
-                com = command.replace('<exp_id>', exp_id)
+                com = command.replace("<exp_id>", exp_id)
                 self.launch_or_ignore_exp_dict(exp_dict, com, reset, savedir, submit_dict)
 
         if len(submit_dict) == 0:
-            raise ValueError('The threads have an error, most likely a permission error (see above)')
-        
-        for i, (k,v) in enumerate(submit_dict.items()):
-            print('***')
-            print('Exp %d/%d - %s' % (i+1, len(submit_dict), v['message']))
-            print('exp_id: %s' % hu.hash_dict(v['exp_dict']))
-            print('job_id: %s' % k)
+            raise ValueError("The threads have an error, most likely a permission error (see above)")
+
+        for i, (k, v) in enumerate(submit_dict.items()):
+            print("***")
+            print("Exp %d/%d - %s" % (i + 1, len(submit_dict), v["message"]))
+            print("exp_id: %s" % hu.hash_dict(v["exp_dict"]))
+            print("job_id: %s" % k)
             savedir = os.path.join(savedir_base, hu.hash_dict(v["exp_dict"]))
-            print(f'savedir: {savedir}')
-            pprint.pprint(v['exp_dict'])
+            print(f"savedir: {savedir}")
+            pprint.pprint(v["exp_dict"])
             print()
 
-        print("%d experiments submitted." % len(exp_list))                                      
+        print("%d experiments submitted." % len(exp_list))
         if len(submit_dict) > 0:
-            assert len(submit_dict) == len(exp_list), 'considered exps does not match expected exps'
+            assert len(submit_dict) == len(exp_list), "considered exps does not match expected exps"
         return submit_dict
 
     def kill_jobs(self, exp_list=None):
@@ -245,17 +251,16 @@ class JobManager:
             fname = get_job_fname(savedir)
 
             if os.path.exists(fname):
-                job_id = hu.load_json(fname)['job_id']
+                job_id = hu.load_json(fname)["job_id"]
                 pr.add(self.kill_job, job_id)
-                submit_dict[exp_id] = 'KILLED'
+                submit_dict[exp_id] = "KILLED"
             else:
-                submit_dict[exp_id] = 'NoN-Existent'
+                submit_dict[exp_id] = "NoN-Existent"
 
         pr.run()
         pr.close()
         pprint.pprint(submit_dict)
-        print("%d/%d experiments killed." % (len([s for s in submit_dict.values() if 'KILLED' in s]),
-                                             len(submit_dict)))
+        print("%d/%d experiments killed." % (len([s for s in submit_dict.values() if "KILLED" in s]), len(submit_dict)))
         return submit_dict
 
     def launch_or_ignore_exp_dict(self, exp_dict, command, reset, savedir, submit_dict={}):
@@ -270,7 +275,7 @@ class JobManager:
         if not os.path.exists(fname):
             # Check if the job already exists
             job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=None)
-            job_id = job_dict['job_id']
+            job_id = job_dict["job_id"]
             message = "SUBMITTED: Launching"
 
         elif reset:
@@ -280,44 +285,43 @@ class JobManager:
             hc.delete_and_backup_experiment(savedir)
 
             job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=None)
-            job_id = job_dict['job_id']
+            job_id = job_dict["job_id"]
             message = "SUBMITTED: Resetting"
 
         else:
             job_id = hu.load_json(fname).get("job_id")
-            job = self.get_job( job_id)
+            job = self.get_job(job_id)
 
-            if job['state'] in ALIVE_STATES + COMPLETED_STATES:
+            if job["state"] in ALIVE_STATES + COMPLETED_STATES:
                 # If the job is alive, do nothing
-                message = 'IGNORED: Job %s' % job['state']
+                message = "IGNORED: Job %s" % job["state"]
 
-            elif job['state'] in FAILED_STATES:
-                message = "SUBMITTED: Retrying %s Job" % job['state']
+            elif job["state"] in FAILED_STATES:
+                message = "SUBMITTED: Retrying %s Job" % job["state"]
                 job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=job)
-                job_id = job_dict['job_id']
+                job_id = job_dict["job_id"]
             # This shouldn't happen
             else:
-                raise ValueError('wtf')
+                raise ValueError("wtf")
 
-        submit_dict[job_id] = {'exp_dict':exp_dict, 'message':message}
+        submit_dict[job_id] = {"exp_dict": exp_dict, "message": message}
 
     def launch_exp_dict(self, exp_dict, savedir, command, job=None):
         """Submit a job job and save job dict and exp_dict."""
         # Check for duplicates
         # if job is not None:
-            # assert self._assert_no_duplicates(job)
+        # assert self._assert_no_duplicates(job)
 
         fname_exp_dict = os.path.join(savedir, "exp_dict.json")
         hu.save_json(fname_exp_dict, exp_dict)
         exp_id = hu.hash_dict(exp_dict)
-        assert(hu.hash_dict(hu.load_json(fname_exp_dict)) == exp_id)
-
+        assert hu.hash_dict(hu.load_json(fname_exp_dict)) == exp_id
 
         # Define paths
         workdir_job = os.path.join(savedir, "code")
 
         # Copy the experiment code into the experiment folder
-        print(f'Copying code for experiment {exp_id}')
+        print(f"Copying code for experiment {exp_id}")
         hu.copy_code(self.workdir + "/", workdir_job, verbose=0)
 
         # Run  command
@@ -326,22 +330,29 @@ class JobManager:
         else:
             savedir_logs = None
         job_id = self.submit_job(command, workdir_job, savedir_logs=savedir_logs)
-        print(f'Job submitted for experiment {exp_id} with job id {job_id}')
-        
+        print(f"Job submitted for experiment {exp_id} with job id {job_id}")
+
         # Verbose
         if self.verbose:
             print("Job_id: %s command: %s" % (job_id, command))
 
-        job_dict = {"job_id": job_id,
-                    "command": command}
+        job_dict = {"job_id": job_id, "command": command}
 
         hu.save_json(get_job_fname(savedir), job_dict)
 
         return job_dict
 
-
-    def get_summary_list(self, failed_only=False, columns=None, max_lines=10, wrap_size=8,
-                               add_prefix=False, get_logs=True, exp_list=None, savedir_base=None):
+    def get_summary_list(
+        self,
+        failed_only=False,
+        columns=None,
+        max_lines=10,
+        wrap_size=8,
+        add_prefix=False,
+        get_logs=True,
+        exp_list=None,
+        savedir_base=None,
+    ):
         savedir_base = savedir_base or self.savedir_base
         exp_list = exp_list or self.exp_list
 
@@ -359,7 +370,7 @@ class JobManager:
 
         # get summaries
         summary_list = []
-        
+
         for exp_dict in exp_list:
             result_dict = {}
 
@@ -369,10 +380,10 @@ class JobManager:
 
             # General info
             result_dict = {}
-            result_dict['exp_dict'] = exp_dict
+            result_dict["exp_dict"] = exp_dict
             result_dict["exp_id"] = exp_id
             result_dict["job_id"] = None
-            result_dict["job_state"] = 'NEVER LAUNCHED'
+            result_dict["job_state"] = "NEVER LAUNCHED"
 
             if os.path.exists(job_fname):
                 job_dict = hu.load_json(job_fname)
@@ -382,7 +393,6 @@ class JobManager:
 
                 fname_exp_dict = os.path.join(savedir, "exp_dict.json")
                 job = jobs_dict[job_id]
-                
 
                 # if hasattr(job, 'command'):
                 #     command = job_dict['command']
@@ -390,12 +400,12 @@ class JobManager:
                 #     command = None
 
                 # Job info
-                result_dict['started_at'] = hu.time_to_montreal(fname_exp_dict)
+                result_dict["started_at"] = hu.time_to_montreal(fname_exp_dict)
                 result_dict["job_id"] = job_id
                 result_dict["job_state"] = job["state"]
                 result_dict["restarts"] = len(job["runs"])
-                result_dict["command"] = job_dict['command']
-                
+                result_dict["command"] = job_dict["command"]
+
                 if get_logs:
                     # Logs info
                     if job["state"] == "FAILED":
@@ -421,30 +431,26 @@ class JobManager:
         # get job ids
 
         # fill summary
-        summary_dict = {'table': [], 
-                        'status': [],
-                        'logs_failed': [], 
-                        'logs': []}
+        summary_dict = {"table": [], "status": [], "logs_failed": [], "logs": []}
 
         # get info
-        df = pd.DataFrame(summary_dict['table'])
+        df = pd.DataFrame(summary_dict["table"])
 
         # if columns:
         #     df = df[[c for c in columns if (c in df.columns and c not in ['err'])]]
 
         if "job_state" in df:
-            stats = np.vstack(
-                np.unique(df['job_state'].fillna("NaN"), return_counts=True)).T
-            status = ([{a: b} for (a, b) in stats])
+            stats = np.vstack(np.unique(df["job_state"].fillna("NaN"), return_counts=True)).T
+            status = [{a: b} for (a, b) in stats]
         else:
-            df['job_state'] = None
+            df["job_state"] = None
 
         df = hu.sort_df_columns(df)
-        summary_dict['status'] = status
-        summary_dict['table'] = df
+        summary_dict["status"] = status
+        summary_dict["table"] = df
 
         for state in ALIVE_STATES + COMPLETED_STATES + FAILED_STATES:
-            summary_dict[state] = df[df['job_state'] == state]
+            summary_dict[state] = df[df["job_state"] == state]
 
         return summary_dict
 
@@ -456,7 +462,7 @@ class JobManager:
         command_dict = {}
         for job in jobList:
 
-            if hasattr(job, 'command'):
+            if hasattr(job, "command"):
                 if job.command is None:
                     continue
                 job_python_command = job.command[2]
@@ -468,8 +474,7 @@ class JobManager:
             elif job_python_command not in command_dict:
                 command_dict[job_python_command] = job
             else:
-                print("Job state", job['state'], "Job command",
-                      job_python_command)
+                print("Job state", job["state"], "Job command", job_python_command)
                 raise ValueError("Job %s is duplicated" % job_python_command)
 
         # Check if the new job causes duplicate
@@ -486,20 +491,14 @@ def get_job_fname(savedir):
         # for backward compatibility
         fname = os.path.join(savedir, "borgy_dict.json")
     else:
-        fname = os.path.join(savedir, 'job_dict.json')
+        fname = os.path.join(savedir, "job_dict.json")
 
     return fname
 
 
-
-def run_exp_list_jobs(exp_list,
-                      savedir_base,
-                      workdir,
-                      run_command,
-                      job_config=None,
-                      force_run=False,
-                      wait_seconds=3,
-                      account_id=None):
+def run_exp_list_jobs(
+    exp_list, savedir_base, workdir, run_command, job_config=None, force_run=False, wait_seconds=3, account_id=None
+):
     """Run the experiments in the cluster.
 
     Parameters
@@ -529,23 +528,26 @@ def run_exp_list_jobs(exp_list,
     >>>                  'mem': '20',
     >>>                  'cpu': '2'}
     >>>    run_command = ('python trainval.py -ei <exp_id> -sb %s' %  (args.savedir_base))
-    >>>    hjb.run_exp_list_jobs(exp_list, 
-    >>>                          savedir_base=args.savedir_base, 
+    >>>    hjb.run_exp_list_jobs(exp_list,
+    >>>                          savedir_base=args.savedir_base,
     >>>                          workdir=os.path.dirname(os.path.realpath(__file__)),
     >>>                          run_command=run_command,
     >>>                          job_config=job_config)
     """
     # let the user choose one of these options
-    jm = JobManager(exp_list,
-                    savedir_base,
-                    run_command=run_command,
-                    workdir=workdir,
-                    job_config=job_config,
-                    verbose=1,
-                    account_id=account_id,
-                    token=token)
+    jm = JobManager(
+        exp_list,
+        savedir_base,
+        run_command=run_command,
+        workdir=workdir,
+        job_config=job_config,
+        verbose=1,
+        account_id=account_id,
+        token=token,
+    )
 
     jm.run()
 
+
 def chunk_list(my_list, n=100):
-    return [my_list[x:x+n] for x in range(0, len(my_list), n)]
+    return [my_list[x : x + n] for x in range(0, len(my_list), n)]

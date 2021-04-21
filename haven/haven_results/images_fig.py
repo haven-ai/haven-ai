@@ -36,12 +36,10 @@ def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
         [description], by default None
     dirname : str, optional
         [description], by default 'images'
-
     Returns
     -------
     fig_list : list
         a list of pylab figures
-
     Example
     -------
     >>> from haven import haven_results as hr
@@ -71,7 +69,7 @@ def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
         base_dir = os.path.join(savedir, dirname)
         img_list = glob.glob(os.path.join(base_dir, '*.jpg'))
         img_list += glob.glob(os.path.join(base_dir, '*.png'))
-
+        img_list += glob.glob(os.path.join(base_dir, '*.gif'))
         img_list.sort(key=os.path.getmtime)
         img_list = img_list[::-1]
         img_list = img_list[:n_images]
@@ -110,14 +108,23 @@ def get_images(exp_list, savedir_base, n_exps=20, n_images=1,
             img_fname = os.path.split(img_list[i])[-1]
             fig = plt.figure(figsize=figsize)
             try:
-                img = plt.imread(img_list[i])
-                plt.imshow(img)
-                plt.title('%s - %s\n%s' %
-                                (exp_id, img_fname, label),
-                                fontsize=28)
+                if '.gif' in img_list[i]:
+                    from IPython.display import Image
+                    from IPython.display import display
+                    display(exp_id)
+                    display(exp_dict)
+                    display(Image(img_list[i]))
+                else:
+                    img = plt.imread(img_list[i])
+                    plt.imshow(img)
+                    display(exp_id)
+                    display(exp_dict)
+                    # plt.title('%s - %s\n%s' %
+                    #                 (exp_id, img_fname, label),
+                    #                 fontsize=28)
 
-                plt.axis('off')
-                plt.tight_layout()
+                    plt.axis('off')
+                    plt.tight_layout()
                 fig_list += [fig]
 
             except:

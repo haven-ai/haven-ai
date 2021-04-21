@@ -12,6 +12,8 @@ from subprocess import SubprocessError
 
 # Job submission
 # ==============
+
+
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
     # read slurm setting
     lines = "#! /bin/bash \n"
@@ -42,14 +44,14 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
                 continue
             else:
                 # other errors
-                exit(str(e.output)[2:-1].replace('\\n', ''))
+                exit(str(e.output)[2:-1].replace("\\n", ""))
         break
 
     # delete the bash.sh
     os.remove(file_name)
 
     return job_id
-    
+
 
 # Job status
 # ===========
@@ -62,9 +64,9 @@ def get_job(api, job_id):
 
 
 def get_jobs(api, account_id):
-    ''' get all jobs launched by the current user'''
+    """ get all jobs launched by the current user"""
     job_list = ""
-    command = "squeue --user=%s --format=\"%%.18i %%.8T\"" % getpass.getuser()
+    command = 'squeue --user=%s --format="%%.18i %%.8T"' % getpass.getuser()
     while True:
         try:
             job_list = hu.subprocess_call(command)
@@ -75,10 +77,10 @@ def get_jobs(api, account_id):
                 continue
             else:
                 # other errors
-                exit(str(e.output)[2:-1].replace('\\n', ''))
+                exit(str(e.output)[2:-1].replace("\\n", ""))
         break
 
-    result = [{"job_id": j.split()[0], "state": j.split()[1]} for j in job_list.split('\n')[1:-1]]
+    result = [{"job_id": j.split()[0], "state": j.split()[1]} for j in job_list.split("\n")[1:-1]]
     return result
 
 
@@ -99,10 +101,10 @@ def get_jobs_dict(api, job_id_list, query_size=20):
                 continue
             else:
                 # other errors
-                exit(str(e.output)[2:-1].replace('\\n', ''))
+                exit(str(e.output)[2:-1].replace("\\n", ""))
         break
 
-    lines = job_list.split('\n')
+    lines = job_list.split("\n")
     header = lines[0].split()
     lines = [l.split() for l in lines[2:-1]]
 
@@ -119,6 +121,7 @@ def get_jobs_dict(api, job_id_list, query_size=20):
 
     return jobs_dict
 
+
 # Job kill
 # ===========
 
@@ -128,13 +131,13 @@ def kill_job(api, job_id):
     job = get_job(api, job_id)
 
     if job["state"] in ["CANCELLED", "COMPLETED", "FAILED", "TIMEOUT"]:
-        print('%s is already dead' % job_id)
+        print("%s is already dead" % job_id)
     else:
         kill_command = "scancel %s" % job_id
         while True:
             try:
                 hu.subprocess_call(kill_command)
-                print('%s CANCELLING...' % job_id)
+                print("%s CANCELLING..." % job_id)
             except Exception as e:
                 if "Socket timed out" in str(e):
                     print("scancel time out and retry now")
@@ -148,4 +151,4 @@ def kill_job(api, job_id):
             time.sleep(2)
             job = get_job(api, job_id)
 
-        print('%s now is dead.' % job_id)
+        print("%s now is dead." % job_id)
