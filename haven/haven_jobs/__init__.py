@@ -4,9 +4,8 @@ import sys
 import subprocess
 from .. import haven_utils as hu
 from .. import haven_chk as hc
-import os
 from textwrap import wrap
-import time
+
 import copy
 import pandas as pd
 import numpy as np
@@ -315,6 +314,7 @@ class JobManager:
         fname_exp_dict = os.path.join(savedir, "exp_dict.json")
         hu.save_json(fname_exp_dict, exp_dict)
         exp_id = hu.hash_dict(exp_dict)
+
         assert hu.hash_dict(hu.load_json(fname_exp_dict)) == exp_id
 
         # Define paths
@@ -494,59 +494,6 @@ def get_job_fname(savedir):
         fname = os.path.join(savedir, "job_dict.json")
 
     return fname
-
-
-def run_exp_list_jobs(
-    exp_list, savedir_base, workdir, run_command, job_config=None, force_run=False, wait_seconds=3, account_id=None
-):
-    """Run the experiments in the cluster.
-
-    Parameters
-    ----------
-    exp_list : list
-        list of experiment dictionaries
-    savedir_base : str
-        the directory where the experiments are saved
-    workdir : str
-        main directory of the code
-    run_command : str
-        the command to be ran in the cluster
-    job_config : dict
-        dictionary describing the job specifications
-
-    Example
-    -------
-    Add the following code to the main file.
-
-    >>> elif args.run_jobs:
-    >>>    from haven import haven_jobs as hjb
-    >>>    job_config = {'data': <data>,
-    >>>                  'image': <image>,
-    >>>                  'bid': '1',
-    >>>                  'restartable': '1',
-    >>>                  'gpu': '1',
-    >>>                  'mem': '20',
-    >>>                  'cpu': '2'}
-    >>>    run_command = ('python trainval.py -ei <exp_id> -sb %s' %  (args.savedir_base))
-    >>>    hjb.run_exp_list_jobs(exp_list,
-    >>>                          savedir_base=args.savedir_base,
-    >>>                          workdir=os.path.dirname(os.path.realpath(__file__)),
-    >>>                          run_command=run_command,
-    >>>                          job_config=job_config)
-    """
-    # let the user choose one of these options
-    jm = JobManager(
-        exp_list,
-        savedir_base,
-        run_command=run_command,
-        workdir=workdir,
-        job_config=job_config,
-        verbose=1,
-        account_id=account_id,
-        token=token,
-    )
-
-    jm.run()
 
 
 def chunk_list(my_list, n=100):

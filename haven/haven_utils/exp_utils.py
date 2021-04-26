@@ -1,5 +1,7 @@
 import os
+import json
 import copy
+import sys
 import hashlib
 import itertools
 from itertools import groupby
@@ -118,6 +120,14 @@ def hash_dict(exp_dict):
             v = hash_dict(exp_dict[k])
         elif isinstance(exp_dict[k], tuple):
             raise ValueError("tuples can't be hashed yet, consider converting tuples to lists")
+        elif isinstance(exp_dict[k], list) and isinstance(exp_dict[k][0], dict):
+            v_str = ""
+            for e in exp_dict[k]:
+                if isinstance(e, dict):
+                    v_str += hash_dict(e)
+                else:
+                    raise ValueError("all have to be dicts")
+            v = v_str
         else:
             v = exp_dict[k]
 
