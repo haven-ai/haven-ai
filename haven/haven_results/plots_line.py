@@ -55,6 +55,7 @@ def get_plot(
     result_step=0,
     map_legend_list=dict(),
     xticks=None,
+    random_marker=True,
 ):
     """Plots the experiment list in a single figure.
 
@@ -100,6 +101,8 @@ def get_plot(
         [description], formatting of the title, by default None
     cmap: [str], optional
         [description], specify colormap, by default None
+    random_marker: [bool], optional
+        [description], whether to choose markers at random
 
     Returns
     -------
@@ -237,7 +240,12 @@ def get_plot(
         plot_idx += 1
 
         color = None
-        marker = "o"
+        
+        if random_marker:
+            marker = np.random.choice(["o", "v", "ˆ", "<", ">", "1", "2", "3", "4", "p", "P", "s", "*", "+", "x", "X", "d", "D"])
+        else:
+            marker = "o"
+        
         linewidth = 2.8
 
         try:
