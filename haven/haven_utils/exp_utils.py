@@ -120,7 +120,7 @@ def hash_dict(exp_dict):
             v = hash_dict(exp_dict[k])
         elif isinstance(exp_dict[k], tuple):
             raise ValueError("tuples can't be hashed yet, consider converting tuples to lists")
-        elif isinstance(exp_dict[k], list) and isinstance(exp_dict[k][0], dict):
+        elif isinstance(exp_dict[k], list) and len(exp_dict[k]) and isinstance(exp_dict[k][0], dict):
             v_str = ""
             for e in exp_dict[k]:
                 if isinstance(e, dict):

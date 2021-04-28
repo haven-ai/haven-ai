@@ -243,7 +243,7 @@ def get_plot(
 
         if random_marker:
             marker = np.random.choice(
-                ["o", "v", "ˆ", "<", ">", "1", "2", "3", "4", "p", "P", "s", "*", "+", "x", "X", "d", "D"]
+                ["o", "v", "<", ">", "1", "2", "3", "4", "p", "P", "s", "*", "+", "x", "X", "d", "D"]
             )
         else:
             marker = "o"
