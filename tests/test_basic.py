@@ -357,6 +357,58 @@ def test_toolkit():
     db.display()
 
 
+def test_avg_runs():
+    # save a score_list
+    savedir_base = ".tmp"
+    exp_dict = {"run": 0, "model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
+    exp_dict2 = {"run": 1, "model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
+
+    score_list = [
+        {
+            "epoch": 0,
+            "acc": 0.2,
+        },
+        {"epoch": 1, "acc": 1.0},
+        {"epoch": 2, "acc": 0.9},
+    ]
+
+    hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list.pkl"), score_list)
+    hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict), "exp_dict.json"), exp_dict)
+
+    score_list = [
+        {
+            "epoch": 0,
+            "acc": 0.4,
+        },
+        {"epoch": 1, "acc": 1.5},
+        {"epoch": 2, "acc": 0.5},
+    ]
+    hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict2), "score_list.pkl"), score_list)
+    hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict2), "exp_dict.json"), exp_dict2)
+    # check if score_list can be loaded and viewed in pandas
+    exp_list = hu.get_exp_list(savedir_base=savedir_base)
+    score_df = hr.get_score_df(exp_list, savedir_base=savedir_base, avg_across="run")
+
+    assert score_df[("acc", "mean")].max() == 0.7
+    assert abs(score_df[("acc (min)", "mean")].max() - 0.3) < 1e-4
+    assert score_df[("acc (max)", "mean")].max() == 1.25
+
+    result_dict = hr.get_result_dict(
+        exp_dict, savedir_base, exp_list=exp_list, x_metric="epoch", y_metric="acc", avg_across="run"
+    )
+
+    np.testing.assert_array_almost_equal(result_dict["y_list"], np.array([0.3, 1.25, 0.7]))
+
+    score_list = [{"epoch": 1, "acc": 1.5}, {"epoch": 2, "acc": 0.5}]
+    hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict2), "score_list.pkl"), score_list)
+    result_dict = hr.get_result_dict(
+        exp_dict, savedir_base, exp_list=exp_list, x_metric="epoch", y_metric="acc", avg_across="run"
+    )
+    np.testing.assert_array_almost_equal(result_dict["x_list"], np.array([1, 2]))
+    np.testing.assert_array_almost_equal(result_dict["y_list"], np.array([1.25, 0.7]))
+    shutil.rmtree(".tmp")
+
+
 def test_wizard():
     print()
 
@@ -383,6 +435,7 @@ if __name__ == "__main__":
         test_get_result_manager()
         test_get_plot()
         test_get_score_df()
+        test_avg_runs()
         test_get_score_lists()
 
     if "toolkit" in args.mode:

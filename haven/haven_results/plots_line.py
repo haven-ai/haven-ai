@@ -463,7 +463,7 @@ def get_result_dict(
         # print(uniques, len(exp_sublist))
         assert len(exp_sublist) > 0
         assert len(uniques) == len(exp_sublist)
-        for sub_dict in exp_sublist:
+        for ek, sub_dict in enumerate(exp_sublist):
             sub_id = hu.hash_dict(sub_dict)
             sub_score_list_fname = os.path.join(savedir_base, sub_id, score_list_name)
 
@@ -485,29 +485,41 @@ def get_result_dict(
                 if x_metric in score_dict and y_metric in score_dict:
                     x_val = score_dict[x_metric]
                     if not x_val in x_dict:
-                        x_dict[x_val] = []
+                        x_dict[x_val] = {}
 
-                    x_dict[x_val] += [score_dict[y_metric]]
+                    x_dict[x_val][ek] = score_dict[y_metric]
         # import ipdb; ipdb.set_trace()
-        if len(x_dict) == 0:
+        if len(x_dict) == 0 or isinstance(score_dict[y_metric], dict):
             x_list = []
             y_list = []
+            y_std_list = []
         else:
-            x_list = np.array(list(x_dict.keys()))
-            y_list_raw = list(x_dict.values())
-            y_list_raw = [yy for yy in y_list_raw if len(yy) == len(exp_sublist)]
-            y_list_all = np.array(y_list_raw)
-            x_list = x_list[: len(y_list_all)]
-            if y_list_all.dtype == "object" or len(y_list_all) == 0:
-                x_list = []
-                y_list = []
-                y_std_list = []
+            counts = {}
+            for v in x_dict.values():
+                for k in v:
+                    if k not in counts:
+                        counts[k] = 0
+                    counts[k] += 1
+
+            # interpolate
+            xx_yy = {xx: list(yy.values()) for xx, yy in x_dict.items() if len(yy) == len(exp_sublist)}
+            if len(np.unique([v in counts.values()])) == 1 and len(xx_yy) != len(sub_score_list):
+                y_list_all = []
+                x_list = np.array(list(x_dict.keys()))
+                for k in counts.keys():
+                    xp_fp = {i: j[k] for i, j in x_dict.items() if k in j}
+                    y_list_all += [np.interp(x_list, list(xp_fp.keys()), list(xp_fp.values()))]
+                y_list_all = np.vstack(y_list_all).T
+                # print()
             else:
-                if plot_confidence:
-                    y_std_list = np.std(y_list_all, axis=1)
-                else:
-                    y_std_list = 0
-                y_list = np.mean(y_list_all, axis=1)
+                y_list_all = np.array(list(xx_yy.values()))
+                x_list = np.array(list(xx_yy.keys()))
+
+            if plot_confidence:
+                y_std_list = np.std(y_list_all, axis=1)
+            else:
+                y_std_list = 0
+            y_list = np.mean(y_list_all, axis=1)
 
     if x_cumsum:
         x_list = np.cumsum(x_list)
