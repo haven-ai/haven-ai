@@ -506,6 +506,7 @@ def get_result_dict(
             if len(np.unique([v in counts.values()])) == 1 and len(xx_yy) != len(sub_score_list):
                 y_list_all = []
                 x_list = np.array(list(x_dict.keys()))
+                x_list.sort()
                 for k in counts.keys():
                     xp_fp = {i: j[k] for i, j in x_dict.items() if k in j}
                     y_list_all += [np.interp(x_list, list(xp_fp.keys()), list(xp_fp.values()))]
