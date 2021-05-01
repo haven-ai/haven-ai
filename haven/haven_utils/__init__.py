@@ -428,7 +428,10 @@ def time_to_montreal(fname=None, timezone="US/Eastern"):
     """
     # Get time
     os.environ["TZ"] = timezone
-    time.tzset()
+    try:
+        time.tzset()
+    except:
+        pass
     if fname:
         tstamp = os.path.getctime(fname)
     else:
