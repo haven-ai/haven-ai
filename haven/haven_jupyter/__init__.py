@@ -181,7 +181,7 @@ def create_jupyter(
     print("Jupyter")
 
     if create_notebook and (overwrite or not os.path.exists(fname)):
-        cells = [main_cell(savedir_base), install_cell()]
+        cells = [main_cell(savedir_base), sub_cell(savedir_base), install_cell()]
         os.makedirs(os.path.dirname(fname), exist_ok=True)
         save_ipynb(fname, cells)
         print("- saved:", fname)
@@ -205,6 +205,38 @@ def create_jupyter(
             print("a jupyter server can be started using the script in https://github.com/ElementAI/haven .")
 
 
+def sub_cell():
+    script = """
+# get table 
+rm.get_score_df().head()
+
+# get custom plots
+fig = rm.get_plot_all(
+                # order='metrics_by_groups',
+                # avg_across='runs',
+                # y_metric_list =  ['train_loss'], 
+                # x_metric='epoch',
+                # legend_fontsize=18,
+                # x_fontsize=20,
+                # y_fontsize=20,
+                # xtick_fontsize=20,
+                # ytick_fontsize=20,
+                # title_fontsize=24,
+                # legend_list=['model], 
+                # title_list = ['dataset'], 
+                # title_format='Dataset:{}',
+                # log_metric_list = ['train_loss'], 
+                # groupby_list = ['dataset'],
+                # map_ylabel_list=[{'train_loss':'Train loss'}],
+                # map_xlabel_list=[{'epoch':'Epoch'}],
+                # figsize=(15,5),
+                # plot_confidence=False,
+                # savedir_plots='%s' % (name)
+)
+          """
+    return script
+
+
 def main_cell(savedir_base):
     script = (
         """
@@ -216,9 +248,20 @@ from haven import haven_utils as hu
 savedir_base = '%s'
 exp_list = None
 
+# get experiments from the exp config
+exp_config_fname = None
+if exp_config_fname:
+    config = hu.load_py(exp_config_fname)
+    exp_list = []
+    for exp_group in [
+        "example"
+                    ]:
+        exp_list += config.EXP_GROUPS[exp_group]
+
 # filter exps
-# e.g. filterby_list =[{'dataset':'mnist'}] gets exps with mnist
+
 filterby_list = None
+# filterby_list =[{'dataset':'mnist'}]
 
 # get experiments
 rm = hr.ResultManager(exp_list=exp_list,
@@ -228,11 +271,16 @@ rm = hr.ResultManager(exp_list=exp_list,
                       exp_groups=None
                      )
 
-# launch dashboard
-# make sure you have 'widgetsnbextension' enabled;
-# otherwise see README.md in https://github.com/ElementAI/haven
+# specify display parameters
 
-hj.get_dashboard(rm, vars(), wide_display=True)
+# groupby_list = ['dataset']
+# title_list = ['dataset']
+# legend_list = ['model']
+# y_metrics = ['train_loss']
+# x_metric = 'epoch'
+
+# launch dashboard
+hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
           """
         % savedir_base
     )
