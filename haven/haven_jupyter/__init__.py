@@ -171,20 +171,19 @@ def launch_jupyter():
     print()
 
 
-def create_jupyter(
-    fname="example.ipynb",
-    savedir_base="<path_to_saved_experiments>",
+def create_jupyter_file(
+    fname,
+    savedir_base,
     overwrite=False,
     print_url=False,
-    create_notebook=True,
 ):
-    print("Jupyter")
 
-    if create_notebook and (overwrite or not os.path.exists(fname)):
-        cells = [main_cell(savedir_base), sub_cell(savedir_base), install_cell()]
-        os.makedirs(os.path.dirname(fname), exist_ok=True)
+    if overwrite or not os.path.exists(fname):
+        cells = [main_cell(savedir_base), sub_cell(), install_cell()]
+        if os.path.dirname(fname) != "":
+            os.makedirs(os.path.dirname(fname), exist_ok=True)
         save_ipynb(fname, cells)
-        print("- saved:", fname)
+        print("> Open %s to visualize results" % fname)
 
     if print_url:
         from notebook import notebookapp

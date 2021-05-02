@@ -5,6 +5,7 @@ import pandas as pd
 import pprint
 
 from . import haven_utils as hu
+from . import haven_jupyter as hj
 import numpy as np
 
 
@@ -104,7 +105,7 @@ def run_wizard(
         if len(results_fname):
             if ".ipynb" not in results_fname:
                 raise ValueError(".ipynb should be the file extension")
-            create_jupyter_file(fname=results_fname, savedir_base=savedir_base)
+            hj.create_jupyter_file(fname=results_fname, savedir_base=savedir_base)
 
     # Run experiments
     # ===============
@@ -172,56 +173,6 @@ def run_wizard(
 
         print(command)
         jm.launch_menu(command=command, in_parallel=use_threads)
-
-
-def create_jupyter_file(fname, savedir_base):
-    if not os.path.exists(fname):
-        cells = [main_cell(savedir_base)]
-        save_ipynb(fname, cells)
-        print("> Open %s to visualize results" % fname)
-
-
-def save_ipynb(fname, script_list):
-    import nbformat as nbf
-
-    nb = nbf.v4.new_notebook()
-    nb["cells"] = [nbf.v4.new_code_cell(code) for code in script_list]
-    with open(fname, "w") as f:
-        nbf.write(nb, f)
-
-
-def main_cell(savedir_base):
-    script = (
-        """
-from haven import haven_jupyter as hj
-from haven import haven_results as hr
-from haven import haven_utils as hu
-
-# path to where the experiments got saved
-savedir_base = '%s'
-exp_list = None
-
-# filter exps
-# e.g. filterby_list =[{'dataset':'mnist'}] gets exps with mnist
-filterby_list = None
-
-# get experiments
-rm = hr.ResultManager(exp_list=exp_list,
-                      savedir_base=savedir_base,
-                      filterby_list=filterby_list,
-                      verbose=0,
-                      exp_groups=None
-                     )
-
-# launch dashboard
-# make sure you have 'widgetsnbextension' enabled;
-# otherwise see README.md in https://github.com/haven-ai/haven-ai
-
-hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
-          """
-        % savedir_base
-    )
-    return script
 
 
 def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp_id=False, verbose=True):
@@ -357,24 +308,4 @@ def get_checkpoint(savedir, return_model_state_dict=False):
     if return_model_state_dict:
         if os.path.exists(model_state_dict_fname):
             chk_dict["model_state_dict"] = hu.torch_load(model_state_dict_fname)
-    return chk_dict
-
-
-def create_jupyter(savedir, return_model_state_dict=False):
-    chk_dict = {}
-
-    # score list
-    score_list_fname = os.path.join(savedir, "score_list.pkl")
-    score_list = hu.load_pkl(score_list_fname)
-
-    chk_dict["score_list"] = score_list
-    if len(score_list) == 0:
-        chk_dict["epoch"] = 0
-    else:
-        chk_dict["epoch"] = score_list[-1]["epoch"] + 1
-
-    if return_model_state_dict:
-        model_state_dict_fname = os.path.join(savedir, "model.pth")
-        chk_dict["model_state_dict"] = hu.torch_load(model_state_dict_fname)
-
     return chk_dict

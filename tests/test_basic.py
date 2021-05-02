@@ -9,7 +9,7 @@ import os
 import torch
 import shutil
 
-
+from haven import haven_wizard as hw
 from haven import haven_jupyter as hj
 from haven import haven_img as hi
 from haven import haven_utils as hu
@@ -410,11 +410,22 @@ def test_avg_runs():
 
 
 def test_wizard():
-    print()
+    savedir_base = ".tmp"
+
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[{"lr": 1e-3}],
+        savedir_base=savedir_base,
+        reset=0,
+        results_fname=f"{savedir_base}/results.ipynb",
+    )
+
+    shutil.rmtree(".tmp")
 
 
-def test_trainval():
-    print()
+def test_trainval(exp_dict, savedir, args):
+    assert isinstance(exp_dict, dict)
+    assert isinstance(savedir, str)
 
 
 import argparse
@@ -426,6 +437,7 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
+        test_wizard()
         test_cartesian_product()
         test_hash()
         test_checkpoint()
