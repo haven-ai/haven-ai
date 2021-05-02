@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea
+results.ipynb
 .tmp
 eai-python-client/
 job_config.py

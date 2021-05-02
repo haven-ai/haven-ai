@@ -33,28 +33,34 @@ def trainval(exp_dict, savedir, args):
         score_dict = {"epoch": epoch, "acc": train_dict["train_acc"], "loss": train_dict["train_loss"]}
         chk_dict["score_list"] += [score_dict]
 
-        # Save Images and Checkpoint
-        images = model.vis_on_loader(train_loader)
-        hw.save_checkpoint(savedir, score_list=chk_dict["score_list"], images=[images])
+        # Save Checkpoint
+        hw.save_checkpoint(savedir, score_list=chk_dict["score_list"])
 
     print("Experiment done\n")
 
 
 if __name__ == "__main__":
-    # Define a list of experiments
-    exp_list = []
-    for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
-        exp_list += [{"lr": lr, "dataset": "syn", "model": "linear"}]
-
     # Specify arguments regarding save directory and job scheduler
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-sb", "--savedir_base", default=None, help="Define the base directory where the experiments will be saved."
+        "-e",
+        "--exp_group",
+        required=True,
+        help="Define the experiment group to run.",
+    )
+    parser.add_argument(
+        "-sb", "--savedir_base", required=True, help="Define the base directory where the experiments will be saved."
     )
     parser.add_argument("-r", "--reset", default=0, type=int, help="Reset or resume the experiment.")
     parser.add_argument("-j", "--job_scheduler", default=None, help="Choose Job Scheduler.")
 
     args, others = parser.parse_known_args()
+
+    # Define a list of experiments
+    if args.exp_group == "syn":
+        exp_list = []
+        for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
+            exp_list += [{"lr": lr, "dataset": "syn", "model": "linear"}]
 
     # Choose Job Scheduler
     if args.job_scheduler == "slurm":

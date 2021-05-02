@@ -6,61 +6,50 @@
 </p>
 
 
-### Motivation
+### Motivation (<a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Try the Google Colab</a>)
 
 Haven-AI a library that helps you easily turn your code base into an effective, large-scale machine learning toolkit. You will be able to launch thousands of experiments in parallel, visualize their results and status, and ensure that they are reliable, reproducible, and that the code base is modular to facilitate collaboration and easy integration of new models and datasets.
 
 The goal of this library is help you quickly and efficiently find solutions to machine learning problems, get papers accepted, and win at competitions.
 
-### Install
-
-Master:
-```
-pip install --upgrade git+https://github.com/haven-ai/haven-ai
-```
-
-Dev:
-```
-pip install --upgrade git+https://github.com/haven-ai/haven-ai@dev
-```
-
-    
 ## **Getting Started**
 
-- Run a minimal example with <a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Google Colab</a>.
+### 1. Install requirements
 
-- Run experiments in sequence: 
+`pip install --upgrade git+https://github.com/haven-ai/haven-ai` 
 
-```
-python trainval.py --savedir_base ../results -r 1
-```
+### 2. Train and Validate
 
-- Run experiments in parallel using **slurm** tested under **Compute Canada** servers:
-
-```
-python trainval.py --savedir_base ../results -r 1 -j slurm
+```python
+python trainval.py -e syn -sb results -r 1 -j None
 ```
 
-- Run experiments in parallel using **toolkit**:
+Argument Descriptions:
+```
+-e  [Experiment group to run like 'syn'] 
+-sb [Directory where the experiments are saved]
+-r  [Flag for whether to reset the experiments]
+-j  [Scheduler for launching the experiment like 'slurm, toolkit, gcp'. 
+     None for running them on local machine]
+```
 
-```
-python trainval.py --savedir_base ../results -r 1 -j toolkit
-```
+### 3. Visualize the Results
 
-- Run experiments in parallel using **Google Cloud Platform (GCP)**:
+Open `results.ipynb` for visualization.
 
-```
-To be added
-```
+<p align="center" width="100%">
+<img width="65%" src="docs/images/vis.gif">
+</p>
+
+
+### 4. Run experiments on the cluster
+
+- By defining the job scheduler to be slurm or toolkit for example, you get the following functionality.
 
 <p align="center" width="100%">
 <img width="65%" src="docs/images/ork2.gif">
 </p>
 
-- Visualize experiments by opening `results.ipynb` and get the following output.
-<p align="center" width="100%">
-<img width="65%" src="docs/images/vis.gif">
-</p>
 
 ## Structure
 
