@@ -498,3 +498,20 @@ def get_job_fname(savedir):
 
 def chunk_list(my_list, n=100):
     return [my_list[x : x + n] for x in range(0, len(my_list), n)]
+
+def launch_job(command, savedir_base, job_scheduler, job_config, reset=False):
+    exp_dict = {'command': command}
+        
+    jm = JobManager(
+            exp_list=[exp_dict],
+            savedir_base=savedir_base,
+            workdir=os.getcwd(),
+            job_config=job_config,
+            job_scheduler=job_scheduler,
+            save_logs=True,
+        )
+    
+    savedir = f'{savedir_base}/{hu.hash_dict(exp_dict)}'
+    job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)
+    
+    return job 
