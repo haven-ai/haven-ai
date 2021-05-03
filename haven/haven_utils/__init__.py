@@ -347,11 +347,18 @@ def copy_code(src_path, dst_path, verbose=1):
     os.makedirs(dst_path, exist_ok=True)
 
     # Define the command for copying the code using rsync
-    rsync_code = (
-        "rsync -av -r -q  --delete-before --exclude='.*' \
-                     --exclude '__pycache__/' %s %s"
-        % (src_path, dst_path)
-    )
+    if os.path.exists(os.path.join(src_path, ".havenignore")):
+        rsync_code = (
+            "rsync -av -r -q  --delete-before --exclude='.*'  --exclude-from=%s \
+                        --exclude '__pycache__/' %s %s"
+            % (os.path.join(src_path, ".havenignore"), src_path, dst_path)
+        )
+    else:
+        rsync_code = (
+            "rsync -av -r -q  --delete-before --exclude='.*' \
+                        --exclude '__pycache__/' %s %s"
+            % (src_path, dst_path)
+        )
 
     # Run the command in the terminal
     try:
