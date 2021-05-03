@@ -65,12 +65,12 @@ if __name__ == "__main__":
     # Choose Job Scheduler
     if args.job_scheduler == "slurm":
         import slurm_config
-
         job_config = slurm_config.JOB_CONFIG
+        
     elif args.job_scheduler == "toolkit":
         import job_configs
-
         job_config = job_configs.JOB_CONFIG
+        
     else:
         job_config = None
 
