@@ -210,7 +210,7 @@ def sub_cell():
 rm.get_score_df().head()
 
 # get latex 
-# print(rm.get_latex_table(legend=['dataset'], metrics=['train_loss'], caption="Results", label='tab:results'))
+# print(rm.get_latex_table(legend=['dataset'], metrics=['train_loss'], decimals=1, caption="Results", label='tab:results'))
 
 # get custom plots
 fig = rm.get_plot_all(
