@@ -209,6 +209,9 @@ def sub_cell():
 # get table 
 rm.get_score_df().head()
 
+# get latex 
+# print(rm.get_latex_table(legend=['dataset'], metrics=['train_loss'], caption="Results", label='tab:results'))
+
 # get custom plots
 fig = rm.get_plot_all(
                 # order='metrics_by_groups',

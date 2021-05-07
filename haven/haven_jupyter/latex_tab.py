@@ -28,10 +28,8 @@ def latex_tab(db, output):
 
     b_table = widgets.Button(description="Display Latex Table")
 
-    w_rows = wdg.SelectMultiple(header="Select Rows:", options=db.rm.exp_params, db_vars=db.vars, var="latex_rows")
-    w_cols = wdg.SelectMultiple(
-        header="Select Columns:", options=db.rm.score_keys, db_vars=db.vars, var="latex_columns"
-    )
+    w_rows = wdg.SelectMultiple(header="Legend", options=db.rm.exp_params, db_vars=db.vars, var="latex_rows")
+    w_cols = wdg.SelectMultiple(header="Metrics", options=db.rm.score_keys, db_vars=db.vars, var="latex_columns")
 
     button = widgets.VBox(
         [
@@ -50,7 +48,7 @@ def latex_tab(db, output):
         with output_plot:
             db.update_rm()
 
-            score_table = db.rm.get_latex_table(columns=w_cols.update(), rows=w_rows.update(), caption="Results")
+            score_table = db.rm.get_latex_table(legend=w_cols.update(), metrics=w_rows.update(), caption="Results")
             print(score_table)
 
     b_table.on_click(on_clicked)
