@@ -175,7 +175,7 @@ def test_get_result_manager():
     hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict), "exp_dict.json"), exp_dict)
 
     rm = hr.ResultManager(savedir_base=savedir_base)
-
+    rm.get_latex_table(legend=["dataset"], metrics=["acc"])
     # assert(len(rm.exp_groups) == 2)
     # for exp_list in rm.exp_groups:
     #     assert(exp_list[0]['dataset'] in ['mnist', 'cifar10'])
