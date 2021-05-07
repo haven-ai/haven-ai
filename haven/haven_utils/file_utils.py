@@ -110,6 +110,12 @@ def load_pkl(fname):
         return pickle.load(f)
 
 
+def append_pkl(fname, score_dict):
+    pkl = load_pkl(fname)
+    pkl += [score_dict]
+    save_pkl(fname, pkl)
+
+
 def save_pkl(fname, data, with_rename=True, makedirs=True):
     """Save data in pkl format.
 

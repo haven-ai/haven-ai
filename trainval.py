@@ -20,21 +20,21 @@ def trainval(exp_dict, savedir, args):
     model = he.get_model(name=exp_dict["model"], exp_dict=exp_dict)
 
     # Resume or initialize checkpoint
-    chk_dict = hw.get_checkpoint(savedir)
-    if "model_state_dict" in chk_dict and len(chk_dict["model_state_dict"]):
-        model.set_state_dict(chk_dict["model_state_dict"])
+    cm = hw.CheckpointManager(savedir)
+    state_dict = cm.load_model()
+    if state_dict is not None:
+        model.set_state_dict(state_dict)
 
     # Train and Validate
-    for epoch in tqdm.tqdm(range(chk_dict["epoch"], 3), desc="Running Experiment"):
+    for epoch in tqdm.tqdm(range(cm.get_epoch(), 3), desc="Running Experiment"):
         # Train for one epoch
         train_dict = model.train_on_loader(train_loader, epoch=epoch)
 
         # Get and save metrics
         score_dict = {"epoch": epoch, "acc": train_dict["train_acc"], "loss": train_dict["train_loss"]}
-        chk_dict["score_list"] += [score_dict]
 
         # Save Checkpoint
-        hw.save_checkpoint(savedir, score_list=chk_dict["score_list"])
+        cm.log_metrics(score_dict)
 
     print("Experiment done\n")
 
@@ -65,12 +65,14 @@ if __name__ == "__main__":
     # Choose Job Scheduler
     if args.job_scheduler == "slurm":
         import slurm_config
+
         job_config = slurm_config.JOB_CONFIG
-        
+
     elif args.job_scheduler == "toolkit":
         import job_configs
+
         job_config = job_configs.JOB_CONFIG
-        
+
     else:
         job_config = None
 

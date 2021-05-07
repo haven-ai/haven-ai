@@ -38,7 +38,7 @@ Argument Descriptions:
 Open `results.ipynb` for visualization.
 
 <p align="center" width="100%">
-<img width="65%" src="docs/images/vis.gif">
+<img width="65%" src="docs/vis.gif">
 </p>
 
 
@@ -47,7 +47,7 @@ Open `results.ipynb` for visualization.
 - By defining the job scheduler to be slurm or toolkit for example, you get the following functionality.
 
 <p align="center" width="100%">
-<img width="65%" src="docs/images/ork2.gif">
+<img width="65%" src="docs/ork2.gif">
 </p>
 
 

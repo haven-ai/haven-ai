@@ -1,5 +1,6 @@
 import os
 import sys
+import torch
 import argparse
 import pandas as pd
 import pprint
@@ -217,25 +218,32 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
     return savedir
 
 
-class Checkpointer:
-    def __init__(self, savedir, return_model_state_dict=False, verbose=True):
+class CheckpointManager:
+    def __init__(self, savedir, verbose=True):
         self.savedir = savedir
         self.verbose = verbose
-        self.chk_dict = get_checkpoint(savedir, return_model_state_dict=return_model_state_dict)
+        self.chk_dict = get_checkpoint(savedir)
 
-    def save_checkpoint(
-        self, score_dict, score_list=None, model_state_dict=None, images=None, images_fname=None, fname_suffix=""
-    ):
+    def log_metrics(self, score_dict):
+        self.chk_dict["score_list"] += [score_dict]
+        hu.save_pkl(os.path.join(self.savedir, "score_list.pkl"), self.chk_dict["score_list"])
+        if self.verbose:
+            report(self.savedir, self.chk_dict["score_list"])
 
-        save_checkpoint(
-            savedir,
-            score_list,
-            model_state_dict=model_state_dict,
-            images=images,
-            images_fname=images_fname,
-            fname_suffix=fname_suffix,
-            verbose=self.verbose,
-        )
+    def load_model(self):
+        fname = os.path.join(self.savedir, "model.pth")
+        if os.path.exists(fname):
+            return torch.load(fname)
+        else:
+            return None
+
+    def save_model(state_dict):
+        hu.torch_save(os.path.join(self.savedir, "model.pth"), state_dict)
+
+    def get_epoch(self):
+        if len(self.chk_dict["score_list"]) == 0:
+            return 0
+        return self.chk_dict["score_list"][-1]["epoch"] + 1
 
 
 def save_checkpoint(
@@ -243,18 +251,7 @@ def save_checkpoint(
 ):
     # Report
     if verbose:
-        exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
-
-        print("\nExp id: %s" % hu.hash_dict(exp_dict))
-
-        print("\nHyperparameters:\n" + "-" * 16)
-        # print(pd.DataFrame([exp_dict]).to_string(index=False))
-        pprint.pprint(exp_dict)
-        print("\nMetrics:\n" + "-" * 8)
-        score_df = pd.DataFrame(score_list)
-        print(score_df.tail().to_string(index=False), "\n")
-
-        print("Save directory: %s" % savedir)
+        report(savedir, score_list)
 
     # save score_list
     score_list_fname = os.path.join(savedir, "score_list%s.pkl" % fname_suffix)
@@ -285,6 +282,21 @@ def save_checkpoint(
         #     print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
 
     print("=" * 100)
+
+
+def report(savedir, score_list):
+    exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
+
+    print("\nExp id: %s" % hu.hash_dict(exp_dict))
+
+    print("\nHyperparameters:\n" + "-" * 16)
+    # print(pd.DataFrame([exp_dict]).to_string(index=False))
+    pprint.pprint(exp_dict)
+    print("\nMetrics:\n" + "-" * 8)
+    score_df = pd.DataFrame(score_list)
+    print(score_df.tail().to_string(index=False), "\n")
+
+    print("Save directory: %s" % savedir)
 
 
 def get_checkpoint(savedir, return_model_state_dict=False):
