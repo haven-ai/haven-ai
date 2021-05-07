@@ -245,6 +245,18 @@ class CheckpointManager:
             return 0
         return self.chk_dict["score_list"][-1]["epoch"] + 1
 
+    def save_pkl(self, fname, data):
+        hu.save_pkl(os.path.join(self.savedir, fname), data)
+
+    def load_pkl(self, fname, data):
+        hu.load_pkl(os.path.join(self.savedir, fname))
+
+    def save_torch(self, fname, data):
+        hu.torch_save(os.path.join(self.savedir, fname), data)
+
+    def load_torch(self, fname, data):
+        torch.load(os.path.join(self.savedir, fname))
+
 
 def save_checkpoint(
     savedir, score_list, model_state_dict=None, images=None, images_fname=None, fname_suffix="", verbose=True

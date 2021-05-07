@@ -30,11 +30,12 @@ def trainval(exp_dict, savedir, args):
         # Train for one epoch
         train_dict = model.train_on_loader(train_loader, epoch=epoch)
 
-        # Get and save metrics
+        # Get Metrics
         score_dict = {"epoch": epoch, "acc": train_dict["train_acc"], "loss": train_dict["train_loss"]}
 
-        # Save Checkpoint
+        # Save Metrics and Model
         cm.log_metrics(score_dict)
+        cm.save_torch("model.pth", model.state_dict())
 
     print("Experiment done\n")
 
