@@ -489,7 +489,7 @@ def get_result_dict(
 
                     x_dict[x_val][ek] = score_dict[y_metric]
         # import ipdb; ipdb.set_trace()
-        if len(x_dict) == 0 or isinstance(score_dict[y_metric], dict):
+        if len(x_dict) == 0 or isinstance(x_dict[x_val][ek], dict):
             x_list = []
             y_list = []
             y_std_list = []
