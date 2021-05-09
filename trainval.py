@@ -64,19 +64,19 @@ if __name__ == "__main__":
             exp_list += [{"lr": lr, "dataset": "syn", "model": "linear"}]
 
     # Choose Job Scheduler
-    if args.job_scheduler == "slurm":
-        import slurm_config
-
-        job_config = slurm_config.JOB_CONFIG
+    if args.job_scheduler is None:
+        job_config = None
+        
+    elif args.job_scheduler == "slurm":
+        job_config = {"account_id": "def-dnowrouz-ab",
+                      "time": "1:00:00",
+                      "cpus-per-task": "2",
+                      "mem-per-cpu": "20G",
+                      "gres": "gpu:1"}
 
     elif args.job_scheduler == "toolkit":
-        import job_configs
-
-        job_config = job_configs.JOB_CONFIG
-
-    else:
-        job_config = None
-
+        job_config = {'account_id':account_id}
+        
     # Run experiments and create results file
     hw.run_wizard(
         func=trainval,
