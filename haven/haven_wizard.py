@@ -257,6 +257,13 @@ class CheckpointManager:
     def load_torch(self, fname, data):
         torch.load(os.path.join(self.savedir, fname))
 
+    def save_images(self, images):
+        if not isinstance(images, list):
+            images = [images]
+
+        for im in images:
+            hu.save_image(os.path.join(self.savedir, "images", f"{i}.jpg"), im)
+
 
 def save_checkpoint(
     savedir, score_list, model_state_dict=None, images=None, images_fname=None, fname_suffix="", verbose=True
