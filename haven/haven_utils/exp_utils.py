@@ -131,7 +131,7 @@ def hash_dict(exp_dict):
         else:
             v = exp_dict[k]
 
-        dict2hash += os.path.join(str(k), str(v))
+        dict2hash += str(k) + "/" + str(v)
 
     hash_id = hashlib.md5(dict2hash.encode()).hexdigest()
 
