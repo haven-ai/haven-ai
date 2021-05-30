@@ -37,6 +37,9 @@ def trainval(exp_dict, savedir, args):
         cm.log_metrics(score_dict)
         cm.save_torch("model.pth", model.state_dict())
 
+    if (args.gcloud_savedir is not None):
+        cm.upload_to_gcloud(args.gcloud_savedir)
+
     print("Experiment done\n")
 
 
@@ -46,6 +49,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-e",
         "--exp_group",
+        required=True,
         help="Define the experiment group to run.",
     )
     parser.add_argument(
@@ -76,6 +80,15 @@ if __name__ == "__main__":
 
     elif args.job_scheduler == "toolkit":
         job_config = {"account_id": account_id}
+
+    elif args.job_scheduler == "gcp":
+        job_config = {
+            "account_id": "",
+            "container_hostname": "gcr.io",
+            "project_id": "ai-platform-tutorial-313202",
+            "region": "northamerica-northeast1",
+            "gcloud_savedir": "gs://ai_platform_bucket"
+        }
 
     # Run experiments and create results file
     hw.run_wizard(

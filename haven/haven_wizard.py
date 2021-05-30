@@ -22,6 +22,7 @@ def get_args():
     parser.add_argument(
         "-j", "--job_scheduler", default=None, type=str, help="Run the experiments as jobs in the cluster."
     )
+    parser.add_argument("-gc", "--gcloud_savedir", default=None, type=str, help="Define the gcloud directory where the experiments will be saved.")
 
     args, others = parser.parse_known_args()
 
@@ -264,6 +265,9 @@ class CheckpointManager:
         for im in images:
             hu.save_image(os.path.join(self.savedir, "images", f"{i}.jpg"), im)
 
+    def upload_to_gcloud(self, gcloud_savedir):
+        command = "gsutil cp -r %s %s" % ("results", gcloud_savedir)
+        hu.subprocess_call(command)
 
 def save_checkpoint(
     savedir, score_list, model_state_dict=None, images=None, images_fname=None, fname_suffix="", verbose=True

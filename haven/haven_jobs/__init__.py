@@ -57,6 +57,7 @@ class JobManager:
         self.savedir_base = savedir_base
         self.account_id = account_id
         self.save_logs = save_logs
+        self.job_scheduler = job_scheduler
 
         # define funcs
         if job_scheduler == "toolkit":
@@ -67,6 +68,12 @@ class JobManager:
 
         elif job_scheduler == "slurm":
             from . import slurm_manager as ho
+
+            self.ho = ho
+            self.api = None
+        
+        elif job_scheduler == "gcp":
+            from . import gcp_manager as ho
 
             self.ho = ho
             self.api = None
@@ -160,6 +167,9 @@ class JobManager:
             if len(exp_list) == 0:
                 print("All experiments have ran.")
                 return
+
+            if self.job_scheduler == "gcp":
+                self.job_config = self.ho.setup_image(self.job_config)
 
             for e_list in chunk_list(exp_list, n=100):
                 self.launch_exp_list(command=command, exp_list=e_list, reset=0, in_parallel=in_parallel)
