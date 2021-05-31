@@ -49,7 +49,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "-e",
         "--exp_group",
-        required=True,
         help="Define the experiment group to run.",
     )
     parser.add_argument(
@@ -61,6 +60,7 @@ if __name__ == "__main__":
     args, others = parser.parse_known_args()
 
     # Define a list of experiments
+    exp_list = None
     if args.exp_group == "syn":
         exp_list = []
         for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
