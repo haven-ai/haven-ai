@@ -4,6 +4,7 @@ from .. import haven_chk as hc
 import time
 import os
 from subprocess import SubprocessError
+import json
 
 
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
@@ -35,17 +36,22 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
 
 
 def get_job(api, job_id):
-    # todo: handle exception
-    command = "gcloud ai-platform jobs describe %s" % (job_id)
-    job_info = hu.subprocess_call(command)
-    return job_info
+    job_info = get_jobs_dict(api, [job_id])
+    return job_info[job_id]
 
 
 def get_jobs_dict(api, job_id_list, query_size=20):
-    # todo: use --filter and --format for easier string processing
-    command = "gcloud ai-platform jobs list"
+    job_id_list = ",".join(job_id_list)
+    command = "gcloud ai-platform jobs list --filter=JOB_ID=(%s) --format=json(jobId,state) --limit=%s" % (job_id_list, str(query_size))
     job_info = hu.subprocess_call(command)
-    pass
+    job_info = json.loads(job_info)
+    temp = {}
+    for i in job_info:
+        i["job_id"] = i.pop("jobId")
+        i["runs"] = []
+        temp[i["job_id"]] = i
+    job_info = temp
+    return job_info
 
 
 def kill_job(api, job_id):
