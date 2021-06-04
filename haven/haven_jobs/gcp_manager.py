@@ -18,7 +18,7 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
         job_name = "%s_%s" % (job_config["project_id"], time.strftime("%Y%m%d_%H%M%S"))
         job_name = ''.join(list(map(lambda c: c if c.isalnum() else '_', job_name)))
 
-        # hardcoding the savedir in container to /root/results
+        # the savedir in container is always /root/results
         tokens = str.split(command)[2:]
         sb_idx = tokens.index('-sb' if '-sb' in tokens else '--savedir_base')
         tokens[sb_idx + 1] = 'results'
@@ -31,31 +31,65 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
         return job_name
 
     except SubprocessError as e:
-        # todo: fix the output?
-        raise SystemExit(e.output)
+        raise SystemExit(str(e.output))
 
 
 def get_job(api, job_id):
-    job_info = get_jobs_dict(api, [job_id])
-    return job_info[job_id]
+    job_info = get_jobs_dict(api, [job_id])[job_id]
+    job_info['job_id'] = job_id
+    return job_info
+
+
+def get_jobs(api, account_id):
+    # use the default logged in account
+    command = "gcloud ai-platform jobs list --format='json(jobId,state)'"
+    job_info = hu.subprocess_call(command)
+    job_info = json.loads(job_info)
+    result = []
+    for i in job_info:
+        i["job_id"] = i.pop("jobId")
+        i["runs"] = []
+        result.append(i)
+    return result
 
 
 def get_jobs_dict(api, job_id_list, query_size=20):
     job_id_list = ",".join(job_id_list)
-    command = "gcloud ai-platform jobs list --filter=JOB_ID=(%s) --format=json(jobId,state) --limit=%s" % (job_id_list, str(query_size))
+    command = "gcloud ai-platform jobs list --filter='JOB_ID=(%s)' --format='json(jobId,state)' --limit='%s'" % (
+        job_id_list, str(query_size))
     job_info = hu.subprocess_call(command)
     job_info = json.loads(job_info)
     temp = {}
     for i in job_info:
-        i["job_id"] = i.pop("jobId")
+        job_id = i.pop("jobId")
         i["runs"] = []
-        temp[i["job_id"]] = i
+        temp[job_id] = i
     job_info = temp
     return job_info
 
 
 def kill_job(api, job_id):
-    pass
+    """Kill a job job until it is dead."""
+    job = get_job(api, job_id)
+
+    if job["state"] in ["CANCELLED", "CANCELLING", "SUCCEEDED", "FAILED"]:
+        print("%s is already dead" % job_id)
+    else:
+        kill_command = "gcloud ai-platform jobs cancel %s" % (job_id)
+        while True:
+            try:
+                hu.subprocess_call(kill_command)
+                print("%s CANCELLING..." % job_id)
+            except Exception as e:
+                # todo
+                print(str(e.output))
+            break
+
+        # confirm cancelled
+        job = get_job(api, job_id)
+        if job["state"] == "CANCELLED":
+            print("%s now is dead." % job_id)
+
 
 
 def setup_image(job_config, savedir_base, exp_list):
@@ -100,4 +134,4 @@ def setup_image(job_config, savedir_base, exp_list):
         return job_config
 
     except SubprocessError as e:
-        raise SystemExit(e)
+        raise SystemExit(str(e.output))

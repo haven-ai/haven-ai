@@ -139,7 +139,7 @@ def kill_job(api, job_id):
                 hu.subprocess_call(kill_command)
                 print("%s CANCELLING..." % job_id)
             except Exception as e:
-                if "Socket timed out" in str(e):
+                if "Socket timed out" in str(e.output):
                     print("scancel time out and retry now")
                     time.sleep(1)
                     continue
