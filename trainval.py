@@ -65,6 +65,8 @@ if __name__ == "__main__":
         exp_list = []
         for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
             exp_list += [{"lr": lr, "dataset": "syn", "model": "linear"}]
+    elif args.exp_group == "mnist":
+        exp_list = exp_list = [{"dataset": "mnist", "model": "mlp", "lr": lr} for lr in [1e-1]]
 
     # Choose Job Scheduler
     job_config = None
@@ -86,8 +88,11 @@ if __name__ == "__main__":
             "account_id": "",
             "container_hostname": "gcr.io",
             "project_id": "ai-platform-tutorial-313202",
+            "gcloud_savedir": "gs://ai_platform_bucket",
             "region": "northamerica-northeast1",
-            "gcloud_savedir": "gs://ai_platform_bucket"
+            # "scale-tier": "custom",
+            # "master-machine-type": "n1-standard-4",
+            # "master-accelerator": "count=1,type=nvidia-tesla-p4"
         }
 
     # Run experiments and create results file

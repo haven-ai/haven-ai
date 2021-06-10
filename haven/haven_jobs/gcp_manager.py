@@ -6,15 +6,13 @@ import os
 from subprocess import SubprocessError
 import json
 
+# todo: if jobs fail, need to get the log from logging with correct permission. triger in ResultManager?
+# get log: gcloud logging read "resource.labels.job_id={job_id} AND severity=ERROR" --format="json(jsonPayload.message)"
 
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
-    # assume Dockerfile exist, actually all jobs share the same image, no need to build so many time..
-    # todo: handle exception
 
-    # todo: probably need to fix the account_id and current project things...
-    # todo: fix the data stuff!! may need to fetch data from the cloud
+    # todo: fix the data stuff!! cp to image, done in image prep
     try:
-        # todo: better choice of job_name?
         job_name = "%s_%s" % (job_config["project_id"], time.strftime("%Y%m%d_%H%M%S"))
         job_name = ''.join(list(map(lambda c: c if c.isalnum() else '_', job_name)))
 
@@ -22,16 +20,24 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
         tokens = str.split(command)[2:]
         sb_idx = tokens.index('-sb' if '-sb' in tokens else '--savedir_base')
         tokens[sb_idx + 1] = 'results'
-        attributes = " ".join(tokens)
+        haven_attr = " ".join(tokens)
+        haven_attr += " -gc %s" % (job_config["gcloud_savedir"])
 
-        submit_job_command = "gcloud ai-platform jobs submit training %s --region %s --master-image-uri %s -- %s -gc %s" % (
-            job_name, job_config["region"], job_config["container_tag"], attributes, job_config["gcloud_savedir"])
+        gcp_attr = ""
+        for key in list(job_config.keys()):
+            # skip gcp_manager attr
+            if key in ["account_id", "gcloud_savedir", "container_hostname", "project_id"]:
+                continue
+            gcp_attr += " --%s %s" % (key, job_config[key])
+
+        submit_job_command = "gcloud ai-platform jobs submit training %s %s -- %s" % (
+            job_name, gcp_attr, haven_attr)
 
         hu.subprocess_call(submit_job_command)
         return job_name
 
     except SubprocessError as e:
-        raise SystemExit(str(e.output))
+        raise SystemExit(e.output.decode('utf-8'))
 
 
 def get_job(api, job_id):
@@ -81,7 +87,7 @@ def kill_job(api, job_id):
                 hu.subprocess_call(kill_command)
                 print("%s CANCELLING..." % job_id)
             except Exception as e:
-                # todo
+                # todo: not properly handled
                 print(str(e.output))
             break
 
@@ -89,7 +95,6 @@ def kill_job(api, job_id):
         job = get_job(api, job_id)
         if job["state"] == "CANCELLED":
             print("%s now is dead." % job_id)
-
 
 
 def setup_image(job_config, savedir_base, exp_list):
@@ -100,14 +105,15 @@ def setup_image(job_config, savedir_base, exp_list):
         image_id = hu.subprocess_call(generate_docker_image).strip()
 
         # copy exp_dict.json files to the image
+        temp_folder = os.path.join(savedir_base, 'temp')
         for exp_dict in exp_list:
-            savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
+            savedir = os.path.join(temp_folder, hu.hash_dict(exp_dict))
             fname_exp_dict = os.path.join(savedir, "exp_dict.json")
             hu.save_json(fname_exp_dict, exp_dict)
         create_container = "docker create %s" % (image_id)
         container_id = hu.subprocess_call(create_container).strip()
 
-        copy_to_container = "docker cp %s/. %s:/root/results" % (savedir_base, container_id)
+        copy_to_container = "docker cp %s/. %s:/root/results" % (temp_folder, container_id)
         hu.subprocess_call(copy_to_container)
 
         commit_container = "docker commit %s" % (container_id)
@@ -119,6 +125,7 @@ def setup_image(job_config, savedir_base, exp_list):
         tag_image = "docker tag '%s' '%s'" % (new_image_id, registry_path)
         hu.subprocess_call(tag_image)
 
+        print("Pushing the docker image to google cloud...")
         # uppload the image to the container registry
         upload_iamge = "docker push '%s'" % (registry_path)
         hu.subprocess_call(upload_iamge)
@@ -128,10 +135,12 @@ def setup_image(job_config, savedir_base, exp_list):
         hu.subprocess_call(delete_container)
         delete_image = "docker rmi -f %s" % (new_image_id)
         hu.subprocess_call(delete_image)
+        delete_temp_folder = "rm -rf %s" % (temp_folder)
+        hu.subprocess_call(delete_temp_folder)
 
         # add the image name to job_config
-        job_config["container_tag"] = registry_path
+        job_config["master-image-uri"] = registry_path
         return job_config
 
     except SubprocessError as e:
-        raise SystemExit(str(e.output))
+        raise SystemExit(e.output.decode('utf-8'))

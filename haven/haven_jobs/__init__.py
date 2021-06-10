@@ -151,6 +151,10 @@ class JobManager:
 
         elif option == "reset":
             self.verbose = False
+            
+            if self.job_scheduler == "gcp":
+                self.job_config = self.ho.setup_image(self.job_config, self.savedir_base, exp_list)
+
             for e_list in chunk_list(exp_list, n=100):
                 self.launch_exp_list(command=command, exp_list=e_list, reset=1, in_parallel=in_parallel)
 
