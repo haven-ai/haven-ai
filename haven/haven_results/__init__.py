@@ -45,6 +45,7 @@ class ResultManager:
         account_id=None,
         job_scheduler="toolkit",
         topk_tuple=None,
+        gcloud_dir=None
     ):
         """[summary]
 
@@ -155,10 +156,22 @@ class ResultManager:
             for exp_dict in self.exp_list_all:
                 exp_dict[mode_key] = 1
 
+        # gcp manager downloads results form cloud
+        if self.job_scheduler == 'gcp' and gcloud_dir is not None:
+            # todo: gcloud_dir will be lost if update_rm()
+            jm = hjb.JobManager(
+                exp_list=exp_list,
+                savedir_base=self.savedir_base,
+                account_id=self.account_id,
+                job_scheduler=job_scheduler
+            )
+            jm.ho.download_results(self.exp_list_all, self.savedir_base, gcloud_dir)
+
         _, self.exp_params, self.score_keys = self.get_score_df(
             flatten_columns=True, show_meta=False, return_columns=True, show_max_min=False
         )
         self.exp_groups["all"] = copy.deepcopy(self.exp_list_all)
+
 
     def get_state_dict(self):
         pass

@@ -5,6 +5,7 @@ import os
 from haven import haven_examples as he
 from haven import haven_wizard as hw
 from haven import haven_results as hr
+from haven import haven_utils as hu
 
 
 def trainval(exp_dict, savedir, args):
@@ -37,8 +38,10 @@ def trainval(exp_dict, savedir, args):
         cm.log_metrics(score_dict)
         cm.save_torch("model.pth", model.state_dict())
 
+    # gcp_manager saving
     if (args.gcloud_savedir is not None):
-        cm.upload_to_gcloud(args.gcloud_savedir)
+        hash_code = hu.hash_dict(exp_dict)
+        cm.upload_to_gcloud(args.gcloud_savedir, hash_code)
 
     print("Experiment done\n")
 
@@ -65,9 +68,7 @@ if __name__ == "__main__":
         exp_list = []
         for lr in [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]:
             exp_list += [{"lr": lr, "dataset": "syn", "model": "linear"}]
-    elif args.exp_group == "mnist":
-        exp_list = exp_list = [{"dataset": "mnist", "model": "mlp", "lr": lr} for lr in [1e-1]]
-
+ 
     # Choose Job Scheduler
     job_config = None
 

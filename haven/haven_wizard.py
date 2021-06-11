@@ -265,8 +265,8 @@ class CheckpointManager:
         for im in images:
             hu.save_image(os.path.join(self.savedir, "images", f"{i}.jpg"), im)
 
-    def upload_to_gcloud(self, gcloud_savedir):
-        command = "gsutil cp -r %s %s" % ("results", gcloud_savedir)
+    def upload_to_gcloud(self, gcloud_savedir, hash_code):
+        command = "gsutil cp -r %s %s" % (os.path.join("results", hash_code), gcloud_savedir)
         hu.subprocess_call(command)
 
 def save_checkpoint(

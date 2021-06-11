@@ -429,11 +429,18 @@ class JobManager:
                     # Logs info
                     if job["state"] == "FAILED":
                         logs_fname = os.path.join(savedir, "err.txt")
+                        if self.job_scheduler == "gcp":
+                            serverity = "ERROR"
+                            
                     else:
                         logs_fname = os.path.join(savedir, "logs.txt")
-
+                        if self.job_scheduler == "gcp":
+                            serverity = "INFO"
+                            
                     if os.path.exists(logs_fname):
                         result_dict["logs"] = hu.read_text(logs_fname)[-max_lines:]
+                    elif self.job_scheduler == "gcp":
+                        result_dict["logs"] = self.ho.download_log(job_id, serverity)
 
             summary_list += [result_dict]
 

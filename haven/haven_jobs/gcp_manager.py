@@ -6,9 +6,6 @@ import os
 from subprocess import SubprocessError
 import json
 
-# todo: if jobs fail, need to get the log from logging with correct permission. triger in ResultManager?
-# get log: gcloud logging read "resource.labels.job_id={job_id} AND severity=ERROR" --format="json(jsonPayload.message)"
-
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
 
     # todo: fix the data stuff!! cp to image, done in image prep
@@ -144,3 +141,40 @@ def setup_image(job_config, savedir_base, exp_list):
 
     except SubprocessError as e:
         raise SystemExit(e.output.decode('utf-8'))
+
+
+def download_results(exp_list, savedir_base, gcloud_base):
+    # todo: low performance
+    for exp_dict in exp_list:
+        try:
+            hash_code = hu.hash_dict(exp_dict)
+            gcloud_dir = os.path.join(gcloud_base, 'results', hash_code)
+            savedir = os.path.join(savedir_base, hash_code)
+            save_command = "gsutil cp %s/score_list.pkl  %s" % (gcloud_dir, savedir)
+            hu.subprocess_call(save_command)
+        except SubprocessError as e:
+            # skip and print error message if file not found
+            print(e.output.decode('utf-8'))
+
+
+def download_all(exp_list, savedir_base, gcloud_base):
+    # todo: low performance
+    for exp_dict in exp_list:
+        try:
+            hash_code = hu.hash_dict(exp_dict)
+            gcloud_dir = os.path.join(gcloud_base, 'results', hash_code)
+            savedir = os.path.join(savedir_base, hash_code)
+            save_command = "gsutil cp %s/.  %s" % (gcloud_dir, savedir)
+            hu.subprocess_call(save_command)
+        except SubprocessError as e:
+            # skip and print error message if file not found
+            print(e.output.decode('utf-8'))
+
+
+def download_log(job_id, serverity):
+    # todo: low performance
+    command = 'gcloud logging read "resource.labels.job_id=%s AND severity=%s" --format="json(jsonPayload.message)"' % (job_id, serverity)
+    log = hu.subprocess_call(command)
+    log = json.loads(log)
+    return ''.join([s for s in [l['jsonPayload']['message'] for l in log if l] if s])
+    
