@@ -46,7 +46,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "-e",
         "--exp_group",
-        required=True,
         help="Define the experiment group to run.",
     )
     parser.add_argument(
@@ -86,4 +85,5 @@ if __name__ == "__main__":
         reset=args.reset,
         job_config=job_config,
         results_fname="results.ipynb",
+        args=args
     )
