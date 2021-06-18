@@ -1,19 +1,15 @@
-import copy
-import glob
 import os
-import sys
-import pprint
-from itertools import groupby
-from textwrap import wrap
 import numpy as np
-import pandas as pd
 import pylab as plt
-import tqdm
+import matplotlib._color_data as mcd
 
+from itertools import cycle
 
-from .. import haven_jobs as hjb
 from .. import haven_utils as hu
-from .. import haven_share as hd
+
+COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
+# COLORS += list(mcd.CSS4_COLORS)
+COLORS += list(mcd.XKCD_COLORS)
 
 
 def get_plot(
@@ -56,6 +52,7 @@ def get_plot(
     map_legend_list=dict(),
     xticks=None,
     random_marker=True,
+    show_legend_key=True,
 ):
     """Plots the experiment list in a single figure.
 
@@ -185,6 +182,7 @@ def get_plot(
     bar_count = 0
     visited_exp_ids = set()
     plot_idx = 0
+    color_cycle = cycle(COLORS)
     for exp_dict, style_dict in zip(exp_list, style_list):
         exp_id = hu.hash_dict(exp_dict)
         if exp_id in visited_exp_ids:
@@ -232,14 +230,13 @@ def get_plot(
             if plot_idx != 0:
                 show_legend_key = False
             else:
-                show_legend_key = True
+                show_legend_key = show_legend_key
             label = get_label(legend_list, exp_dict, format_str=legend_format, show_key=show_legend_key)
         else:
             label = exp_id
 
+        color = next(color_cycle)
         plot_idx += 1
-
-        color = None
 
         if random_marker:
             marker = np.random.choice(
@@ -489,7 +486,7 @@ def get_result_dict(
 
                     x_dict[x_val][ek] = score_dict[y_metric]
         # import ipdb; ipdb.set_trace()
-        if len(x_dict) == 0 or isinstance(x_dict[x_val][ek], dict):
+        if len(x_dict) == 0 or isinstance(list(x_dict[x_val].values())[0], dict):
             x_list = []
             y_list = []
             y_std_list = []

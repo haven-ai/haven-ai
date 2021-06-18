@@ -97,6 +97,7 @@ def save_image(
     makedirs=True,
     return_image=False,
     nrow=8,
+    bbox_yxyx=None,
 ):
     """Save an image into a file.
 

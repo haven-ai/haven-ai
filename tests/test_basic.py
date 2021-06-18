@@ -173,7 +173,9 @@ def test_get_result_manager():
 
     hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list.pkl"), score_list)
     hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict), "exp_dict.json"), exp_dict)
-
+    hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list_test.pkl"), score_list)
+    rm2 = hr.ResultManager(savedir_base=savedir_base, score_list_name="score_list_test.pkl")
+    assert len(rm2.get_score_lists()) == 1
     rm = hr.ResultManager(savedir_base=savedir_base)
     rm.get_latex_table(legend=["dataset"], metrics=["acc"])
     # assert(len(rm.exp_groups) == 2)
@@ -254,6 +256,31 @@ def test_group_exp_list():
     list_of_exp_list = hu.group_exp_list(exp_list, groupby_list="dataset")
     for exp_list in list_of_exp_list:
         assert len(set([exp_dict["dataset"] for exp_dict in exp_list])) == 1
+
+
+def test_hash():
+    exp_list = [
+        {
+            "batch_size": 64,
+            "dataset_directory": "/mnt/public/datasets2/softras/mesh_reconstruction",
+            "image_size": 64,
+            "lambda_flatten": 0.0005,
+            "lambda_laplacian": 0.005,
+            "learning_rate": 0.0001,
+            "lr_type": "step",
+            "model_directory": "/mnt/public/datasets2/softras/results/models",
+            "reset": 1,
+            "seed": 0,
+            "sigma_val": 0.0001,
+            "loss": [{"name": "base_ubl", "cheat": True}],
+            "n_train_ratio": 0.001,
+            "n_val_ratio": 0.1,
+            "epochs": 6000,
+            "version": 2,
+            "classes": ["Airplane"],
+        }
+    ]
+    assert hu.hash_dict(exp_list[0]) == "5a4dd8e6a694c732615b9829e9d2eddb"
 
 
 def test_get_best_exp_dict():
@@ -410,8 +437,23 @@ def test_avg_runs():
 
 
 def test_wizard():
+    import job_configs
+
     savedir_base = ".tmp"
 
+    # in cluster
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[{"lr": 1e-3}],
+        savedir_base=os.path.abspath(savedir_base),
+        reset=0,
+        results_fname=f"{savedir_base}/results.ipynb",
+        job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
+        job_option="run",
+    )
+
+    # not in cluster
     hw.run_wizard(
         func=test_trainval,
         exp_list=[{"lr": 1e-3}],
@@ -437,6 +479,7 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
+        test_hash()
         test_wizard()
         test_cartesian_product()
         test_hash()

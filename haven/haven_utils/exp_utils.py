@@ -119,7 +119,7 @@ def hash_dict(exp_dict):
         elif isinstance(exp_dict[k], dict):
             v = hash_dict(exp_dict[k])
         elif isinstance(exp_dict[k], tuple):
-            raise ValueError("tuples can't be hashed yet, consider converting tuples to lists")
+            raise ValueError(f"{exp_dict[k]} tuples can't be hashed yet, consider converting tuples to lists")
         elif isinstance(exp_dict[k], list) and len(exp_dict[k]) and isinstance(exp_dict[k][0], dict):
             v_str = ""
             for e in exp_dict[k]:
@@ -132,7 +132,6 @@ def hash_dict(exp_dict):
             v = exp_dict[k]
 
         dict2hash += str(k) + "/" + str(v)
-
     hash_id = hashlib.md5(dict2hash.encode()).hexdigest()
 
     return hash_id

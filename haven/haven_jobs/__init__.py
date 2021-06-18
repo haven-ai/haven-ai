@@ -108,7 +108,9 @@ class JobManager:
 
     # Main functions
     # --------------
-    def launch_menu(self, command=None, exp_list=None, get_logs=False, wait_seconds=3, in_parallel=True):
+    def launch_menu(
+        self, command=None, exp_list=None, get_logs=False, wait_seconds=3, in_parallel=True, job_option=None
+    ):
         exp_list = exp_list or self.exp_list
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
         summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
@@ -124,10 +126,12 @@ class JobManager:
             "  4)'kill' to kill the jobs.\n"
             "Type option: "
         )
+        if job_option is None:
+            option = input(prompt)
+        else:
+            option = job_option
 
-        option = input(prompt)
-
-        option_list = ["reset", "run", "status", "logs", "kill"]
+        option_list = ["reset", "run", "status", "logs", "kill", "ipdb"]
         if option not in option_list:
             raise ValueError("Prompt input has to be one of these choices %s" % option_list)
 

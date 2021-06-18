@@ -18,7 +18,7 @@ def get_args():
         "-sb", "--savedir_base", default=None, help="Define the base directory where the experiments will be saved."
     )
     parser.add_argument("-r", "--reset", default=0, type=int, help="Reset or resume the experiment.")
-    parser.add_argument("-ei", "--exp_id", default=None, help="Run a specific experiment based on its id.")
+    parser.add_argument("--exp_id", default=None, help="Run a specific experiment based on its id.")
     parser.add_argument(
         "-j", "--job_scheduler", default=None, type=str, help="Run the experiments as jobs in the cluster."
     )
@@ -60,6 +60,7 @@ def run_wizard(
     save_logs=True,
     filter_duplicates=False,
     results_fname=None,
+    job_option=None,
 ):
     if args is None:
         args = get_args()
@@ -113,11 +114,11 @@ def run_wizard(
     if job_scheduler is None:
         job_scheduler = args.job_scheduler
 
-    if job_scheduler in [None, "None", "0"]:
+    elif job_scheduler in [None, "None", "0"]:
         job_scheduler = None
 
     elif job_scheduler in ["toolkit", "slurm", "gcp"]:
-        job_scheduler = args.job_scheduler
+        job_scheduler = job_scheduler
 
     elif job_scheduler in ["1"]:
         job_scheduler = "toolkit"
@@ -161,7 +162,6 @@ def run_wizard(
             if k not in [
                 "savedir_base",
                 "sb",
-                "ei",
                 "exp_id",
                 "e",
                 "exp_group_list",
@@ -173,7 +173,7 @@ def run_wizard(
                 command += f" --{k} {v}"
 
         print(command)
-        jm.launch_menu(command=command, in_parallel=use_threads)
+        jm.launch_menu(command=command, in_parallel=use_threads, job_option=job_option)
 
 
 def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp_id=False, verbose=True):

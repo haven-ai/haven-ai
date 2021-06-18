@@ -1,14 +1,11 @@
+import pylab as plt
+
+plt.rcParams.update({"figure.max_open_warning": 0})
+
 import copy
-import glob
 import os
-import sys
-import pprint
-from itertools import groupby
-from textwrap import wrap
 import numpy as np
 import pandas as pd
-import pylab as plt
-import tqdm
 
 from .. import haven_jobs as hjb
 from .. import haven_utils as hu
@@ -17,8 +14,6 @@ from .tables_scores import *
 from .plots_line import *
 from .latex_tables import get_latex_table
 from . import images_fig
-
-# from . import tools
 
 
 def load_score(savedir_base, exp_dict, metric):
@@ -465,6 +460,21 @@ class ResultManager:
         summary_list = jm.get_summary_list(columns=columns, add_prefix=add_prefix)
 
         return summary_list
+
+    def kill_jobs(self, job_scheduler="toolkit", **kwargs):
+        """[summary]"""
+        exp_list = hu.filter_exp_list(
+            self.exp_list, self.filterby_list, savedir_base=self.savedir_base, verbose=self.verbose
+        )
+        jm = hjb.JobManager(
+            exp_list=exp_list,
+            savedir_base=self.savedir_base,
+            account_id=self.account_id,
+            job_scheduler=job_scheduler,
+            **kwargs
+        )
+
+        return jm.kill_jobs()
 
     def to_zip(self, savedir_base="", fname="tmp.zip", **kwargs):
         """[summary]

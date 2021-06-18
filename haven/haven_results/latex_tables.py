@@ -19,10 +19,11 @@ def get_latex_table(
     map_row_dict_dict=dict(),
     map_col_dict=dict(),
     decimals=None,
+    transposed=True,
     **kwargs
 ):
-    columns = metrics
-    rows = legend
+    columns = legend
+    rows = metrics
     # break it
     dicts = score_df.T.to_dict()
 
@@ -40,5 +41,8 @@ def get_latex_table(
                 metric_scores[k] = v
         dicts_new[legend_label] = metric_scores
 
-    df_new = pd.DataFrame(dicts_new).T
+    df_new = pd.DataFrame(dicts_new)
+    if transposed:
+        df_new = df_new.T
+
     return df_new.to_latex(**kwargs)
