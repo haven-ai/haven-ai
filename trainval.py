@@ -85,4 +85,5 @@ if __name__ == "__main__":
         reset=args.reset,
         job_config=job_config,
         results_fname="results.ipynb",
+        args=args
     )
