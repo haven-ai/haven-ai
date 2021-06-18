@@ -89,7 +89,7 @@ if __name__ == "__main__":
             "account_id": "",
             "container_hostname": "gcr.io",
             "project_id": "ai-platform-tutorial-313202",
-            "gcloud_savedir": "gs://ai_platform_bucket",
+            "gcloud_savedir": "ai_platform_bucket",
             "region": "northamerica-northeast1",
             # "scale-tier": "custom",
             # "master-machine-type": "n1-standard-4",

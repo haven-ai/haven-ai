@@ -18,7 +18,7 @@ def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None)
         sb_idx = tokens.index('-sb' if '-sb' in tokens else '--savedir_base')
         tokens[sb_idx + 1] = 'results'
         haven_attr = " ".join(tokens)
-        haven_attr += " -gc %s" % (job_config["gcloud_savedir"])
+        haven_attr += " -gc gs://%s" % (job_config["gcloud_savedir"])
 
         gcp_attr = ""
         for key in list(job_config.keys()):
