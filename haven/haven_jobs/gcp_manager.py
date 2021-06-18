@@ -144,31 +144,21 @@ def setup_image(job_config, savedir_base, exp_list):
 
 
 def download_results(exp_list, savedir_base, gcloud_base):
-    # todo: low performance
-    for exp_dict in exp_list:
-        try:
-            hash_code = hu.hash_dict(exp_dict)
-            gcloud_dir = os.path.join(gcloud_base, 'results', hash_code)
-            savedir = os.path.join(savedir_base, hash_code)
-            save_command = "gsutil cp %s/score_list.pkl  %s" % (gcloud_dir, savedir)
-            hu.subprocess_call(save_command)
-        except SubprocessError as e:
-            # skip and print error message if file not found
-            print(e.output.decode('utf-8'))
+    str_exp_list = ('|').join(map(lambda d: hu.hash_dict(d), exp_list))
+    sync_command = "gsutil -m rsync -r -x '(?!%s).*/.*\.(?!pkl$).*' %s %s" % (str_exp_list, gcloud_base, savedir_base)
+    try:
+        hu.subprocess_call(sync_command)
+    except SubprocessError as e:
+        print(e.output.decode('utf-8'))
 
 
 def download_all(exp_list, savedir_base, gcloud_base):
-    # todo: low performance
-    for exp_dict in exp_list:
-        try:
-            hash_code = hu.hash_dict(exp_dict)
-            gcloud_dir = os.path.join(gcloud_base, 'results', hash_code)
-            savedir = os.path.join(savedir_base, hash_code)
-            save_command = "gsutil cp %s/.  %s" % (gcloud_dir, savedir)
-            hu.subprocess_call(save_command)
-        except SubprocessError as e:
-            # skip and print error message if file not found
-            print(e.output.decode('utf-8'))
+    str_exp_list = ('|').join(map(lambda d: hu.hash_dict(d), exp_list))
+    sync_command = "gsutil -m rsync -r -x (?!%s) %s %s" % (str_exp_list, gcloud_base, savedir_base)
+    try:
+        hu.subprocess_call(sync_command)
+    except SubprocessError as e:
+        print(e.output.decode('utf-8'))
 
 
 def download_log(job_id, serverity):
