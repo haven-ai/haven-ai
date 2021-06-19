@@ -520,12 +520,44 @@ def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, ve
         job_scheduler=job_scheduler,
         save_logs=True,
     )
+    exp_id = hu.hash_dict(exp_dict)
+    savedir = f"{savedir_base}/{exp_id}"
+    fname = get_job_fname(savedir)
 
-    savedir = f"{savedir_base}/{hu.hash_dict(exp_dict)}"
-    job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)
+    if not os.path.exists(fname):
+        message = f"No Job"
+    else:
+        job_id = hu.load_json(fname).get("job_id")
+        job = jm.get_job(job_id)
+        message = f"Job {job['id']} - {job['state']}"
 
-    if verbose:
-        pprint.pprint(job)
-        pprint.pprint({"savedir": savedir, "command": command})
+    print(message)
+    print("command:", command)
+    print(f"saved: {savedir}")
+    prompt = "\nMenu:\n" "  0)'log'; or\n" "  1)'reset'; or\n" "  2)'run'; or\n" "  3)'kill'.\n" "Type option: "
+    option = input(prompt)
+    if option == "reset":
+        reset = 1
+    elif option == "run":
+        reset = 0
+    elif option == "log":
+        # Logs info
+        if job["state"] == "FAILED":
+            logs_fname = os.path.join(savedir, "err.txt")
+        else:
+            logs_fname = os.path.join(savedir, "logs.txt")
 
-    return job
+        if os.path.exists(logs_fname):
+            logs = hu.read_text(logs_fname)[-10:]
+            print(logs)
+    else:
+        raise ValueError(f"{option} does not exist.")
+
+    if option in ["run", "reset"]:
+        job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)
+
+        if verbose:
+            job_id = list(job.keys())[0]
+            pprint.pprint({"job_id": job_id, "savedir": savedir, "command": command, "message": job[job_id]["message"]})
+
+        return job
