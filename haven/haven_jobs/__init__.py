@@ -509,7 +509,7 @@ def chunk_list(my_list, n=100):
     return [my_list[x : x + n] for x in range(0, len(my_list), n)]
 
 
-def launch_job(command, savedir_base, job_scheduler, job_config, reset=False):
+def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, verbose=True):
     exp_dict = {"command": command}
 
     jm = JobManager(
@@ -523,5 +523,9 @@ def launch_job(command, savedir_base, job_scheduler, job_config, reset=False):
 
     savedir = f"{savedir_base}/{hu.hash_dict(exp_dict)}"
     job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)
+
+    if verbose:
+        pprint.pprint(job)
+        pprint.pprint({"savedir": savedir, "command": command})
 
     return job
