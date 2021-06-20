@@ -534,24 +534,34 @@ def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, ve
     print(message)
     print("command:", command)
     print(f"saved: {savedir}")
-    prompt = "\nMenu:\n" "  0)'log'; or\n" "  1)'reset'; or\n" "  2)'run'; or\n" "  3)'kill'.\n" "Type option: "
-    option = input(prompt)
-    if option == "reset":
-        reset = 1
-    elif option == "run":
-        reset = 0
-    elif option == "log":
-        # Logs info
-        if job["state"] == "FAILED":
-            logs_fname = os.path.join(savedir, "err.txt")
-        else:
-            logs_fname = os.path.join(savedir, "logs.txt")
+    prompt = "\nMenu:\n" "  0)'log'; or\n" "  1)'run'; or\n" "  2)'reset'; or\n" "  3)'exit'.\n" "Type option: "
 
-        if os.path.exists(logs_fname):
-            logs = hu.read_text(logs_fname)[-10:]
-            print(logs)
-    else:
-        raise ValueError(f"{option} does not exist.")
+    while 1:
+        option = input(prompt)
+        if option in ["reset", "2"]:
+            reset = 1
+            break
+        elif option in ["run", "1"]:
+            reset = 0
+            break
+        elif option in ["log", "0"]:
+            # Logs info
+            if job["state"] == "FAILED":
+                logs_fname = os.path.join(savedir, "err.txt")
+            else:
+                logs_fname = os.path.join(savedir, "logs.txt")
+
+            if os.path.exists(logs_fname):
+                logs = hu.read_text(logs_fname)[-10:]
+                print(logs)
+                print()
+                print(message)
+
+        elif option in ["exit", "3"]:
+            print("exiting...")
+            break
+        else:
+            raise ValueError(f"{option} does not exist.")
 
     if option in ["run", "reset"]:
         job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)

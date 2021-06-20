@@ -114,7 +114,7 @@ def run_wizard(
     if job_scheduler is None:
         job_scheduler = args.job_scheduler
 
-    elif job_scheduler in [None, "None", "0"]:
+    if job_scheduler in [None, "None", "0"]:
         job_scheduler = None
 
     elif job_scheduler in ["toolkit", "slurm", "gcp"]:
