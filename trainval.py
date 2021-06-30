@@ -53,6 +53,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("-r", "--reset", default=0, type=int, help="Reset or resume the experiment.")
     parser.add_argument("-j", "--job_scheduler", default=None, help="Choose Job Scheduler.")
+    parser.add_argument("--python_binary", default='python', help='path to your python executable')
 
     args, others = parser.parse_known_args()
 
@@ -86,5 +87,6 @@ if __name__ == "__main__":
         reset=args.reset,
         job_config=job_config,
         results_fname="results.ipynb",
+        python_binary_path=args.python_binary,
         args=args
     )
