@@ -75,7 +75,8 @@ if __name__ == "__main__":
         }
 
     elif args.job_scheduler == "toolkit":
-        job_config = {"account_id": account_id}
+        import job_configs
+        job_config = job_configs.JOB_CONFIG
 
     # Run experiments and create results file
     hw.run_wizard(
