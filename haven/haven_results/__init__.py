@@ -38,7 +38,7 @@ class ResultManager:
         save_history=False,
         score_list_name="score_list.pkl",
         account_id=None,
-        job_scheduler="toolkit",
+        job_scheduler=None,
         topk_tuple=None,
     ):
         """[summary]
@@ -445,7 +445,7 @@ class ResultManager:
             exp_list=self.exp_list, savedir_base=self.savedir_base, verbose=self.verbose, **kwargs
         )
 
-    def get_job_summary(self, columns=None, add_prefix=False, job_scheduler="toolkit", **kwargs):
+    def get_job_summary(self, columns=None, add_prefix=False, job_scheduler=None, **kwargs):
         """[summary]"""
         exp_list = hu.filter_exp_list(
             self.exp_list, self.filterby_list, savedir_base=self.savedir_base, verbose=self.verbose
@@ -461,7 +461,7 @@ class ResultManager:
 
         return summary_list
 
-    def kill_jobs(self, job_scheduler="toolkit", **kwargs):
+    def kill_jobs(self, job_scheduler=None, **kwargs):
         """[summary]"""
         exp_list = hu.filter_exp_list(
             self.exp_list, self.filterby_list, savedir_base=self.savedir_base, verbose=self.verbose
