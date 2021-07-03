@@ -270,7 +270,8 @@ rm = hr.ResultManager(exp_list=exp_list,
                       savedir_base=savedir_base,
                       filterby_list=filterby_list,
                       verbose=0,
-                      exp_groups=None
+                      exp_groups=None,
+                      job_scheduler='slurm'
                      )
 
 # specify display parameters
