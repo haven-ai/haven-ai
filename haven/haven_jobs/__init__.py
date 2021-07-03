@@ -28,7 +28,7 @@ class JobManager:
         job_config=None,
         verbose=1,
         account_id=None,
-        job_scheduler="toolkit",
+        job_scheduler=None,
         save_logs=True,
     ):
         """[summary]
@@ -70,6 +70,9 @@ class JobManager:
 
             self.ho = ho
             self.api = None
+
+        else:
+            raise ValueError(f'Job Scheduler {job_scheduler} is not defined. Should be one of ["toolkit", "slurm"]')
 
     def get_command_history(self, topk=10):
         job_list = self.get_jobs()

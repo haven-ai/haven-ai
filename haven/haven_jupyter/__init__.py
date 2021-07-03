@@ -87,9 +87,9 @@ class DashboardManager:
 
         main_out = widgets.Output()
         # Display tabs
-        tab = widgets.Tab(children=[tables, plots, images, latex, share])
-        tab.set_title(0, "Tables")
-        tab.set_title(1, "Plots")
+        tab = widgets.Tab(children=[plots, tables, images, latex, share])
+        tab.set_title(0, "Plots")
+        tab.set_title(1, "Tables")
         tab.set_title(2, "Images")
         tab.set_title(3, "Latex")
         tab.set_title(4, "Share")

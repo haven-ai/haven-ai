@@ -19,6 +19,6 @@ if __name__ == "__main__":
     parser.add_argument("--path", required=False, help="Define the base directory where the experiments will be saved.")
 
     args, others = parser.parse_known_args()
-    args.url = "https://drive.google.com/u/0/uc?id=13HGW3_zCTKHGVtr_JDHD4Wv64PP5Z2mG&export=download"
-    args.path = "/mnt/public/datasets2/kitti/cadnn.pth"
+    args.url = "https://drive.google.com/file/d/1YWjUODQWwQ3_vKSytqVdF4recqBOEe72/view?usp=sharing"
+    args.path = "/mnt/public/datasets/SumFish/train_val.zip"
     gdown.cached_download(args.url, path=args.path, quiet=False, proxy=False)

@@ -274,6 +274,7 @@ def get_best_exp_dict(
     return_scores=False,
     verbose=True,
     score_list_name="score_list.pkl",
+    return_score_dict=False,
 ):
     """Obtain best the experiment for a specific metric.
 
@@ -297,6 +298,7 @@ def get_best_exp_dict(
         best_score = 0.0
 
     exp_dict_best = None
+    best_score_dict = None
     exp_list = filter_exp_list(exp_list, filterby_list, verbose=verbose)
     for exp_dict in exp_list:
         exp_id = hu.hash_dict(exp_dict)
@@ -317,9 +319,11 @@ def get_best_exp_dict(
                 score = metric_scores[-1]
             elif metric_agg == "min":
                 score = np.min(metric_scores)
+
             if best_score >= score:
                 best_score = score
                 exp_dict_best = exp_dict
+                best_score_dict = {"score": score, "epochs": len(score_list), "exp_id": exp_id}
 
         elif metric_agg in ["max", "max_last"]:
             if metric_agg == "max_last":
@@ -330,13 +334,15 @@ def get_best_exp_dict(
             if best_score <= score:
                 best_score = score
                 exp_dict_best = exp_dict
-
-        scores_dict += [{"score": score, "epochs": len(score_list), "exp_id": exp_id}]
+                best_score_dict = {"score": score, "epochs": len(score_list), "exp_id": exp_id}
 
     if exp_dict_best is None:
         if verbose:
             print('no experiments with metric "%s"' % metric)
         return {}
+
+    if return_score_dict:
+        return exp_dict_best, best_score_dict
 
     return exp_dict_best
 
