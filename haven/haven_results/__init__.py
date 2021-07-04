@@ -38,7 +38,7 @@ class ResultManager:
         save_history=False,
         score_list_name="score_list.pkl",
         account_id=None,
-        job_scheduler=None,
+        job_scheduler="toolkit",
         topk_tuple=None,
     ):
         """[summary]

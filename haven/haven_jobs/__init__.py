@@ -71,6 +71,11 @@ class JobManager:
             self.ho = ho
             self.api = None
 
+            try:
+                ho.sanity_check()
+            except Exception as e:
+                raise ValueError("slurm is not supported in this machine.")
+
         else:
             raise ValueError(f'Job Scheduler {job_scheduler} is not defined. Should be one of ["toolkit", "slurm"]')
 

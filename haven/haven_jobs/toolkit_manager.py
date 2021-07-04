@@ -14,7 +14,7 @@ try:
     import eai_toolkit_client
     from eai_toolkit_client.rest import ApiException
 except Exception:
-    pass
+    raise ValueError("toolkit is not supported in this machine, please consider installing the library.")
 
 
 def to_dict(job):

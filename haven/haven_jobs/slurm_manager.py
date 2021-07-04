@@ -12,6 +12,8 @@ from subprocess import SubprocessError
 
 # Job submission
 # ==============
+def sanity_check():
+    hu.subprocess_call("sbatch")
 
 
 def submit_job(api, account_id, command, job_config, workdir, savedir_logs=None):
