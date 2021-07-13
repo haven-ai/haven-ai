@@ -277,11 +277,24 @@ def pretty_print_df(df):
     return df
 
 
-def flatten_column(result_dict):
+def flatten_column(result_dict, flatten_list=False):
     new_dict = {}
 
     for k, v in result_dict.items():
-        new_dict.update(flatten_dict(k, v))
+        if isinstance(v, list) and flatten_list:
+            list_dict = {}
+            for vi in v:
+                flat = flatten_dict(k, vi)
+                for f1, f2 in flat.items():
+                    if f1 in list_dict:
+                        list_dict[f1] += "_" + str(f2)
+                    else:
+                        list_dict[f1] = str(f2)
+            # print()
+        else:
+            list_dict = flatten_dict(k, v)
+
+        new_dict.update(list_dict)
 
     result_dict = new_dict
     return result_dict

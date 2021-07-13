@@ -181,7 +181,7 @@ def group_exp_list(exp_list, groupby_list):
         groupby_list = [groupby_list]
     # groupby_list = hu.as_double_list(groupby_list)
     exp_list = copy.deepcopy(exp_list)
-    exp_list_flat = [hu.flatten_column(exp_dict) for exp_dict in exp_list]
+    exp_list_flat = [hu.flatten_column(exp_dict, flatten_list=True) for exp_dict in exp_list]
     for e1, e2 in zip(exp_list_flat, exp_list):
         e1["exp_dict"] = e2
 
@@ -211,7 +211,7 @@ def group_exp_list(exp_list, groupby_list):
 
 
 def get_exp_diff(exp_list):
-    flat_list = [hu.flatten_column(e) for e in exp_list]
+    flat_list = [hu.flatten_column(e, flatten_list=True) for e in exp_list]
 
     hparam_dict = {}
     for f in flat_list:

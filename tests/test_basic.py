@@ -174,6 +174,17 @@ def test_get_result_manager():
     hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list.pkl"), score_list)
     hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict), "exp_dict.json"), exp_dict)
     hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list_test.pkl"), score_list)
+
+    exp_dict = {
+        "model": [{"name": "lenet", "n_layers": 30}, {"name": "lenet", "n_layers": 15}],
+        "dataset": "cifar10",
+        "batch_size": 5,
+    }
+    score_list = [{"epoch": 0, "acc": 0.15}, {"epoch": 1, "acc": 1.21}, {"epoch": 2, "acc": 1.7}]
+
+    hu.save_pkl(os.path.join(savedir_base, hu.hash_dict(exp_dict), "score_list.pkl"), score_list)
+    hu.save_json(os.path.join(savedir_base, hu.hash_dict(exp_dict), "exp_dict.json"), exp_dict)
+
     rm2 = hr.ResultManager(savedir_base=savedir_base, score_list_name="score_list_test.pkl")
     assert len(rm2.get_score_lists()) == 1
     rm = hr.ResultManager(savedir_base=savedir_base)
@@ -181,16 +192,17 @@ def test_get_result_manager():
     # assert(len(rm.exp_groups) == 2)
     # for exp_list in rm.exp_groups:
     #     assert(exp_list[0]['dataset'] in ['mnist', 'cifar10'])
+    rm.get_score_df()
     rm.get_exp_list_df()
     rm.get_score_df(avg_across="dataset")
     rm.get_score_df(avg_across="dataset")
-    rm.get_score_df()
+
     rm.get_score_lists()
     rm.get_images()
     table = rm.get_score_table()
     table = rm.get_exp_table()
 
-    fig_list = rm.get_plot(x_metric="epoch", y_metric="acc", title_list=["dataset"], legend_list=["model"])
+    fig_list = rm.get_plot(x_metric="epoch", y_metric="acc", title_list=["dataset"], legend_list=["model.n_layers"])
     for i, fig in enumerate(fig_list):
         fig.savefig(os.path.join(savedir_base, "%d.png" % i))
 
@@ -479,6 +491,7 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
+        test_get_result_manager()
         test_hash()
         test_wizard()
         test_cartesian_product()
@@ -487,7 +500,7 @@ if __name__ == "__main__":
         test_get_best_exp_dict()
         test_filter_exp_list()
         test_group_exp_list()
-        test_get_result_manager()
+
         test_get_plot()
         test_get_score_df()
         test_avg_runs()

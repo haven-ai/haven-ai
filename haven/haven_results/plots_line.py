@@ -371,17 +371,21 @@ def get_plot(
 def get_label(original_list, exp_dict, format_str=None, show_key=False):
     key_list = []
     label_list = []
+    exp_dict_flat = hu.flatten_column(exp_dict, flatten_list=True)
     for i, k in enumerate(original_list):
         if k == "exp_id":
             sub_dict = str(hu.hash_dict(exp_dict))
         else:
-            depth_list = k.split(".")
-            sub_dict = exp_dict
-            for d in depth_list:
-                if sub_dict is None or d not in sub_dict:
-                    sub_dict = None
-                    break
-                sub_dict = sub_dict[d]
+            sub_dict = None
+            if k in exp_dict_flat:
+                sub_dict = exp_dict_flat[k]
+            # depth_list = k.split(".")
+            # sub_dict = exp_dict
+            # for d in depth_list:
+            #     if sub_dict is None or d not in sub_dict:
+            #         sub_dict = None
+            #         break
+            #     sub_dict = sub_dict[d]
 
         if i < (len(original_list) - 1):
             if format_str:

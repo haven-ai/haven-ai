@@ -84,7 +84,7 @@ def get_score_df(
         exp_dict_fname = os.path.join(savedir, "exp_dict.json")
 
         if flatten_columns:
-            exp_dict_flat = hu.flatten_column(exp_dict)
+            exp_dict_flat = hu.flatten_column(exp_dict, flatten_list=True)
         else:
             exp_dict_flat = exp_dict
 
