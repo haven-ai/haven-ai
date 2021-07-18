@@ -215,8 +215,8 @@ rm.get_score_df().head()
 fig = rm.get_plot_all(
                 # order='metrics_by_groups',
                 # avg_across='runs',
-                y_metric_list =  ['train_loss'], 
-                x_metric='epoch',
+                y_metric_list=y_metrics, 
+                x_metric=x_metric,
                 # legend_fontsize=18,
                 # x_fontsize=20,
                 # y_fontsize=20,
@@ -278,8 +278,8 @@ rm = hr.ResultManager(exp_list=exp_list,
 # groupby_list = ['dataset']
 # title_list = ['dataset']
 # legend_list = ['model']
-# y_metrics = ['train_loss']
-# x_metric = 'epoch'
+y_metrics = ['train_loss']
+x_metric = 'epoch'
 
 # launch dashboard
 hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
