@@ -201,7 +201,6 @@ def create_jupyter_file(
 
         if flag == False:
             print("a jupyter server was not found :(")
-            print("a jupyter server can be started using the script in https://github.com/ElementAI/haven .")
 
 
 def sub_cell():
@@ -216,8 +215,8 @@ rm.get_score_df().head()
 fig = rm.get_plot_all(
                 # order='metrics_by_groups',
                 # avg_across='runs',
-                # y_metric_list =  ['train_loss'], 
-                # x_metric='epoch',
+                y_metric_list =  ['train_loss'], 
+                x_metric='epoch',
                 # legend_fontsize=18,
                 # x_fontsize=20,
                 # y_fontsize=20,
@@ -292,7 +291,7 @@ hj.get_dashboard(rm, vars(), wide_display=False, enable_datatables=False)
 
 def install_cell():
     script = """
-    !pip install --upgrade git+https://github.com/ElementAI/haven
+    !pip install --upgrade git+https://github.com/haven-ai/haven-ai
           """
     return script
 
