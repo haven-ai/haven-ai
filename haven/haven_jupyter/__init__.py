@@ -177,7 +177,7 @@ def create_jupyter_file(
     overwrite=False,
     print_url=False,
 ):
-
+    savedir_base = os.path.abspath(savedir_base)
     if overwrite or not os.path.exists(fname):
         cells = [main_cell(savedir_base), sub_cell(), install_cell()]
         if os.path.dirname(fname) != "":
