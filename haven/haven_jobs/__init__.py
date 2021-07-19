@@ -46,6 +46,7 @@ class JobManager:
         verbose : int, optional
             [description], by default 1
         """
+        job_config = copy.deepcopy(job_config)
         if account_id is None and job_config is not None and "account_id" in job_config:
             account_id = job_config["account_id"]
             del job_config["account_id"]
@@ -105,6 +106,11 @@ class JobManager:
         return self.ho.kill_job(self.api, job_id)
 
     def submit_job(self, command, workdir, savedir_logs=None):
+        # make sure the paths are absolute
+        workdir = os.path.abspath(workdir)
+        if savedir_logs is not None:
+            savedir_logs = os.path.abspath(savedir_logs)
+
         return self.ho.submit_job(
             api=self.api,
             account_id=self.account_id,

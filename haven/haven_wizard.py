@@ -79,6 +79,9 @@ def run_wizard(
     exp_id = exp_id or args.exp_id
     assert savedir_base is not None
 
+    # make sure savedir_base is absolute
+    savedir_base = os.path.abspath(savedir_base)
+
     # Collect experiments
     # ===================
     if exp_id is not None:

@@ -73,7 +73,7 @@ def test_checkpoint():
 
 def test_get_score_lists():
     # save a score_list
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
     exp_dict = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     score_list = [{"epoch": 0, "acc": 0.5}, {"epoch": 0, "acc": 0.9}]
 
@@ -91,7 +91,7 @@ def test_get_score_lists():
 
 def test_get_score_df():
     # save a score_list
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
     exp_dict = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     exp_dict2 = {"model": {"name": "mlp2", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
 
@@ -108,7 +108,7 @@ def test_get_score_df():
 
     assert np.array(score_df["dataset"])[0].strip("'") == "mnist"
 
-    shutil.rmtree(".tmp")
+    shutil.rmtree(savedir_base)
 
 
 def test_get_images():
@@ -118,7 +118,7 @@ def test_get_images():
 
 def test_get_plot():
     # save a score_list
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
     exp_dict = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     score_list = [{"epoch": 0, "acc": 0.5}, {"epoch": 1, "acc": 0.9}]
 
@@ -140,14 +140,14 @@ def test_get_plot():
     #      y_metric='acc',
     #      mode='pretty_plot')
     fig, axis = hr.get_plot(exp_list, savedir_base=savedir_base, x_metric="epoch", y_metric="acc", mode="bar")
-    fig.savefig(os.path.join(".tmp", "test.png"))
+    fig.savefig(os.path.join(savedir_base, "test.png"))
 
-    shutil.rmtree(".tmp")
+    shutil.rmtree(savedir_base)
 
 
 def test_get_result_manager():
     # save a score_list
-    savedir_base = ".tmp_plots"
+    savedir_base = "../haven_results"
     if os.path.exists(savedir_base):
         shutil.rmtree(savedir_base)
     exp_dict = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
@@ -296,7 +296,7 @@ def test_hash():
 
 
 def test_get_best_exp_dict():
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
     exp_dict_1 = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     score_list = [{"epoch": 0, "acc": 0.5}, {"epoch": 1, "acc": 0.9}]
 
@@ -349,19 +349,20 @@ def test_toolkit():
     import job_configs
 
     exp_list = [{"model": {"name": "mlp", "n_layers": 20}, "dataset": "mnist", "batch_size": 1}]
-    savedir_base = os.path.realpath(".tmp")
+    savedir_base = "../haven_results"
     os.makedirs(savedir_base, exist_ok=True)
     jm = hjb.JobManager(
         exp_list=exp_list,
         savedir_base=savedir_base,
         workdir=os.path.dirname(os.path.realpath(__file__)),
         job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
     )
     # get jobs
     job_list_old = jm.get_jobs()
 
     # run single command
-    savedir_logs = "%s/%s" % (savedir_base, np.random.randint(1000))
+    savedir_logs = os.path.join(savedir_base, str(np.random.randint(1000)))
     os.makedirs(savedir_logs, exist_ok=True)
     command = "echo 2"
     job_id = jm.submit_job(command, workdir=jm.workdir, savedir_logs=savedir_logs)
@@ -398,7 +399,7 @@ def test_toolkit():
 
 def test_avg_runs():
     # save a score_list
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
     exp_dict = {"run": 0, "model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     exp_dict2 = {"run": 1, "model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
 
@@ -445,19 +446,19 @@ def test_avg_runs():
     )
     np.testing.assert_array_almost_equal(result_dict["x_list"], np.array([1, 2]))
     np.testing.assert_array_almost_equal(result_dict["y_list"], np.array([1.25, 0.7]))
-    shutil.rmtree(".tmp")
+    shutil.rmtree(savedir_base)
 
 
 def test_wizard():
     import job_configs
 
-    savedir_base = ".tmp"
+    savedir_base = "../haven_results"
 
     # in cluster
     hw.run_wizard(
         func=test_trainval,
         exp_list=[{"lr": 1e-3}],
-        savedir_base=os.path.abspath(savedir_base),
+        savedir_base=savedir_base,
         reset=0,
         results_fname=f"{savedir_base}/results.ipynb",
         job_config=job_configs.JOB_CONFIG,
@@ -474,7 +475,7 @@ def test_wizard():
         results_fname=f"{savedir_base}/results.ipynb",
     )
 
-    shutil.rmtree(".tmp")
+    shutil.rmtree(savedir_base)
 
 
 def test_trainval(exp_dict, savedir, args):
