@@ -33,7 +33,7 @@ def trainval(exp_dict, savedir, args):
         # Get Metrics
         score_dict = {"epoch": epoch, "acc": train_dict["train_acc"], "loss": train_dict["train_loss"]}
 
-        # Save Metrics and Model
+        # Save Metrics in "savedir" as score_list.pkl
         cm.log_metrics(score_dict)
         cm.save_torch("model.pth", model.state_dict())
 
