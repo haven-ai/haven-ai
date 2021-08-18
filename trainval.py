@@ -1,10 +1,11 @@
 import tqdm
 import argparse
-import os
+import os, torch
 
 from haven import haven_examples as he
 from haven import haven_wizard as hw
 from haven import haven_results as hr
+from haven import haven_utils as hu
 
 
 def trainval(exp_dict, savedir, args):
@@ -35,7 +36,11 @@ def trainval(exp_dict, savedir, args):
 
         # Save Metrics and Model
         cm.log_metrics(score_dict)
-        cm.save_torch("model.pth", model.state_dict())
+        torch.save(model.state_dict(), os.path.join(savedir, "model.pth"))
+
+        # Save Example Image for qualitative results
+        image = torch.zeros(50, 50, 3)
+        hu.save_image(os.path.join(savedir, "images", "example.png"), image)
 
     print("Experiment done\n")
 
@@ -53,7 +58,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("-r", "--reset", default=0, type=int, help="Reset or resume the experiment.")
     parser.add_argument("-j", "--job_scheduler", default=None, help="Choose Job Scheduler.")
-    parser.add_argument("--python_binary", default='python', help='path to your python executable')
+    parser.add_argument("--python_binary", default="python", help="path to your python executable")
 
     args, others = parser.parse_known_args()
 
@@ -77,6 +82,7 @@ if __name__ == "__main__":
 
     elif args.job_scheduler == "toolkit":
         import job_configs
+
         job_config = job_configs.JOB_CONFIG
 
     # Run experiments and create results file
@@ -88,5 +94,5 @@ if __name__ == "__main__":
         job_config=job_config,
         results_fname="results.ipynb",
         python_binary_path=args.python_binary,
-        args=args
+        args=args,
     )

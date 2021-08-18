@@ -455,7 +455,6 @@ class ResultManager:
             savedir_base=self.savedir_base,
             account_id=self.account_id,
             job_scheduler=self.job_scheduler,
-            **kwargs
         )
         summary_list = jm.get_summary_list(columns=columns, add_prefix=add_prefix)
 
@@ -467,11 +466,7 @@ class ResultManager:
             self.exp_list, self.filterby_list, savedir_base=self.savedir_base, verbose=self.verbose
         )
         jm = hjb.JobManager(
-            exp_list=exp_list,
-            savedir_base=self.savedir_base,
-            account_id=self.account_id,
-            job_scheduler=job_scheduler,
-            **kwargs
+            exp_list=exp_list, savedir_base=self.savedir_base, account_id=self.account_id, job_scheduler=job_scheduler
         )
 
         return jm.kill_jobs()
