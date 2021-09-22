@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import pylab as plt
 from skimage.segmentation import mark_boundaries
+import cv2
 
 from . import haven_utils as hu
 
@@ -162,7 +163,6 @@ def scatter_plot(X, color, fig=None, title=""):
 
 
 def pretty_vis(image, annList, show_class=False, alpha=0.0, dpi=100, **options):
-    import cv2
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.patches import Polygon
     from matplotlib.figure import Figure
