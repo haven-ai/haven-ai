@@ -55,13 +55,20 @@ def text_tab(db, output):
 
             for i, (exp_dict, text) in enumerate(zip(db.rm.exp_list, text_list)):
                 exp_id = hu.hash_dict(exp_dict)
+                savedir = os.path.join(db.rm_original.savedir_base, exp_id)
                 print("\nPredictions %d/%d" % (i + 1, n_logs), "=" * 50)
                 print("exp_id:", exp_id)
-                print("savedir:", os.path.join(db.rm_original.savedir_base, exp_id))
+                print("savedir:", savedir)
 
                 print("\nexp_dict")
                 print("-" * 50)
                 pprint.pprint(exp_dict)
+
+                if text is not "None":
+                    print("\nscore_dict")
+                    print("-" * 50)
+                    score_list = hu.load_pkl(os.path.join(savedir, "score_list.pkl"))
+                    pprint.pprint(score_list[-1])
 
                 print("\nPredictions")
                 print("-" * 50)
