@@ -316,6 +316,8 @@ def bbox_on_image(bbox_xyxy, image, mode="yxyx", color=(255, 0, 0)):
     [type]
         [description]
     """
+    import cv2
+
     image_uint8 = image_as_uint8(image)
 
     H, W, _ = image_uint8.shape

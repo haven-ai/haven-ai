@@ -8,6 +8,7 @@ from .plots_tab import plots_tab
 from .tables_tab import tables_tab
 from .latex_tab import latex_tab
 from .images_tab import images_tab
+from .text_tab import text_tab
 from . import widgets as wdg
 
 import haven
@@ -82,23 +83,26 @@ class DashboardManager:
         tables = widgets.Output()
         plots = widgets.Output()
         images = widgets.Output()
+        text = widgets.Output()
         share = widgets.Output()
         latex = widgets.Output()
 
         main_out = widgets.Output()
         # Display tabs
-        tab = widgets.Tab(children=[tables, plots, images, latex, share])
+        tab = widgets.Tab(children=[tables, plots, images, text, latex, share])
         tab.set_title(1, "Plots")
         tab.set_title(0, "Tables")
         tab.set_title(2, "Images")
-        tab.set_title(3, "Latex")
-        tab.set_title(4, "Share")
+        tab.set_title(3, "Text")
+        tab.set_title(4, "Latex")
+        tab.set_title(5, "Share")
 
         with main_out:
             display(tab)
             tables.clear_output()
             plots.clear_output()
             images.clear_output()
+            text.clear_output()
             latex.clear_output()
             share.clear_output()
 
@@ -106,6 +110,7 @@ class DashboardManager:
             tables_tab(self, tables)
             plots_tab(self, plots)
             images_tab(self, images)
+            text_tab(self, text)
             latex_tab(self, latex)
             share_tab(self, share)
 
