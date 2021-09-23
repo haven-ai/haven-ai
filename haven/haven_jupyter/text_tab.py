@@ -47,7 +47,8 @@ def text_tab(db, output):
                 savedir_text = os.path.join(db.rm.savedir_base, exp_id, "text")
                 if os.path.exists(savedir_text):
                     path = os.path.join(savedir_text, "*.json")
-                    text_list = [hu.load_json(glob.glob(path)[0])]
+                    out = hu.load_json(glob.glob(path)[0])
+                    text_list += [out]
                 else:
                     text_list += ["None"]
 
@@ -72,6 +73,8 @@ def text_tab(db, output):
 
                 print("\nPredictions")
                 print("-" * 50)
-                pprint.pprint(text)
+                for j, t in enumerate(text):
+                    pprint.pprint(t)
+                    print(f"\n*** Example {j} ***\n")
 
     blogs.on_click(on_logs_clicked)
