@@ -3,7 +3,12 @@ import numpy as np
 from PIL import Image
 import pylab as plt
 from skimage.segmentation import mark_boundaries
-import cv2
+
+try:
+    import cv2
+except:
+    # ignore cv2 if it can't get imported, sometimes it doesn't install well
+    pass
 
 from . import haven_utils as hu
 
