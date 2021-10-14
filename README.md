@@ -12,7 +12,9 @@ Haven-AI a library that helps you easily turn your code base into an effective, 
 
 The goal of this library is help you quickly and efficiently find solutions to machine learning problems, get papers accepted, and win at competitions.
 
-## **Getting Started**
+## **Getting Started** 
+
+See this <a href="https://github.com/IssamLaradji/image_classification_template">mnist template code</a>
 
 ### 1. Install requirements
 
