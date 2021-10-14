@@ -14,7 +14,10 @@ The goal of this library is help you quickly and efficiently find solutions to m
 
 ## **Getting Started** 
 
-See this <a href="https://github.com/IssamLaradji/image_classification_template">mnist template code</a>
+See this 
+
+- <a href="https://github.com/IssamLaradji/image_classification_template">mnist template code</a>
+- <a href="https://github.com/IssamLaradji/semantic_segmentation_template">semantic segmentation template code</a>
 
 ### 1. Install requirements
 
