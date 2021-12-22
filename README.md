@@ -8,7 +8,7 @@
 
 ### Motivation (<a href="https://colab.research.google.com/drive/1iqmJWTfsC3Erfay_SwEoUhq_wS4l18Fd?usp=sharing">Try the Google Colab</a>)
 
-Haven-AI a library that helps you easily turn your code base into an effective, large-scale machine learning toolkit. You will be able to launch thousands of experiments in parallel, visualize their results and status, and ensure that they are reliable, reproducible, and that the code base is modular to facilitate collaboration and easy integration of new models and datasets.
+Haven-AI is a library that helps you easily turn your code base into an effective, large-scale machine learning toolkit. You will be able to launch thousands of experiments in parallel, visualize their results and status, and ensure that they are reliable, reproducible, and that the code base is modular to facilitate collaboration and easy integration of new models and datasets.
 
 The goal of this library is help you quickly and efficiently find solutions to machine learning problems, get papers accepted, and win at competitions.
 
