@@ -15,6 +15,7 @@ import pprint
 ALIVE_STATES = ["RUNNING", "QUEUED", "PENDING", "QUEUING"]
 COMPLETED_STATES = ["COMPLETED", "SUCCEEDED", "COMPLETING"]
 FAILED_STATES = ["FAILED", "CANCELLED", "INTERRUPTED", "TIMEOUT", "NODE_FAIL"]
+SUFFIX_TO_ADD_TO_SAVEDIR_TO_GET_WORKDIR = "code"
 
 
 class JobManager:
@@ -115,10 +116,38 @@ class JobManager:
             api=self.api,
             account_id=self.account_id,
             command=command,
-            job_config=self.job_config,
+            job_config=self._adapt_job_config(self.job_config, workdir),
             workdir=workdir,
             savedir_logs=savedir_logs,
         )
+
+    @staticmethod
+    def _adapt_job_config(job_config, workdir):
+        """Substitute `<special_patterns_like_this>` in job config (e.g., name)
+
+        The input `job_config` is NOT altered in place (i.e., a copy is made if needed).
+        """
+        # As of right now, substitution is only performed if a str "name" field is provided.
+        if isinstance(job_config.get("name", None), str):
+            # Get a copy so that we can safely do substitutions.
+            job_config = copy.deepcopy(job_config)
+            # The <exp_id> substitution is a special case.
+            if "<exp_id>" in job_config["name"]:
+                # Complication: we don't have `exp_id`, but we have `workdir`.
+                savedir = os.path.dirname(workdir)
+                assert (
+                    os.path.join(savedir, SUFFIX_TO_ADD_TO_SAVEDIR_TO_GET_WORKDIR) == workdir
+                ), "Cannot substitute `<exp_id>` because `workdir` has unexpected format."
+                fname_exp_dict = os.path.join(savedir, "exp_dict.json")
+                exp_dict = hu.load_json(fname_exp_dict)
+                exp_id = hu.hash_dict(exp_dict)
+                # We may now proceed with the substitution proper for <exp_id>.
+                job_config["name"] = job_config["name"].replace("<exp_id>", exp_id)
+            # Other substitutions (simpler)
+            # Adding time in a name help prevent duplicated names (which are forbidden on toolkit)
+            job_config["name"] = job_config["name"].replace("<time>", str(int(time.time())))
+            job_config["name"] = job_config["name"].replace("<time_ns>", str(time.time_ns()))
+        return job_config
 
     # Main functions
     # --------------
@@ -341,7 +370,7 @@ class JobManager:
         assert hu.hash_dict(hu.load_json(fname_exp_dict)) == exp_id
 
         # Define paths
-        workdir_job = os.path.join(savedir, "code")
+        workdir_job = os.path.join(savedir, SUFFIX_TO_ADD_TO_SAVEDIR_TO_GET_WORKDIR)
 
         # Copy the experiment code into the experiment folder
         print(f"Copying code for experiment {exp_id}")
