@@ -74,7 +74,7 @@ def text_tab(db, output):
                 print("\nPredictions")
                 print("-" * 50)
                 for j, t in enumerate(text):
-                    pprint.pprint(t)
                     print(f"\n*** Example {j} ***\n")
+                    pprint.pprint(t)
 
     blogs.on_click(on_logs_clicked)

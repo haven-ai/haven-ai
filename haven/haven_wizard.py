@@ -194,8 +194,8 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
     # -- exp_dict
     exp_dict_json_fname = os.path.join(savedir, "exp_dict.json")
-    # if not os.path.exists(exp_dict_json_fname):
-    hu.save_json(exp_dict_json_fname, exp_dict)
+    if not os.path.exists(exp_dict_json_fname):
+        hu.save_json(exp_dict_json_fname, exp_dict)
 
     # -- images
     os.makedirs(os.path.join(savedir, "images"), exist_ok=True)
