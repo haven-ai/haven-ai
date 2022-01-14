@@ -192,10 +192,17 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
     # create experiment structure
     os.makedirs(savedir, exist_ok=True)
 
-    # -- exp_dict
+    # -- save exp_dict only when it is needed
     exp_dict_json_fname = os.path.join(savedir, "exp_dict.json")
     if not os.path.exists(exp_dict_json_fname):
         hu.save_json(exp_dict_json_fname, exp_dict)
+    else:
+        # make sure it is not corrupt and same exp_id
+        try:
+            exp_dict_tmp = hu.load_json(exp_dict_json_fname)
+            assert hu.hash_dict(exp_dict_tmp) == hu.hash_dict(exp_dict)
+        except:
+            hu.save_json(exp_dict_json_fname, exp_dict)
 
     # -- images
     os.makedirs(os.path.join(savedir, "images"), exist_ok=True)
