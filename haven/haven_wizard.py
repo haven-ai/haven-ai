@@ -4,6 +4,7 @@ import torch
 import argparse
 import pandas as pd
 import pprint
+import haven
 
 from . import haven_utils as hu
 from . import haven_jupyter as hj
@@ -214,6 +215,7 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
 
     if verbose:
         print("\n******")
+        print(f"Haven: {haven.__version__}")
         print("Exp id: %s" % exp_id)
         print("\nHyperparameters:\n" + "-" * 16)
         # print(pd.DataFrame([exp_dict]).to_string(index=False))
@@ -315,7 +317,6 @@ def save_checkpoint(
 
 def report(savedir, score_list):
     exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
-
     print("\nExp id: %s" % hu.hash_dict(exp_dict))
 
     print("\nHyperparameters:\n" + "-" * 16)

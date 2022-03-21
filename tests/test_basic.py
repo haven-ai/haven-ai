@@ -57,7 +57,9 @@ def test_checkpoint():
     # create exp folder
     exp_dict = {"model": {"name": "mlp", "n_layers": 30}, "dataset": "mnist", "batch_size": 1}
     savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
+
     hu.save_json(os.path.join(savedir, "exp_dict.json"), exp_dict)
+    hw.report(savedir, [])
     hu.torch_save(os.path.join(savedir, "model.pth"), torch.zeros(10))
     hu.torch_load(os.path.join(savedir, "model.pth"))
     hc.load_checkpoint(exp_dict, savedir_base, fname="model.pth")
