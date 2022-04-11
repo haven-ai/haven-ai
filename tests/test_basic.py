@@ -394,7 +394,9 @@ def test_toolkit():
 
     rm = hr.ResultManager(exp_list=exp_list, savedir_base=savedir_base)
     rm_summary_list = rm.get_job_summary()
-
+    df = rm.get_resources_stats(job_dict={"cpu": 4, "mem": 20, "gpu": 1, "gpu_mem": 16})
+    assert df is not None
+    # print(df)
     db = hj.get_dashboard(rm, wide_display=True)
     db.display()
 

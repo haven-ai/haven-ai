@@ -161,6 +161,38 @@ class ResultManager:
     def load_state_dict(self, state_dict):
         pass
 
+    def get_resources_stats(self, job_dict, savedir_base=None, return_df=False):
+        if savedir_base is not None:
+            self = ResultManager(
+                exp_list=None,
+                savedir_base=savedir_base,
+                filterby_list=None,
+                verbose=0,
+                exp_groups=None,
+                job_scheduler="toolkit",
+            )
+        summary_list = []
+        for savedir in self.get_savedir_list():
+            fname_job_dict = os.path.join(savedir, "job_dict.json")
+            fname_score_list = os.path.join(savedir, "logs.txt")
+            if os.path.exists(fname_job_dict) and os.path.exists(fname_score_list):
+                s_time = os.path.getctime(fname_job_dict)
+                e_time = os.path.getctime(fname_score_list)
+                hours = (e_time - s_time) / 3600.0
+                summary_dict = {"hours": hours}
+
+                for k in ["cpu", "mem", "gpu", "gpu_mem"]:
+                    summary_dict[k] = job_dict[k]
+                summary_list += [summary_dict]
+        df = pd.DataFrame(summary_list)
+        if len(summary_list) == 0:
+            return df
+
+        if return_df:
+            return df.describe(), df
+
+        return df.describe()
+
     def get_savedir_list(self):
         return [os.path.join(self.savedir_base, hu.hash_dict(e_dict)) for e_dict in self.exp_list]
 
