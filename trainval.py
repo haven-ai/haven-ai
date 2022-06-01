@@ -16,7 +16,10 @@ def trainval(exp_dict, savedir, args):
     """
     # Create data loader and model
     train_loader = he.get_loader(
-        name=exp_dict["dataset"], split="train", datadir=os.path.dirname(savedir), exp_dict=exp_dict
+        name=exp_dict["dataset"], 
+        split="train", 
+        datadir=os.path.dirname(savedir), 
+        exp_dict=exp_dict
     )
     model = he.get_model(name=exp_dict["model"], exp_dict=exp_dict)
 
