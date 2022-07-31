@@ -1,16 +1,17 @@
+import copy
+import getpass
 import os
-import time
-import sys
+import pprint
 import subprocess
-from .. import haven_utils as hu
-from .. import haven_chk as hc
+import sys
+import time
 from textwrap import wrap
 
-import copy
-import pandas as pd
 import numpy as np
-import getpass
-import pprint
+import pandas as pd
+
+from .. import haven_chk as hc
+from .. import haven_utils as hu
 
 ALIVE_STATES = ["RUNNING", "QUEUED", "PENDING", "QUEUING"]
 COMPLETED_STATES = ["COMPLETED", "SUCCEEDED", "COMPLETING"]
@@ -554,6 +555,17 @@ def chunk_list(my_list, n=100):
 
 def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, verbose=True):
     exp_dict = {"command": command}
+
+    try:
+        import git
+
+        repo = git.Repo(search_parent_directories=True)
+        exp_dict["git_hash"] = repo.head.object.hexsha
+        print(f"found git repo {repo.common_dir} at hash {repo.head.object.hexsha}")
+    except ImportError:
+        print("gitpython not installed, not using git hash for experiment hash")
+    except git.InvalidGitRepositoryDir:
+        pass
 
     jm = JobManager(
         exp_list=[exp_dict],
