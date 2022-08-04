@@ -553,19 +553,21 @@ def chunk_list(my_list, n=100):
     return [my_list[x : x + n] for x in range(0, len(my_list), n)]
 
 
-def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, verbose=True):
+def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, use_git=False, verbose=True):
     exp_dict = {"command": command}
 
-    try:
-        import git
+    if use_git:
+        try:
+            import git
 
-        repo = git.Repo(search_parent_directories=True)
-        exp_dict["git_hash"] = repo.head.object.hexsha
-        print(f"found git repo {repo.common_dir} at hash {repo.head.object.hexsha}")
-    except ImportError:
-        print("gitpython not installed, not using git hash for experiment hash")
-    except git.InvalidGitRepositoryDir:
-        pass
+            repo = git.Repo(search_parent_directories=True)
+        except ImportError:
+            print("gitpython not installed, it is necessary for use_git=True, not using git hash for experiment hash")
+        except git.InvalidGitRepositoryDir:
+            print("use_git=True but no git repository found, not using git hash for experiment hash")
+        else:
+            exp_dict["git_hash"] = repo.head.object.hexsha
+            print(f"found git repo {repo.common_dir} at hash {repo.head.object.hexsha}")
 
     jm = JobManager(
         exp_list=[exp_dict],
