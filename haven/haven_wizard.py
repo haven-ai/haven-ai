@@ -291,7 +291,7 @@ class CheckpointManager:
         else:
             return None
 
-    def save_model(state_dict):
+    def save_model(self, state_dict):
         hu.torch_save(os.path.join(self.savedir, "model.pth"), state_dict)
 
     def get_epoch(self):
@@ -315,7 +315,7 @@ class CheckpointManager:
         if not isinstance(images, list):
             images = [images]
 
-        for im in images:
+        for i, im in enumerate(images):
             hu.save_image(os.path.join(self.savedir, "images", f"{i}.jpg"), im)
 
 
