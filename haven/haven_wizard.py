@@ -1,14 +1,16 @@
-import os
-import sys
-import torch
 import argparse
-import pandas as pd
+import os
 import pprint
+import sys
+
+import numpy as np
+import pandas as pd
+import torch
+
 import haven
 
-from . import haven_utils as hu
 from . import haven_jupyter as hj
-import numpy as np
+from . import haven_utils as hu
 
 
 def get_args():
@@ -24,7 +26,7 @@ def get_args():
         "-j", "--job_scheduler", default=None, type=str, help="Run the experiments as jobs in the cluster."
     )
 
-    args, others = parser.parse_known_args()
+    args, _ = parser.parse_known_args()
 
     return args
 
@@ -46,10 +48,10 @@ def make_wide(formatter, w=120, h=36):
 
 def run_wizard(
     func,
+    savedir_base=None,
     exp_list=None,
     exp_groups=None,
     job_config=None,
-    savedir_base=None,
     reset=None,
     args=None,
     use_threads=False,
@@ -73,11 +75,59 @@ def run_wizard(
                 continue
             setattr(args, k, v)
 
-    # Asserts
-    # =======
     savedir_base = savedir_base or args.savedir_base
     reset = reset or args.reset
     exp_id = exp_id or args.exp_id
+    job_scheduler = job_scheduler if job_scheduler is not None else args.job_scheduler
+
+    if exp_list is None:
+        # select exp group
+        exp_list = []
+        for exp_group_name in args.exp_group_list:
+            exp_list += exp_groups[exp_group_name]
+
+    run_wizard_no_argparse(
+        func,
+        savedir_base,
+        exp_list,
+        exp_groups,
+        job_config,
+        reset,
+        args,
+        use_threads,
+        exp_id,
+        python_binary_path,
+        python_file_path,
+        workdir,
+        job_scheduler,
+        save_logs,
+        filter_duplicates,
+        results_fname,
+        job_option,
+    )
+
+
+def run_wizard_no_argparse(
+    func,
+    savedir_base,
+    exp_list=None,
+    exp_groups=None,
+    job_config=None,
+    reset=None,
+    args=None,
+    use_threads=False,
+    exp_id=None,
+    python_binary_path="python",
+    python_file_path=None,
+    workdir=None,
+    job_scheduler=None,
+    save_logs=True,
+    filter_duplicates=False,
+    results_fname=None,
+    job_option=None,
+):
+    # Asserts
+    # =======
     assert savedir_base is not None
 
     # make sure savedir_base is absolute
@@ -91,12 +141,6 @@ def run_wizard(
         exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
 
         exp_list = [exp_dict]
-
-    elif exp_list is None:
-        # select exp group
-        exp_list = []
-        for exp_group_name in args.exp_group_list:
-            exp_list += exp_groups[exp_group_name]
 
     if filter_duplicates:
         n_total = len(exp_list)
@@ -115,9 +159,6 @@ def run_wizard(
 
     # Run experiments
     # ===============
-    if job_scheduler is None:
-        job_scheduler = args.job_scheduler
-
     if job_scheduler in [None, "None", "0"]:
         job_scheduler = None
 
@@ -162,7 +203,7 @@ def run_wizard(
 
         command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base}"
 
-        for k, v in custom_args.items():
+        for k, v in args.items():
             if k not in [
                 "savedir_base",
                 "sb",
@@ -182,6 +223,7 @@ def run_wizard(
 
 def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp_id=False, verbose=True):
     import pprint
+
     from . import haven_chk as hc
 
     exp_id = hu.hash_dict(exp_dict)
