@@ -67,7 +67,6 @@ def run_wizard(
 ):
     if args is None:
         args = get_args()
-        custom_args = {}
     else:
         custom_args = vars(args).copy()
         for k, v in vars(get_args()).items():
@@ -203,7 +202,7 @@ def run_wizard_no_argparse(
 
         command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base}"
 
-        for k, v in args.items():
+        for k, v in args.__dict__.items():
             if k not in [
                 "savedir_base",
                 "sb",
