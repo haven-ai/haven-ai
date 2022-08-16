@@ -160,10 +160,11 @@ def run_wizard(
         if python_file_path is None:
             python_file_path = os.path.split(sys.argv[0])[-1]
 
-        command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base}"
+        command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base} --python_binary '{python_binary_path}'"
 
         for k, v in custom_args.items():
             if k not in [
+                "python_binary",
                 "savedir_base",
                 "sb",
                 "exp_id",
