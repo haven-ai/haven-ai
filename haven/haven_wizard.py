@@ -243,10 +243,13 @@ class CheckpointManager:
         if self.verbose:
             report(self.savedir, self.chk_dict["score_list"])
 
-    def load_model(self):
+    def load_model(self, device=None):
         fname = os.path.join(self.savedir, "model.pth")
         if os.path.exists(fname):
-            return torch.load(fname)
+            if device is not None:
+                return torch.load(fname, map_location=device)
+            else:
+                return torch.load(fname)
         else:
             return None
 
