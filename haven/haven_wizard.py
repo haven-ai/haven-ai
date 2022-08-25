@@ -160,10 +160,11 @@ def run_wizard(
         if python_file_path is None:
             python_file_path = os.path.split(sys.argv[0])[-1]
 
-        command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base}"
+        command = f"{python_binary_path} {python_file_path} --exp_id <exp_id> --savedir_base {savedir_base} --python_binary '{python_binary_path}'"
 
         for k, v in custom_args.items():
             if k not in [
+                "python_binary",
                 "savedir_base",
                 "sb",
                 "exp_id",
@@ -242,10 +243,13 @@ class CheckpointManager:
         if self.verbose:
             report(self.savedir, self.chk_dict["score_list"])
 
-    def load_model(self):
+    def load_model(self, device=None):
         fname = os.path.join(self.savedir, "model.pth")
         if os.path.exists(fname):
-            return torch.load(fname)
+            if device is not None:
+                return torch.load(fname, map_location=device)
+            else:
+                return torch.load(fname)
         else:
             return None
 
