@@ -1,0 +1,35 @@
+{
+    "batch_size": [64],
+
+    "epochs": [500],
+    "fid_pretrained": [
+        "$OG_PRETRAINED_CLS_S4/model_best.pth"
+    ],
+    "dataset.k_shot": [5],
+    "dataset.name": ["omniglot_fs"],
+    "dataset.seed": [4],
+    "dataset.input_size": [32],
+
+    "model.use_ema": ["true"],
+    "model.ndf": [32],
+    "model.ngf_decoder": [1024],
+    "model.z_dim": [128],
+
+    "model.pretrain": ["false"],
+    "model.beta": [0.0],
+    "model.gamma": [25.0, 10.0],
+    "model.blocks_per_res": [
+        [4,4,4,4]
+    ],
+
+    "model.name": ["ae_mixup"],
+
+    "optim.lr": [2e-4],
+    "optim.beta1": [0.0],
+    "optim.beta2": [0.9],
+
+    "optim.weight_decay": [0.0],
+    "optim.n_gen": [5],
+
+    "fid_every": [10]
+}

@@ -18,25 +18,6 @@ from haven import haven_chk as hc
 from haven import haven_jobs as hjb
 
 
-def test_other_account():
-    # toolkit tests
-    import job_configs
-
-    exp_list = [{"model": {"name": "mlp", "n_layers": 20}, "dataset": "mnist", "batch_size": 1}]
-    savedir_base = "../haven_results"
-    os.makedirs(savedir_base, exist_ok=True)
-    jm = hjb.JobManager(
-        exp_list=exp_list,
-        savedir_base=savedir_base,
-        workdir=os.path.dirname(os.path.realpath(__file__)),
-        job_config=job_configs.JOB_CONFIG_OTHER,
-        job_scheduler="toolkit",
-    )
-    # get jobs
-    job_list_old = jm.get_jobs()
-
-
-
 def test_cartesian_product():
     # test whether the cartesian product covers all needed variations
     exp_dict_1 = {"dataset": "mnist", "model": "mlp", "batch_size": 1}
@@ -527,7 +508,6 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
-        test_other_account()
         test_wizard()
         test_get_result_manager()
         test_hash()

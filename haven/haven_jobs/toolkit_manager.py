@@ -23,6 +23,41 @@ def to_dict(job):
 
 # Api
 # ==============
+if 1:
+    import os
+    import sys
+    import eai_toolkit_client
+
+
+    jobs_url = "https://console.elementai.com"
+
+
+    config = eai_toolkit_client.Configuration()
+    config.host = jobs_url
+
+
+    api_client = eai_toolkit_client.ApiClient(config)
+    # # get token
+    # token_url = "https://internal.console.elementai.com/v1/token"
+    # r = requests.get(token_url)
+    # r.raise_for_status()
+    # token = r.text
+    token = "zLzmJiaBDUZ-Jj5Gu1F0oRaXCANgHZ-vLVgukuEvLSM.8UpUaKHgOCm_t6mu0tjH95qvJY2m-kat2dt6xWgYS4s"
+    
+    api_client.set_default_header("Authorization", "Bearer {}".format(token))
+    account_id = "28d9c559-373b-4387-b646-d8721a15ef4e"
+
+
+    # create an instance of the API class
+    api = eai_toolkit_client.AccountApi(api_client)
+
+
+    try:
+        datas = api.v1_account_job_run_get(account_id)
+        print(datas)
+        print()
+    except Exception as e:
+        print(e)
 
 
 def get_api(**kwargs):
@@ -79,9 +114,14 @@ def get_job_spec(job_config, command, savedir_logs, workdir):
     _job_config["workdir"] = workdir
 
     if savedir_logs is not None:
-        path_log = os.path.join(savedir_logs, "logs.txt")
-        path_err = os.path.join(savedir_logs, "err.txt")
-        command_with_logs = "%s 1>%s 2>%s" % (command, path_log, path_err)
+        if isinstance(savedir_logs, tuple):
+            path_log = os.path.join(savedir_logs[0], "logs.txt")
+            path_err = os.path.join(savedir_logs[0], "err.txt")
+            command_with_logs = "%s 1>(tee %s) 2>(tee %s)" % (command, path_log, path_err)
+        else:
+            path_log = os.path.join(savedir_logs, "logs.txt")
+            path_err = os.path.join(savedir_logs, "err.txt")
+            command_with_logs = "%s 1>%s 2>%s" % (command, path_log, path_err)
     else:
         command_with_logs = command
 

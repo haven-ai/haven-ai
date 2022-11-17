@@ -58,7 +58,7 @@ def run_wizard(
     python_file_path=None,
     workdir=None,
     job_scheduler=None,
-    save_logs=True,
+    save_logs=2,
     filter_duplicates=False,
     results_fname=None,
     job_option=None,

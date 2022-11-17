@@ -42,19 +42,23 @@ def text_tab(db, output):
         output_plot.clear_output()
         with output_plot:
             text_list = []
+            fname_list = []
             for exp_dict in db.rm.exp_list:
                 exp_id = hu.hash_dict(exp_dict)
-                savedir_text = os.path.join(db.rm.savedir_base, exp_id, "text")
+                savedir_text = os.path.join(db.rm.savedir_base, exp_id, "texts")
                 if os.path.exists(savedir_text):
                     path = os.path.join(savedir_text, "*.json")
-                    out = hu.load_json(glob.glob(path)[0])
+                    files = sorted( glob.glob(path), key = lambda file: os.path.getctime(file)) 
+                    out = hu.load_json(files[-1])
                     text_list += [out]
+                    fname_list += [files[-1]]
                 else:
                     text_list += ["None"]
+                    fname_list += ["None"]
 
             n_logs = len(text_list)
 
-            for i, (exp_dict, text) in enumerate(zip(db.rm.exp_list, text_list)):
+            for i, (exp_dict, text, fname) in enumerate(zip(db.rm.exp_list, text_list, fname_list)):
                 exp_id = hu.hash_dict(exp_dict)
                 savedir = os.path.join(db.rm_original.savedir_base, exp_id)
                 print("\nPredictions %d/%d" % (i + 1, n_logs), "=" * 50)
@@ -70,11 +74,15 @@ def text_tab(db, output):
                     print("-" * 50)
                     score_list = hu.load_pkl(os.path.join(savedir, "score_list.pkl"))
                     pprint.pprint(score_list[-1])
-
+       
                 print("\nPredictions")
                 print("-" * 50)
-                for j, t in enumerate(text):
-                    print(f"\n*** Example {j} ***\n")
-                    pprint.pprint(t)
+
+                # print(f"\n*** Example {i} ***\n")
+                pprint.pprint(fname)
+                pprint.pprint(text)
+
+                # for j, t in enumerate(text):
+                    
 
     blogs.on_click(on_logs_clicked)

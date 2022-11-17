@@ -30,7 +30,7 @@ class JobManager:
         verbose=1,
         account_id=None,
         job_scheduler=None,
-        save_logs=True,
+        save_logs=2,
     ):
         """[summary]
 
@@ -110,7 +110,10 @@ class JobManager:
         # make sure the paths are absolute
         workdir = os.path.abspath(workdir)
         if savedir_logs is not None:
-            savedir_logs = os.path.abspath(savedir_logs)
+            if self.save_logs == 2:
+                savedir_logs = (os.path.abspath(savedir_logs), "tee")
+            else:
+                savedir_logs = os.path.abspath(savedir_logs)
 
         return self.ho.submit_job(
             api=self.api,
@@ -165,8 +168,10 @@ class JobManager:
             "  0)'ipdb' run ipdb for an interactive session; or\n"
             "  1)'reset' to reset the experiments; or\n"
             "  2)'run' to run the remaining experiments and retry the failed ones; or\n"
-            "  3)'status' to view the job status; or\n"
-            "  4)'kill' to kill the jobs.\n"
+            "  3)'reset failed' to reset the failed experiments; or\n"
+            "  4)'reset success' to reset the succeeded experiments; or\n"
+            "  5)'status' to view the job status; or\n"
+            "  6)'kill' to kill the jobs.\n"
             "Type option: "
         )
         if job_option is None:
