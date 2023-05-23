@@ -7,6 +7,7 @@ import tqdm
 import torchvision
 import pprint
 import os
+import logging
 import pickle
 import shlex
 import subprocess
@@ -360,23 +361,30 @@ def copy_code(src_path, dst_path, verbose=1):
     # Create destination folder
     os.makedirs(dst_path, exist_ok=True)
 
-    # Define the command for copying the code using rsync
-    if os.path.exists(os.path.join(src_path, ".havenignore")):
-        rsync_code = (
-            "rsync -av -r -q  --delete-before --exclude='.*'  --exclude-from=%s \
-                        --exclude '__pycache__/' %s %s"
-            % (os.path.join(src_path, ".havenignore"), src_path, dst_path)
-        )
+    # Check if rsync is available
+    rsync_avialable = len(subprocess.run(['which', 'rsync'], capture_output=True, text=True).stdout)
+
+    if rsync_avialable:
+        # Define the command for copying the code using rsync
+        if os.path.exists(os.path.join(src_path, ".havenignore")):
+            copy_code_cmd = (
+                "rsync -av -r -q  --delete-before --exclude='.*'  --exclude-from=%s \
+                            --exclude '__pycache__/' %s %s"
+                % (os.path.join(src_path, ".havenignore"), src_path, dst_path)
+            )
+        else:
+            copy_code_cmd = (
+                "rsync -av -r -q  --delete-before --exclude='.*' \
+                            --exclude '__pycache__/' %s %s"
+                % (src_path, dst_path)
+            )
     else:
-        rsync_code = (
-            "rsync -av -r -q  --delete-before --exclude='.*' \
-                        --exclude '__pycache__/' %s %s"
-            % (src_path, dst_path)
-        )
+        logging.warning("rsync not available. Doing a hard copy of the code folder.")
+        copy_code_cmd = f"cp -r {src_path} {dst_path}"
 
     # Run the command in the terminal
     try:
-        subprocess_call(rsync_code)
+        subprocess_call(copy_code_cmd)
     except subprocess.CalledProcessError as e:
         raise ValueError("Ping stdout output:\n", e.output)
 
