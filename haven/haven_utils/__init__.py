@@ -380,7 +380,7 @@ def copy_code(src_path, dst_path, verbose=1):
             )
     else:
         logging.warning("rsync not available. Doing a hard copy of the code folder.")
-        copy_code_cmd = f"cp -r {src_path} {dst_path}"
+        copy_code_cmd = f"cp -rf {src_path}. {dst_path}"
 
     # Run the command in the terminal
     try:
