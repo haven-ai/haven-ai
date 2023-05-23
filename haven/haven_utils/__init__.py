@@ -362,7 +362,7 @@ def copy_code(src_path, dst_path, verbose=1):
     os.makedirs(dst_path, exist_ok=True)
 
     # Check if rsync is available
-    rsync_avialable = len(subprocess.run(['which', 'rsync'], capture_output=True, text=True).stdout)
+    rsync_avialable = len(subprocess.run(['which', 'rsync'], capture_output=True, text=True).stdout) > 0
 
     if rsync_avialable:
         # Define the command for copying the code using rsync
