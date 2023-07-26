@@ -25,7 +25,6 @@ setup(
         "scikit-image>=0.0",
         "scikit-learn>=0.0",
         "scipy>=0.0",
-        "sklearn>=0.0",
         "torch>=0.0",
         "torchvision>=0.0",
         "notebook >= 4.0",
