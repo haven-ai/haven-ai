@@ -167,6 +167,7 @@ class JobManager:
             "  2)'run' to run the remaining experiments and retry the failed ones; or\n"
             "  3)'status' to view the job status; or\n"
             "  4)'kill' to kill the jobs.\n"
+            "  5)'srun' to re-run succeeded jobs.\n"
             "Type option: "
         )
         if job_option is None:
@@ -174,7 +175,7 @@ class JobManager:
         else:
             option = job_option
 
-        option_list = ["reset", "run", "status", "logs", "kill", "ipdb"]
+        option_list = ["reset", "run", "status", "logs", "kill", "ipdb", "srun"]
         if option not in option_list:
             raise ValueError("Prompt input has to be one of these choices %s" % option_list)
 
@@ -211,6 +212,21 @@ class JobManager:
             for e_list in chunk_list(exp_list, n=100):
                 self.launch_exp_list(command=command, exp_list=e_list, reset=0, in_parallel=in_parallel)
 
+        elif option == "srun":
+            self.verbose = False
+            tmp_list = [s_dict["exp_dict"] for s_dict in summary_list if s_dict["job_state"] not in ALIVE_STATES]
+
+            print("Selected %d/%d exps" % (len(tmp_list), len(exp_list)))
+            exp_list = tmp_list
+            if len(exp_list) == 0:
+                print("All experiments have ran.")
+                return
+
+            for e_list in chunk_list(exp_list, n=100):
+                self.launch_exp_list(
+                    command=command, exp_list=e_list, reset=0, in_parallel=in_parallel, run_anyway=True
+                )
+
         elif option == "kill":
             self.verbose = False
             tmp_list = [s_dict["exp_dict"] for s_dict in summary_list if s_dict["job_state"] in ALIVE_STATES]
@@ -235,7 +251,7 @@ class JobManager:
         summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
         print(summary_dict)
 
-    def launch_exp_list(self, command, exp_list=None, savedir_base=None, reset=0, in_parallel=True):
+    def launch_exp_list(self, command, exp_list=None, savedir_base=None, reset=0, in_parallel=True, run_anyway=False):
         exp_list = exp_list or self.exp_list
         assert "<exp_id>" in command
 
@@ -251,7 +267,7 @@ class JobManager:
                 savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
 
                 com = command.replace("<exp_id>", exp_id)
-                pr.add(self.launch_or_ignore_exp_dict, exp_dict, com, reset, savedir, submit_dict)
+                pr.add(self.launch_or_ignore_exp_dict, exp_dict, com, reset, savedir, submit_dict, run_anyway)
 
             pr.run()
             pr.close()
@@ -264,7 +280,7 @@ class JobManager:
                 savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
 
                 com = command.replace("<exp_id>", exp_id)
-                self.launch_or_ignore_exp_dict(exp_dict, com, reset, savedir, submit_dict)
+                self.launch_or_ignore_exp_dict(exp_dict, com, reset, savedir, submit_dict, run_anyway)
 
         if len(submit_dict) == 0:
             raise ValueError("The threads have an error, most likely a permission error (see above)")
@@ -309,7 +325,7 @@ class JobManager:
         print("%d/%d experiments killed." % (len([s for s in submit_dict.values() if "KILLED" in s]), len(submit_dict)))
         return submit_dict
 
-    def launch_or_ignore_exp_dict(self, exp_dict, command, reset, savedir, submit_dict=None):
+    def launch_or_ignore_exp_dict(self, exp_dict, command, reset, savedir, submit_dict=None, run_anyway=False):
         """launch or ignore job.
 
         It checks if the experiment exist and manages the special casses, e.g.,
@@ -338,14 +354,14 @@ class JobManager:
             job_id = hu.load_json(fname).get("job_id")
             job = self.get_job(job_id)
 
-            if job["state"] in ALIVE_STATES + COMPLETED_STATES:
-                # If the job is alive, do nothing
-                message = "IGNORED: Job %s" % job["state"]
-
-            elif job["state"] in FAILED_STATES:
+            if job["state"] in FAILED_STATES or run_anyway:
                 message = "SUBMITTED: Retrying %s Job" % job["state"]
                 job_dict = self.launch_exp_dict(exp_dict, savedir, command, job=job)
                 job_id = job_dict["job_id"]
+
+            elif job["state"] in ALIVE_STATES + COMPLETED_STATES:
+                # If the job is alive, do nothing
+                message = "IGNORED: Job %s" % job["state"]
             # This shouldn't happen
             else:
                 raise ValueError("wtf")
@@ -552,7 +568,7 @@ def chunk_list(my_list, n=100):
     return [my_list[x : x + n] for x in range(0, len(my_list), n)]
 
 
-def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, verbose=True):
+def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, verbose=True, option=None):
     exp_dict = {"command": command}
 
     jm = JobManager(
@@ -579,38 +595,52 @@ def launch_job(command, savedir_base, job_scheduler, job_config, reset=False, ve
     print(f"saved: {savedir}")
     prompt = "\nMenu:\n" "  0)'log'; or\n" "  1)'run'; or\n" "  2)'reset'; or\n" "  3)'exit'.\n" "Type option: "
 
-    while 1:
-        option = input(prompt)
-        if option in ["reset", "2"]:
-            reset = 1
-            break
-        elif option in ["run", "1"]:
-            reset = 0
-            break
-        elif option in ["log", "0"]:
-            # Logs info
-            if job["state"] == "FAILED":
-                logs_fname = os.path.join(savedir, "err.txt")
+    if option is None:
+        while 1:
+            option = input(prompt)
+            if option in ["reset", "2"]:
+                reset = 1
+                break
+            elif option in ["run", "1"]:
+                reset = 0
+                break
+            elif option in ["log", "0"]:
+                # Logs info
+                if job["state"] == "FAILED":
+                    logs_fname = os.path.join(savedir, "err.txt")
+                else:
+                    logs_fname = os.path.join(savedir, "logs.txt")
+
+                if os.path.exists(logs_fname):
+                    logs = hu.read_text(logs_fname)[-10:]
+                    print(logs)
+                    print()
+                    print(message)
+
+            elif option in ["exit", "3"]:
+                print("exiting...")
+                break
             else:
-                logs_fname = os.path.join(savedir, "logs.txt")
+                raise ValueError(f"{option} does not exist.")
 
-            if os.path.exists(logs_fname):
-                logs = hu.read_text(logs_fname)[-10:]
-                print(logs)
-                print()
-                print(message)
-
-        elif option in ["exit", "3"]:
-            print("exiting...")
-            break
+    if option in ["run", "reset"]:
+        # Get whether to reset
+        if option == "run":
+            reset = 0
+        elif option == "reset":
+            reset = 1
         else:
             raise ValueError(f"{option} does not exist.")
 
-    if option in ["run", "reset"]:
+        # Launch job
         job = jm.launch_or_ignore_exp_dict(exp_dict=exp_dict, reset=reset, savedir=savedir, command=command)
 
+        # Get job id
         if verbose:
             job_id = list(job.keys())[0]
             pprint.pprint({"job_id": job_id, "savedir": savedir, "command": command, "message": job[job_id]["message"]})
 
         return job
+
+    else:
+        raise ValueError(f"{option} does not exist.")
