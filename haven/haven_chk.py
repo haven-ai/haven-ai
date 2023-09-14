@@ -1,6 +1,6 @@
 import shutil
 import os
-import torch
+
 
 from . import haven_utils as hu
 
@@ -45,6 +45,8 @@ def delete_experiment(savedir, backup_flag=False):
 
 
 def load_checkpoint(exp_dict, savedir_base, fname="model_best.pth"):
+    import torch
+
     path = os.path.join(savedir_base, hu.hash_dict(exp_dict), fname)
     return torch.load(path)
 

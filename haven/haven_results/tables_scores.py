@@ -1,18 +1,9 @@
 import copy
-import glob
 import os
-import sys
-import pprint
-from itertools import groupby
-from textwrap import wrap
 import numpy as np
 import pandas as pd
-import pylab as plt
-import tqdm
 
-from .. import haven_jobs as hjb
 from .. import haven_utils as hu
-from .. import haven_share as hd
 
 
 def get_score_df(
@@ -22,7 +13,6 @@ def get_score_df(
     columns=None,
     score_columns=None,
     verbose=True,
-    wrap_size=8,
     hparam_diff=0,
     flatten_columns=True,
     show_meta=True,
@@ -113,11 +103,7 @@ def get_score_df(
 
         # hparam_columns = [k for k in result_dict.keys() if k not in ['creation_time']]
 
-        if not os.path.exists(score_list_fname):
-            if verbose:
-                print("%s: %s is missing" % (exp_id, score_list_name))
-
-        else:
+        if os.path.exists(score_list_fname):
             try:
                 score_list = hu.load_pkl(score_list_fname)
             except Exception:
@@ -148,6 +134,10 @@ def get_score_df(
                             result_dict[k_new] = v[-1]
 
         result_list += [result_dict]
+
+    # Number of experiments without scores
+    if verbose:
+        print("Experiments with score_list.pkl: %d/%d" % (len(result_list), len(exp_list)))
 
     # create table
     df = pd.DataFrame(result_list)

@@ -1,15 +1,11 @@
 import os
 import time
-import sys
-import subprocess
 from .. import haven_utils as hu
 from .. import haven_chk as hc
-from textwrap import wrap
 
 import copy
 import pandas as pd
 import numpy as np
-import getpass
 import pprint
 
 ALIVE_STATES = ["RUNNING", "QUEUED", "PENDING", "QUEUING"]

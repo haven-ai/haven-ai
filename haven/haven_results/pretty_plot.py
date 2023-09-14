@@ -1,12 +1,10 @@
 import matplotlib
 import numpy as np
 import os
-import pandas as pd
 import pylab as plt
 
 from itertools import product
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
-from sklearn.metrics.pairwise import pairwise_distances
 
 
 matplotlib.style.use("bmh")
@@ -49,7 +47,7 @@ def myticks(x, pos):
         return "$0$"
 
     exponent = int(np.log10(x))
-    coeff = x / 10 ** exponent
+    coeff = x / 10**exponent
 
     # return r"{:0.1f}e{:0d}".format(coeff,exponent)
 
@@ -62,7 +60,7 @@ def myticks_new(x, pos, exponent=1e5):
         return "$0$"
 
     exponent = int(np.log10(x))
-    coeff = x / 10 ** exponent
+    coeff = x / 10**exponent
 
     return r"${:0s}$".format(coeff / exponent)
 
@@ -468,6 +466,7 @@ def get_labelPositions(y_list, x_list, ylim=None, labels=None, ref_points=None):
             xy_points.copy(), ref_points[: n_border + i].copy(), y_min, y_max, x_min, x_max
         )
         # GET REF POINTS
+        from sklearn.metrics.pairwise import pairwise_distances
 
         dist = pairwise_distances(xy_normed, ref_normed, metric="l1")
 
