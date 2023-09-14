@@ -1,7 +1,5 @@
-from .. import haven_utils
 from .. import haven_results as hr
 from .. import haven_utils as hu
-from .. import haven_share as hd
 
 from .share_tab import share_tab
 from .plots_tab import plots_tab
@@ -9,15 +7,9 @@ from .tables_tab import tables_tab
 from .latex_tab import latex_tab
 from .images_tab import images_tab
 from .text_tab import text_tab
-from . import widgets as wdg
 
 import haven
 import os
-import pprint
-import json
-import copy
-import pprint
-import pandas as pd
 
 try:
     import ast
@@ -29,7 +21,7 @@ try:
     from IPython.display import FileLink, FileLinks
     from ipywidgets.widgets.interaction import show_inline_matplotlib_plots
 except Exception:
-    print("widgets not available...")
+    pass
 
 
 def get_dashboard(rm, vars=None, show_jobs=True, wide_display=False, enable_datatables=True):
@@ -246,7 +238,6 @@ fig = rm.get_plot_all(
 def main_cell(savedir_base):
     script = (
         """
-from haven import haven_jupyter as hj
 from haven import haven_results as hr
 from haven import haven_utils as hu
 

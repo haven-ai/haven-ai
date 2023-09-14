@@ -1,14 +1,10 @@
 import os
 import sys
-import torch
+
 import argparse
-import pandas as pd
-import pprint
 import haven
 
 from . import haven_utils as hu
-from . import haven_jupyter as hj
-import numpy as np
 
 
 def get_args():
@@ -111,7 +107,7 @@ def run_wizard(
         if len(results_fname):
             if ".ipynb" not in results_fname:
                 raise ValueError(".ipynb should be the file extension")
-            hj.create_jupyter_file(fname=results_fname, savedir_base=savedir_base)
+            hu.create_jupyter_file(fname=results_fname, savedir_base=savedir_base)
 
     # Run experiments
     # ===============
@@ -229,129 +225,3 @@ def create_experiment(exp_dict, savedir_base, reset, copy_code=False, return_exp
         return savedir, exp_id
 
     return savedir
-
-
-class CheckpointManager:
-    def __init__(self, savedir, verbose=True):
-        self.savedir = savedir
-        self.verbose = verbose
-        self.chk_dict = get_checkpoint(savedir)
-
-    def log_metrics(self, score_dict):
-        self.chk_dict["score_list"] += [score_dict]
-        hu.save_pkl(os.path.join(self.savedir, "score_list.pkl"), self.chk_dict["score_list"])
-        if self.verbose:
-            report(self.savedir, self.chk_dict["score_list"])
-
-    def load_model(self, device=None):
-        fname = os.path.join(self.savedir, "model.pth")
-        if os.path.exists(fname):
-            if device is not None:
-                return torch.load(fname, map_location=device)
-            else:
-                return torch.load(fname)
-        else:
-            return None
-
-    def save_model(state_dict):
-        hu.torch_save(os.path.join(self.savedir, "model.pth"), state_dict)
-
-    def get_epoch(self):
-        if len(self.chk_dict["score_list"]) == 0:
-            return 0
-        return self.chk_dict["score_list"][-1]["epoch"] + 1
-
-    def save_pkl(self, fname, data):
-        hu.save_pkl(os.path.join(self.savedir, fname), data)
-
-    def load_pkl(self, fname, data):
-        hu.load_pkl(os.path.join(self.savedir, fname))
-
-    def save_torch(self, fname, data):
-        hu.torch_save(os.path.join(self.savedir, fname), data)
-
-    def load_torch(self, fname, data):
-        torch.load(os.path.join(self.savedir, fname))
-
-    def save_images(self, images):
-        if not isinstance(images, list):
-            images = [images]
-
-        for im in images:
-            hu.save_image(os.path.join(self.savedir, "images", f"{i}.jpg"), im)
-
-
-def save_checkpoint(
-    savedir, score_list, model_state_dict=None, images=None, images_fname=None, fname_suffix="", verbose=True
-):
-    # Report
-    if verbose:
-        report(savedir, score_list)
-
-    # save score_list
-    score_list_fname = os.path.join(savedir, "score_list%s.pkl" % fname_suffix)
-    hu.save_pkl(score_list_fname, score_list)
-    # if verbose:
-    # print('> Saved "score_list" as %s' %
-    #       os.path.split(score_list_fname)[-1])
-
-    # save model
-    if model_state_dict is not None:
-        model_state_dict_fname = os.path.join(savedir, "model%s.pth" % fname_suffix)
-        hu.torch_save(model_state_dict_fname, model_state_dict)
-        # if verbose:
-        # print('> Saved "model_state_dict" as %s' %
-        #       os.path.split(model_state_dict_fname)[-1])
-
-    # save images
-    images_dir = os.path.join(savedir, "images%s" % fname_suffix)
-    if images is not None:
-        for i, img in enumerate(images):
-
-            if images_fname is not None:
-                fname = "%s" % images_fname[i]
-            else:
-                fname = "%d.png" % i
-            hu.save_image(os.path.join(images_dir, fname), img)
-        # if verbose:
-        #     print('> Saved "images" in %s' % os.path.split(images_dir)[-1])
-
-    print("=" * 100)
-
-
-def report(savedir, score_list):
-    exp_dict = hu.load_json(os.path.join(savedir, "exp_dict.json"))
-    print("\nExp id: %s" % hu.hash_dict(exp_dict))
-
-    print("\nHyperparameters:\n" + "-" * 16)
-    # print(pd.DataFrame([exp_dict]).to_string(index=False))
-    pprint.pprint(exp_dict)
-    print("\nMetrics:\n" + "-" * 8)
-    score_df = pd.DataFrame(score_list)
-    print(score_df.tail().to_string(index=False), "\n")
-
-    print("Save directory: %s" % savedir)
-
-
-def get_checkpoint(savedir, return_model_state_dict=False):
-    chk_dict = {}
-
-    # score list
-    score_list_fname = os.path.join(savedir, "score_list.pkl")
-    if os.path.exists(score_list_fname):
-        score_list = hu.load_pkl(score_list_fname)
-    else:
-        score_list = []
-
-    chk_dict["score_list"] = score_list
-    if len(score_list) == 0:
-        chk_dict["epoch"] = 0
-    else:
-        chk_dict["epoch"] = score_list[-1]["epoch"] + 1
-
-    chk_dict["model_state_dict"] = {}
-    model_state_dict_fname = os.path.join(savedir, "model.pth")
-    if return_model_state_dict:
-        if os.path.exists(model_state_dict_fname):
-            chk_dict["model_state_dict"] = hu.torch_load(model_state_dict_fname)
-    return chk_dict

@@ -3,14 +3,12 @@ import sys, os
 path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.insert(0, path)
 
-import unittest
 import numpy as np
 import os
 import torch
 import shutil
 
 from haven import haven_wizard as hw
-from haven import haven_jupyter as hj
 from haven import haven_img as hi
 from haven import haven_utils as hu
 from haven import haven_results as hr
@@ -59,7 +57,7 @@ def test_checkpoint():
     savedir = os.path.join(savedir_base, hu.hash_dict(exp_dict))
 
     hu.save_json(os.path.join(savedir, "exp_dict.json"), exp_dict)
-    hw.report(savedir, [])
+    # hw.report(savedir, [])
     hu.torch_save(os.path.join(savedir, "model.pth"), torch.zeros(10))
     hu.torch_load(os.path.join(savedir, "model.pth"))
     hc.load_checkpoint(exp_dict, savedir_base, fname="model.pth")
@@ -397,8 +395,6 @@ def test_toolkit():
     df = rm.get_resources_stats(job_dict={"cpu": 4, "mem": 20, "gpu": 1, "gpu_mem": 16})
     assert df is not None
     # print(df)
-    db = hj.get_dashboard(rm, wide_display=True)
-    db.display()
 
 
 def test_avg_runs():
@@ -458,6 +454,24 @@ def test_wizard():
 
     savedir_base = "../haven_results"
 
+    # if exists
+    if os.path.exists(savedir_base):
+        shutil.rmtree(savedir_base)
+
+    # not in cluster
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[{"lr": 1e-3}],
+        savedir_base=savedir_base,
+        reset=0,
+        results_fname=f"{savedir_base}/results.ipynb",
+    )
+
+    print("results_fname:", f"{savedir_base}/results.ipynb")
+
+    # test for result manager
+    hr.ResultManager(savedir_base=savedir_base)
+
     # in cluster
     hw.run_wizard(
         func=test_trainval,
@@ -468,15 +482,6 @@ def test_wizard():
         job_config=job_configs.JOB_CONFIG,
         job_scheduler="toolkit",
         job_option="run",
-    )
-
-    # not in cluster
-    hw.run_wizard(
-        func=test_trainval,
-        exp_list=[{"lr": 1e-3}],
-        savedir_base=savedir_base,
-        reset=0,
-        results_fname=f"{savedir_base}/results.ipynb",
     )
 
     shutil.rmtree(savedir_base)
@@ -491,14 +496,14 @@ import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mode", nargs="+", default=["toolkit"])
+    parser.add_argument("-m", "--mode", nargs="+", default=["basic"])
     args, others = parser.parse_known_args()
 
     if "basic" in args.mode:
         # baasic tests
+        test_wizard()
         test_get_result_manager()
         test_hash()
-        test_wizard()
         test_cartesian_product()
         test_hash()
         test_checkpoint()

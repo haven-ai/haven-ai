@@ -2,10 +2,11 @@ import pylab as plt
 
 plt.rcParams.update({"figure.max_open_warning": 0})
 
-import copy
+import copy, pprint
 import os
 import numpy as np
 import pandas as pd
+import haven
 
 from .. import haven_jobs as hjb
 from .. import haven_utils as hu
@@ -70,6 +71,9 @@ class ResultManager:
                                     title_list=['dataset'],
                                     legend_list=['model'])
         """
+        if verbose:
+            # print haven version and number of experiments loaded
+            print(f"Haven version: {haven.__version__}")
 
         # sanity checks
         assert os.path.exists(savedir_base), "%s does not exist" % savedir_base
@@ -155,11 +159,57 @@ class ResultManager:
         )
         self.exp_groups["all"] = copy.deepcopy(self.exp_list_all)
 
+        self.hparam_columns = self.exp_params
+        self.score_columns = self.score_keys
+
     def get_state_dict(self):
         pass
 
     def load_state_dict(self, state_dict):
         pass
+
+    def get_job_failed(rm):
+        summary_list = rm.get_job_summary(verbose=rm.verbose, add_prefix=True, job_scheduler=rm.job_scheduler)
+        summary_dict = hu.group_list(summary_list, key="job_state", return_count=False)
+        if "FAILED" not in summary_dict:
+            stdout_list = ["NO FAILED JOBS"]
+            return stdout_list
+
+        n_failed = len(summary_dict["FAILED"])
+
+        if n_failed == 0:
+            stdout_list = ["no failed experiments\n"]
+        else:
+            stdout_list = []
+            for i, failed in enumerate(summary_dict["FAILED"]):
+                stdout = "\nFailed %d/%d " % (i + 1, n_failed) + "=" * 50
+                stdout += "\nexp_id: " + failed["exp_id"]
+                stdout += "\njob_id: " + failed["job_id"]
+                stdout += "\njob_state: " + "FAILED"
+                stdout += "\ncommand:" + failed.get("command")
+                stdout += "\nsavedir: " + os.path.join(rm.savedir_base, failed["exp_id"])
+
+                stdout += "\n\nexp_dict"
+                stdout += "\n" + "-" * 50 + "\n"
+                stdout += pprint.pformat(failed["exp_dict"])
+
+                stdout += "\n\nLogs\n"
+                stdout += "-" * 50 + "\n"
+                stdout += pprint.pformat(failed.get("logs"))
+                stdout += "\n"
+
+                stdout_list += [stdout]
+
+        return stdout_list
+
+    def get_job_status(rm):
+        """
+        Get the status of the jobs in a dictionary format
+        """
+        summary_list = rm.get_job_summary(verbose=rm.verbose, add_prefix=True, job_scheduler=rm.job_scheduler)
+        summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
+
+        return summary_dict
 
     def get_resources_stats(self, job_dict, savedir_base=None, return_df=False):
         if savedir_base is not None:
@@ -208,7 +258,7 @@ class ResultManager:
                 filterby_list=filterby_list,
                 verbose=self.verbose,
                 score_list_name=self.score_list_name,
-                **kwargs
+                **kwargs,
             )
             fig_list += [fig]
 
@@ -230,7 +280,7 @@ class ResultManager:
         savedir_plots=None,
         legend_last_row_only=False,
         show_legend_all=None,
-        **kwargs
+        **kwargs,
     ):
         """[summary]
 
@@ -304,7 +354,7 @@ class ResultManager:
                         ylim=ylim,
                         xlim=xlim,
                         score_list_name=self.score_list_name,
-                        **kwargs
+                        **kwargs,
                     )
                 fig_list += [fig]
 
@@ -359,7 +409,7 @@ class ResultManager:
                         show_legend=show_legend,
                         show_ylabel=show_ylabel,
                         score_list_name=self.score_list_name,
-                        **kwargs
+                        **kwargs,
                     )
                 fig_list += [fig]
 
@@ -398,7 +448,7 @@ class ResultManager:
             savedir_base=self.savedir_base,
             verbose=self.verbose,
             score_list_name=self.score_list_name,
-            **kwargs
+            **kwargs,
         )
         return df_list
 
@@ -443,7 +493,7 @@ class ResultManager:
             score_list_name=self.score_list_name,
             filterby_list=self.filterby_list,
             verbose=self.verbose,
-            **kwargs
+            **kwargs,
         )
         return table
 
@@ -461,7 +511,7 @@ class ResultManager:
             score_list_name=self.score_list_name,
             filterby_list=self.filterby_list,
             verbose=self.verbose,
-            **kwargs
+            **kwargs,
         )
         return score_lists
 

@@ -1,27 +1,13 @@
-from .. import haven_utils
-from .. import haven_results as hr
-from .. import haven_utils as hu
-from .. import haven_share as hd
 from . import widgets as wdg
 
-import os
-import pprint
-import json
-import copy
-import pprint
-import pandas as pd
 
 try:
-    import ast
-    from ipywidgets import Button, HBox, VBox
     from ipywidgets import widgets
 
     from IPython.display import display
-    from IPython.core.display import Javascript, display, HTML
-    from IPython.display import FileLink, FileLinks
-    from ipywidgets.widgets.interaction import show_inline_matplotlib_plots
+    from IPython.core.display import display
 except Exception:
-    print("widgets not available...")
+    pass
 
 
 def latex_tab(db, output):

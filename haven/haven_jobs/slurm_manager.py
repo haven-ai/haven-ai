@@ -1,11 +1,8 @@
 from .. import haven_utils as hu
-from .. import haven_chk as hc
 import os
 
 import time
-import copy
 import pandas as pd
-import numpy as np
 import getpass
 import pandas as pd
 from subprocess import SubprocessError

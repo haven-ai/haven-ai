@@ -1,4 +1,3 @@
-from haven import haven_jupyter as hj
 from haven import haven_jobs as hjb
 from haven import haven_chk as hc
 from haven import haven_results as hr

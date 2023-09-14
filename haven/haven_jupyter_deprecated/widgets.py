@@ -8,7 +8,7 @@ try:
     from IPython.display import FileLink, FileLinks
     from ipywidgets.widgets.interaction import show_inline_matplotlib_plots
 except Exception:
-    print("widgets not available...")
+    pass
 
 
 def autofix():

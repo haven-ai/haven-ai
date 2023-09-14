@@ -1,14 +1,7 @@
-from .. import haven_utils
-from .. import haven_results as hr
 from .. import haven_utils as hu
-from .. import haven_share as hd
 
 import os
 import pprint
-import json
-import copy
-import pprint
-import pandas as pd
 from . import widgets as wdg
 
 try:
@@ -21,7 +14,7 @@ try:
     from IPython.display import FileLink, FileLinks
     from ipywidgets.widgets.interaction import show_inline_matplotlib_plots
 except Exception:
-    print("widgets not available...")
+    pass
 
 
 def images_tab(self, output):

@@ -1,11 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+
 import pylab as plt
-from skimage.segmentation import mark_boundaries
+
 
 try:
     import cv2
+    from skimage.segmentation import mark_boundaries
+    from PIL import Image
 except:
     # ignore cv2 if it can't get imported, sometimes it doesn't install well
     pass
