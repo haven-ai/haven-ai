@@ -162,6 +162,9 @@ class ResultManager:
         self.hparam_columns = self.exp_params
         self.score_columns = self.score_keys
 
+        if verbose:
+            print("-" * 50 + "\n")
+
     def get_state_dict(self):
         pass
 

@@ -1334,7 +1334,18 @@ def create_jupyter_file(
     if overwrite or not os.path.exists(fname):
         nb = nbf.v4.new_notebook()
 
-        nb["cells"] = [main_markdown(), load_exps_md(), main_cell(savedir_base), sub_cell(), install_cell()]
+        nb["cells"] = [
+            main_markdown(),
+            load_exps_md(),
+            load_exps_cell(savedir_base),
+            load_results_md(),
+            load_results_cell(),
+            load_jobs_md(),
+            load_jobs_cell(),
+            load_plots_md(),
+            load_plots_cell(),
+            install_cell()
+        ]
 
         if os.path.dirname(fname) != "":
             os.makedirs(os.path.dirname(fname), exist_ok=True)
@@ -1362,39 +1373,8 @@ In this notebook, you will find various visualization scripts to analyze the res
     return nbf.v4.new_markdown_cell(script)
 
 
-def sub_cell():
-    script = """
-# get table 
-rm.get_score_df().head()
-
-# get latex 
-# print(rm.get_latex_table(legend=['dataset'], metrics=['train_loss'], decimals=1, caption="Results", label='tab:results'))
-
-# get custom plots
-fig = rm.get_plot_all(
-                # order='metrics_by_groups',
-                # avg_across='runs',
-                y_metric_list=y_metrics, 
-                x_metric=x_metric,
-                # legend_fontsize=18,
-                # x_fontsize=20,
-                # y_fontsize=20,
-                # xtick_fontsize=20,
-                # ytick_fontsize=20,
-                # title_fontsize=24,
-                # legend_list=['model], 
-                # title_list = ['dataset'], 
-                # title_format='Dataset:{}',
-                # log_metric_list = ['train_loss'], 
-                # groupby_list = ['dataset'],
-                # map_ylabel_list=[{'train_loss':'Train loss'}],
-                # map_xlabel_list=[{'epoch':'Epoch'}],
-                # figsize=(15,5),
-                # plot_confidence=False,
-                # savedir_plots='%s' % (name)
-)
-          """
-    return nbf.v4.new_code_cell(script)
+# Experiments Section
+# ==============================================================================
 
 
 def load_exps_md():
@@ -1415,64 +1395,195 @@ def load_exps_md():
     return nbf.v4.new_markdown_cell(script)
 
 
-def main_cell(savedir_base):
+def load_exps_cell(savedir_base):
     script = (
         """
 '''
 1. Load Experiments
 '''
+import pandas as pd
+import os 
+
 from haven import haven_utils as hu
 from haven import haven_results as hr
 
-# 1. Change Path to where the results are saved
-savedir_base = "%s"
+def load_experiments():
+    # 1. Change Path to where the results are saved
+    savedir_base = "%s"
 
-# 2. Define which experiments to load
-load_all = True
+    # 2. Define which experiments to load
+    load_all = True
 
-if load_all:
-    # Load all experiments in savedir_base
-    exp_list = None
-else:
-    # Load specific experiments from exp_configs.py
-    exp_configs_fname = "<path_to_exp_configs.py>" 
-    exp_group = "<which_exp_group>" 
-    exp_list = hu.get_exp_list_from_exp_configs(exp_configs_fname, exp_group)
+    if load_all:
+        # Load all experiments in savedir_base
+        exp_list = None
+    else:
+        # Load specific experiments from exp_configs.py
+        exp_configs_fname = "<path_to_exp_configs.py>" 
+        exp_group = "<which_exp_group>" 
+        exp_list = hu.get_exp_list_from_exp_configs(exp_configs_fname, exp_group)
 
-# 3. Load experiments
-rm = hr.ResultManager(exp_list=exp_list,
-                      savedir_base=savedir_base,
-                      filterby_list=None,
-                      verbose=1,
-                      job_scheduler='toolkit'
-                     )
+    # 3. Load experiments
+    rm = hr.ResultManager(exp_list=exp_list,
+                        savedir_base=savedir_base,
+                        filterby_list=None,
+                        verbose=1,
+                        job_scheduler='toolkit'
+                        )
+    return rm
+
+rm = load_experiments()
           """
         % savedir_base
     )
     return nbf.v4.new_code_cell(script)
 
 
+# 2. Table of Results Section
+# ==============================================================================
+
+
 def load_results_md():
     script = """### 2. Load Results Table
 ----------------------
 
-- The following cell will load selected experiments from a given directory called `savedir_base`.
-- It returns 'rm' which is the result manager object that will be used to visualize the results
+- The following cell will display the table of results.
+- It returns 'df' a dataframe with the results
 
 #### Instructions:
-- Select 'savedir_base' to the directory where your experiments are saved.
-- if you want to load all experiments in `savedir_base`, set `load_all=True`.
-- if you want to load specific experiments from `exp_configs.py`, set `load_all=False`.
-    - replace `<path_to_exp_configs.py>` with your `exp_configs.py` absolute path
-    - replace `<which_exp_group>` with the name of the experiment group you want to load
-- Note that experiments without score_list.pkl will not be plotted as they contain the metric scores.
+- Modify `hparam_columns` to display the hyperparameters you want.
+    -  Print `rm.hparam_columns` to find out which hyperparameters are available.
+- Modify `score_columns` to display the metrics you want.
+    - Print `rm.score_columns` to find out which metrics are available.
           """
     return nbf.v4.new_markdown_cell(script)
 
 
+def load_results_cell():
+    script = """'''
+2. Load Table of Results
+'''
+# Reload Experiments
+rm = load_experiments()
+
+# print hparam_columns score_columns
+print("Available Hyperparameters:\\n", rm.hparam_columns)
+print("Available Score Columns:\\n",rm.score_columns)
+
+# define hyperparameters and metrics to display
+hparam_columns = None # could be for instance ['n_layers']
+score_columns = None # could be for instance ['loss', 'acc']
+
+# get table
+df = rm.get_score_df(columns=hparam_columns, score_columns=score_columns, 
+                     show_max_min=False, show_exp_ids=True)
+
+display(df)
+          """
+    return nbf.v4.new_code_cell(script)
+
+
+# 3. Table of Jobs Section
+# ==============================================================================
+def load_jobs_md():
+    script = """### 3. Load Jobs Table
+----------------------
+
+- The following cell will display the table of job status and logs.
+- It returns 'df' a dataframe with the job status and logs
+
+#### Instructions:
+- Define `exp_id` to print its logs
+          """
+    return nbf.v4.new_markdown_cell(script)
+
+
+def load_jobs_cell():
+    script = """'''
+3. Load Table of Job Status and Logs
+'''
+# Reload Experiments
+rm = load_experiments()
+
+# Increase width of dataframes
+pd.set_option('display.max_colwidth', 1000)
+
+# Get the right columns
+columns = ['exp_id', 'job_state', 'job_id', 'logs']
+df = pd.DataFrame(rm.get_job_summary())
+df = df[[c for c in columns if c in df.columns]]
+
+# add savedir by combining savedir_base and exp_id
+df['savedir'] = df['exp_id'].apply(lambda x: os.path.join(rm.savedir_base, x))
+
+# for each unique job_state show the table
+for job_state in df['job_state'].unique():
+    print(f"Job State: {job_state}\\n============")
+    display(df[df['job_state'] == job_state].head())
+
+# print the count of each job_state
+print("Job State Counts\\n================")
+print(df['job_state'].value_counts())
+
+# print the logs of a specific exp_id
+exp_id = None
+if exp_id is not None:
+    print(f"Logs of exp_id {exp_id}\\n, df[df['exp_id'] == exp_id]['logs']")
+          """
+    return nbf.v4.new_code_cell(script)
+
+
+# 4. Plots Section
+# ==============================================================================
+def load_plots_md():
+    script = """### 4. Plots Results
+----------------------
+
+- The following cell will display plots of the results
+- It returns matplotlib figures
+
+#### Instructions:
+- Modify `legend_list` to display the hyperparameters you want.
+    -  Print `rm.hparam_columns` to find out which hyperparameters are available.
+- Modify `y_metric_list` and 'x_metric' to plot the metrics you want.
+    - Print `rm.score_columns` to find out which metrics are available.
+          """
+    return nbf.v4.new_markdown_cell(script)
+
+
+def load_plots_cell():
+    script = """'''
+4. Plot Results
+'''
+# Reload Experiments
+rm = load_experiments()
+
+# Define plot arguments
+mode = 'line'          # 'line' or 'bar' plots
+
+# print hparam_columns score_columns
+print("Available Hyperparameters:\\n", rm.hparam_columns)
+print("Available Score Columns:\\n",rm.score_columns)
+
+# Choose from the hparam columns for the legend
+legend_list=['model'] # put the hyperparameters you want to plot on the legend here
+
+# Choose from the score columns for (x,y)
+y_metric_list=['loss'] # put the metrics you want to plot on the y-axis here
+x_metric='epoch'       # put the metric you want to plot on the x-axis here
+
+fig = rm.get_plot_all(
+                y_metric_list=y_metric_list, 
+                x_metric=x_metric,
+                legend_list=legend_list,
+                mode=mode
+)
+          """
+    return nbf.v4.new_code_cell(script)
+
+
 def install_cell():
-    script = """
-    !pip install --upgrade git+https://github.com/haven-ai/haven-ai
+    script = """!pip install --upgrade git+https://github.com/haven-ai/haven-ai
           """
     return nbf.v4.new_code_cell(script)
 

@@ -103,10 +103,7 @@ def get_score_df(
 
         # hparam_columns = [k for k in result_dict.keys() if k not in ['creation_time']]
 
-        if not os.path.exists(score_list_fname):
-            continue
-
-        else:
+        if os.path.exists(score_list_fname):
             try:
                 score_list = hu.load_pkl(score_list_fname)
             except Exception:

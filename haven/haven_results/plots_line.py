@@ -193,8 +193,6 @@ def get_plot(
 
         # skipt if it does not exist
         if not os.path.exists(score_list_fname):
-            if verbose:
-                print("%s: %s does not exist..." % (exp_id, score_list_name))
             continue
 
         # get result
@@ -469,8 +467,6 @@ def get_result_dict(
             sub_score_list_fname = os.path.join(savedir_base, sub_id, score_list_name)
 
             if not os.path.exists(sub_score_list_fname):
-                if verbose:
-                    print("%s: %s does not exist..." % (sub_id, score_list_name))
                 continue
 
             visited_exp_ids.add(sub_id)

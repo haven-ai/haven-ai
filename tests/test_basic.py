@@ -467,7 +467,7 @@ def test_wizard():
         results_fname=f"{savedir_base}/results.ipynb",
     )
 
-    print("results_fname:", f"{savedir_base}/results.ipynb")
+    print("results_fname:", f"{savedir_base}/results.ipynb\n")
 
     # test for result manager
     hr.ResultManager(savedir_base=savedir_base)
