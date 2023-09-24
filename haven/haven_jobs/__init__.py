@@ -27,7 +27,8 @@ class JobManager:
         account_id=None,
         job_scheduler=None,
         save_logs=True,
-        job_copy_ignore_patterns=None
+        job_copy_ignore_patterns=None,
+        job_ignore_status=None,
     ):
         """[summary]
 
@@ -57,6 +58,7 @@ class JobManager:
         self.account_id = account_id
         self.save_logs = save_logs
         self.job_copy_ignore_patterns = job_copy_ignore_patterns
+        self.job_ignore_status = job_ignore_status
 
         # define funcs
         if job_scheduler == "toolkit":
@@ -155,6 +157,12 @@ class JobManager:
         exp_list = exp_list or self.exp_list
         summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
         summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
+        
+        # filter from exp_list with job_ignore_status
+        if self.job_ignore_status is not None:
+            exp_list = [s_dict["exp_dict"] for s_dict in summary_list if s_dict["job_state"] not in self.job_ignore_status]
+            summary_list = self.get_summary_list(get_logs=False, exp_list=exp_list)
+            summary_dict = hu.group_list(summary_list, key="job_state", return_count=True)
 
         print("\nTotal Experiments:", len(exp_list))
         print("Experiment Status:", summary_dict)
@@ -372,8 +380,7 @@ class JobManager:
 
         # Copy the experiment code into the experiment folder
         print(f"Copying code for experiment {exp_id}")
-        hu.copy_code(self.workdir + "/", workdir_job, verbose=0, 
-                     ignore_patterns=self.job_copy_ignore_patterns)
+        hu.copy_code(self.workdir + "/", workdir_job, verbose=0, ignore_patterns=self.job_copy_ignore_patterns)
 
         # Run  command
         if self.save_logs:
@@ -405,7 +412,8 @@ class JobManager:
         savedir_base=None,
     ):
         savedir_base = savedir_base or self.savedir_base
-        exp_list = exp_list or self.exp_list
+        if exp_list is None:
+            exp_list = self.exp_list
 
         # get job key
         job_id_list = []
@@ -512,7 +520,6 @@ class JobManager:
         # Check if duplicates already exist in job
         command_dict = {}
         for job in jobList:
-
             if hasattr(job, "command"):
                 if job.command is None:
                     continue

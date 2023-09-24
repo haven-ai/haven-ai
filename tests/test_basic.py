@@ -20,6 +20,8 @@ from haven import haven_results as hr
 from haven import haven_chk as hc
 from haven import haven_jobs as hjb
 
+DST_PATH = ".tmp/tests"
+
 
 def test_cartesian_product():
     # test whether the cartesian product covers all needed variations
@@ -494,7 +496,6 @@ def test_wizard():
 
 def test_code_save():
     src_path = "tests"
-    dst_path = ".tmp/tests"
 
     def test_ignore(path):
         # assert the files in .havenignore are not copied
@@ -516,51 +517,51 @@ def test_code_save():
         f.write("\n".join(file_list_to_ignore))
 
     # copy the code
-    hu.copy_code(src_path=src_path, dst_path=dst_path, use_rsync=False)
+    hu.copy_code(src_path=src_path, dst_path=DST_PATH, use_rsync=False)
 
     # delete .havenignore
     os.remove(havenignore_fname)
 
     # test ignore
-    test_ignore(path=dst_path)
+    test_ignore(path=DST_PATH)
 
     # delete dst
-    shutil.rmtree(dst_path)
+    shutil.rmtree(DST_PATH)
 
     # 2. Direct ignore way
     # -------------------
-    hu.copy_code(src_path=src_path, dst_path=dst_path, use_rsync=False, ignore_patterns=file_list_to_ignore)
-    test_ignore(path=dst_path)
+    hu.copy_code(src_path=src_path, dst_path=DST_PATH, use_rsync=False, ignore_patterns=file_list_to_ignore)
+    test_ignore(path=DST_PATH)
 
     # delete dst
-    shutil.rmtree(dst_path)
+    shutil.rmtree(DST_PATH)
 
     # 3. Job Way
     # -------------------
     exp_dict = {"example": 1}
     jm = hjb.JobManager(
         exp_list=[exp_dict],
-        savedir_base=dst_path,
+        savedir_base=DST_PATH,
         workdir=os.path.dirname(os.path.realpath(__file__)),
         job_config=job_configs.JOB_CONFIG,
         job_scheduler="toolkit",
         job_copy_ignore_patterns=file_list_to_ignore,
     )
     command = "echo 2"
-    job_dict = jm.launch_exp_dict(exp_dict=exp_dict, savedir=dst_path, command=command, job=None)
-    test_ignore(path=os.path.join(dst_path, "code"))
+    job_dict = jm.launch_exp_dict(exp_dict=exp_dict, savedir=DST_PATH, command=command, job=None)
+    test_ignore(path=os.path.join(DST_PATH, "code"))
 
     # 4. wizard way
     # -------------------
 
     # delete dst
-    shutil.rmtree(dst_path)
+    shutil.rmtree(DST_PATH)
 
     exp_dict = {"lr": 1e-3}
     hw.run_wizard(
         func=test_trainval,
         exp_list=[exp_dict],
-        savedir_base=dst_path,
+        savedir_base=DST_PATH,
         reset=0,
         workdir=os.path.dirname(os.path.realpath(__file__)),
         job_config=job_configs.JOB_CONFIG,
@@ -568,7 +569,45 @@ def test_code_save():
         job_option="run",
         job_copy_ignore_patterns=file_list_to_ignore,
     )
-    test_ignore(path=os.path.join(dst_path, hu.hash_dict(exp_dict), "code"))
+    test_ignore(path=os.path.join(DST_PATH, hu.hash_dict(exp_dict), "code"))
+    shutil.rmtree(DST_PATH)
+
+
+def test_ignore_status():
+    if os.path.exists(DST_PATH):
+        shutil.rmtree(DST_PATH)
+    exp_dict = {"example": 1}
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[exp_dict],
+        savedir_base=DST_PATH,
+        reset=0,
+        workdir=os.path.dirname(os.path.realpath(__file__)),
+        job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
+        job_option="run",
+        job_ignore_status=["NEVER LAUNCHED", "ABC", "SUCCEEDED"],
+    )
+    # get from stdout
+    assert os.path.exists(os.path.join(DST_PATH, hu.hash_dict(exp_dict), "code")) == False
+
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[exp_dict],
+        savedir_base=DST_PATH,
+        reset=0,
+        workdir=os.path.dirname(os.path.realpath(__file__)),
+        job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
+        job_option="run",
+        job_ignore_status=["abc"],
+    )
+    # get from stdout
+    assert os.path.exists(os.path.join(DST_PATH, hu.hash_dict(exp_dict), "code")) == True
+
+    shutil.rmtree(DST_PATH)
+
+    print()
 
 
 def test_trainval(exp_dict, savedir, args):
@@ -585,6 +624,7 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
+        test_ignore_status()
         test_code_save()
         test_wizard()
         test_get_result_manager()

@@ -163,7 +163,8 @@ def run_wizard(
             job_config=job_config,
             job_scheduler=job_scheduler,
             save_logs=save_logs,
-            job_copy_ignore_patterns=job_copy_ignore_patterns
+            job_copy_ignore_patterns=job_copy_ignore_patterns,
+            job_ignore_status=job_ignore_status,
         )
 
         if python_file_path is None:
