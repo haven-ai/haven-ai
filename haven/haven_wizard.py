@@ -58,7 +58,19 @@ def run_wizard(
     filter_duplicates=False,
     results_fname=None,
     job_option=None,
+    job_copy_ignore_patterns=None,
+    job_ignore_status=None,
 ):
+    """
+    Runs a set of experiments either locally or on a cluster.
+
+    It does the following:
+        - creates a unique id for each experiment
+        - creates a folder for each experiment
+        - copies the code for each experiment
+        - saves the hyperparameters for each experiment
+        - runs the experiment
+    """
     if args is None:
         args = get_args()
         custom_args = {}
@@ -151,6 +163,7 @@ def run_wizard(
             job_config=job_config,
             job_scheduler=job_scheduler,
             save_logs=save_logs,
+            job_copy_ignore_patterns=job_copy_ignore_patterns
         )
 
         if python_file_path is None:

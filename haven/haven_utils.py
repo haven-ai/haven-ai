@@ -228,7 +228,7 @@ def subprocess_call(cmd_string):
     return subprocess.check_output(shlex.split(cmd_string), shell=False, stderr=subprocess.STDOUT).decode("utf-8")
 
 
-def copy_code(src_path, dst_path, verbose=1):
+def copy_code(src_path, dst_path, verbose=1, use_rsync=True, ignore_patterns=None):
     """Copy the code.
 
     Typically, when you run an experiment, first you copy the code used to the
@@ -249,10 +249,8 @@ def copy_code(src_path, dst_path, verbose=1):
     ValueError
         [description]
     """
-    time.sleep(0.5)  # TODO: Why? Why?
-
     if verbose:
-        print("  > Copying code from %s to %s" % (src_path, dst_path))
+        print("\nCopying Code\n  - src: %s\n  - dst: %s\n" % (src_path, dst_path))
 
     # Create destination folder
     os.makedirs(dst_path, exist_ok=True)
@@ -260,7 +258,7 @@ def copy_code(src_path, dst_path, verbose=1):
     # Check if rsync is available
     rsync_avialable = len(subprocess.run(["which", "rsync"], capture_output=True, text=True).stdout) > 0
 
-    if rsync_avialable:
+    if rsync_avialable and use_rsync:
         # Define the command for copying the code using rsync
         if os.path.exists(os.path.join(src_path, ".havenignore")):
             copy_code_cmd = (
@@ -285,8 +283,25 @@ def copy_code(src_path, dst_path, verbose=1):
         if os.path.exists(dst_path):
             shutil.rmtree(dst_path)
 
+        # load from havenignore
+        ignore = None
+        if ignore_patterns is None:
+            if os.path.exists(os.path.join(src_path, ".havenignore")):
+                # read from .havenignore like from .gitignore
+                ignore_patterns = []
+                with open(os.path.join(src_path, ".havenignore"), "r") as f:
+                    for line in f.readlines():
+                        line = line.strip()
+                        if line.startswith("#") or line == "":
+                            continue
+                        ignore_patterns += [line]
+                #
+                ignore = shutil.ignore_patterns(*ignore_patterns)
+        else:
+            ignore = shutil.ignore_patterns(*ignore_patterns)
+
         # copy the code folder
-        shutil.copytree(src_path, dst_path)
+        shutil.copytree(src_path, dst_path, ignore=ignore)
 
 
 def zipdir(src_dirname, out_fname, include_list=None):
@@ -1344,7 +1359,7 @@ def create_jupyter_file(
             load_jobs_cell(),
             load_plots_md(),
             load_plots_cell(),
-            install_cell()
+            install_cell(),
         ]
 
         if os.path.dirname(fname) != "":
@@ -1591,8 +1606,6 @@ def install_cell():
 def save_ipynb(fname, script_list):
     # turn fname to string in case it is a Path object
     fname = str(fname)
-
-    import nbformat as nbf
 
     nb = nbf.v4.new_notebook()
     nb["cells"] = [nbf.v4.new_code_cell(code) for code in script_list]

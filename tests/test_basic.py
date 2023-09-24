@@ -8,6 +8,11 @@ import os
 import torch
 import shutil
 
+try:
+    import job_configs
+except:
+    print("Warning: job_configs not found. Some tests will be skipped")
+
 from haven import haven_wizard as hw
 from haven import haven_img as hi
 from haven import haven_utils as hu
@@ -487,6 +492,85 @@ def test_wizard():
     shutil.rmtree(savedir_base)
 
 
+def test_code_save():
+    src_path = "tests"
+    dst_path = ".tmp/tests"
+
+    def test_ignore(path):
+        # assert the files in .havenignore are not copied
+        assert not os.path.exists(os.path.join(path, "test_haven.ipynb"))
+        assert not os.path.exists(os.path.join(path, "test_basic.py"))
+
+        # assert the rest of the files are copied
+        assert os.path.exists(os.path.join(path, "test_optim.py"))
+        assert os.path.exists(os.path.join(path, "test_other.py"))
+
+    file_list_to_ignore = ["test_haven.ipynb", "test_basic.py"]
+
+    # 1. Haven ignore way
+    # -------------------
+    havenignore_fname = os.path.join(src_path, ".havenignore")
+
+    # create a .havenignore
+    with open(havenignore_fname, "w") as f:
+        f.write("\n".join(file_list_to_ignore))
+
+    # copy the code
+    hu.copy_code(src_path=src_path, dst_path=dst_path, use_rsync=False)
+
+    # delete .havenignore
+    os.remove(havenignore_fname)
+
+    # test ignore
+    test_ignore(path=dst_path)
+
+    # delete dst
+    shutil.rmtree(dst_path)
+
+    # 2. Direct ignore way
+    # -------------------
+    hu.copy_code(src_path=src_path, dst_path=dst_path, use_rsync=False, ignore_patterns=file_list_to_ignore)
+    test_ignore(path=dst_path)
+
+    # delete dst
+    shutil.rmtree(dst_path)
+
+    # 3. Job Way
+    # -------------------
+    exp_dict = {"example": 1}
+    jm = hjb.JobManager(
+        exp_list=[exp_dict],
+        savedir_base=dst_path,
+        workdir=os.path.dirname(os.path.realpath(__file__)),
+        job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
+        job_copy_ignore_patterns=file_list_to_ignore,
+    )
+    command = "echo 2"
+    job_dict = jm.launch_exp_dict(exp_dict=exp_dict, savedir=dst_path, command=command, job=None)
+    test_ignore(path=os.path.join(dst_path, "code"))
+
+    # 4. wizard way
+    # -------------------
+
+    # delete dst
+    shutil.rmtree(dst_path)
+
+    exp_dict = {"lr": 1e-3}
+    hw.run_wizard(
+        func=test_trainval,
+        exp_list=[exp_dict],
+        savedir_base=dst_path,
+        reset=0,
+        workdir=os.path.dirname(os.path.realpath(__file__)),
+        job_config=job_configs.JOB_CONFIG,
+        job_scheduler="toolkit",
+        job_option="run",
+        job_copy_ignore_patterns=file_list_to_ignore,
+    )
+    test_ignore(path=os.path.join(dst_path, hu.hash_dict(exp_dict), "code"))
+
+
 def test_trainval(exp_dict, savedir, args):
     assert isinstance(exp_dict, dict)
     assert isinstance(savedir, str)
@@ -501,6 +585,7 @@ if __name__ == "__main__":
 
     if "basic" in args.mode:
         # baasic tests
+        test_code_save()
         test_wizard()
         test_get_result_manager()
         test_hash()

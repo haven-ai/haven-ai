@@ -27,6 +27,7 @@ class JobManager:
         account_id=None,
         job_scheduler=None,
         save_logs=True,
+        job_copy_ignore_patterns=None
     ):
         """[summary]
 
@@ -55,6 +56,7 @@ class JobManager:
         self.savedir_base = savedir_base
         self.account_id = account_id
         self.save_logs = save_logs
+        self.job_copy_ignore_patterns = job_copy_ignore_patterns
 
         # define funcs
         if job_scheduler == "toolkit":
@@ -370,7 +372,8 @@ class JobManager:
 
         # Copy the experiment code into the experiment folder
         print(f"Copying code for experiment {exp_id}")
-        hu.copy_code(self.workdir + "/", workdir_job, verbose=0)
+        hu.copy_code(self.workdir + "/", workdir_job, verbose=0, 
+                     ignore_patterns=self.job_copy_ignore_patterns)
 
         # Run  command
         if self.save_logs:
